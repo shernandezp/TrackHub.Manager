@@ -1,6 +1,4 @@
-﻿using Common.Domain.Constants;
-
-namespace TrackHub.Manager.Application.Categories.Commands.UpdateCategory;
+﻿namespace TrackHub.Manager.Application.Categories.Commands.UpdateCategory;
 
 public class UpdateCategoryCommandValidator : AbstractValidator<UpdateCategoryCommand>
 {

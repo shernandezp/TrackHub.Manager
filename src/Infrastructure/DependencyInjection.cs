@@ -1,10 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using TrackHub.Manager.Infrastructure;
-using TrackHub.Manager.Infrastructure.Interfaces;
-using TrackHub.Manager.Infrastructure.Readers;
-using TrackHub.Manager.Infrastructure.Writers;
-using TrackHub.Manager.Domain.Interfaces;
 using Common.Application.Interfaces;
 using TrackHub.Manager.Infrastructure.Identity;
 using GraphQL.Client.Abstractions;
@@ -61,6 +57,8 @@ public static class DependencyInjection
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
         services.AddScoped<ICategoryWriter, CategoryWriter>();
         services.AddScoped<ICategoryReader, CategoryReader>();
+        services.AddScoped<IUserWriter, UserWriter>();
+        services.AddScoped<IUserReader, UserReader>();
 
         return services;
     }

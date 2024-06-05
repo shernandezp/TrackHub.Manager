@@ -1,7 +1,8 @@
 using System.Reflection;
 using Common.Application;
 using TrackHub.Manager.Infrastructure;
-using TrackHub.Manager.Web.GraphQL;
+using TrackHub.Manager.Web.GraphQL.Mutation;
+using TrackHub.Manager.Web.GraphQL.Query;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,8 @@ builder.Services.AddHealthChecks()
 builder.Services
     .AddGraphQLServer()
     .AddAuthorization()
-    .AddQueryType<Categories>();
+    .AddQueryType<Query>()
+    .AddMutationType<Mutation>();
 
 var app = builder.Build();
 

@@ -4,7 +4,7 @@ using GraphQL;
 using GraphQL.Client.Abstractions;
 
 namespace TrackHub.Manager.Infrastructure.Identity;
-public class IdentityService(IGraphQLClient graphQLClient) : GraphQLService(graphQLClient), IIdentityService
+public sealed class IdentityService(IGraphQLClient graphQLClient) : GraphQLService(graphQLClient), IIdentityService
 {
 
     public Task<string> GetUserNameAsync(Guid userId, CancellationToken token)
