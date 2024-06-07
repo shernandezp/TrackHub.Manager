@@ -1,7 +1,7 @@
 ﻿namespace TrackHub.Manager.Application.Users.Commands.Update;
 
 [Authorize(Resource = Resources.AccountScreen, Action = Actions.Edit)]
-public readonly record struct UpdateUserCommand(UserDto User) : IRequest;
+public readonly record struct UpdateUserCommand(UpdateUserDto User) : IRequest;
 
 public class UpdateUserCommandHandler(IUserWriter writer) : IRequestHandler<UpdateUserCommand>
 {

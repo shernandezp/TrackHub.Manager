@@ -5,5 +5,5 @@ public interface IUserWriter
 {
     Task<UserVm> CreateUserAsync(UserDto userDto, CancellationToken cancellationToken);
     Task DeleteUserAsync(Guid userId, CancellationToken cancellationToken);
-    Task UpdateUserAsync(UserDto userDto, CancellationToken cancellationToken);
+    Task UpdateUserAsync(UpdateUserDto userDto, CancellationToken cancellationToken);
 }

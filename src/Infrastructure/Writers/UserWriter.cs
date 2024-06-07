@@ -19,7 +19,7 @@ public sealed class UserWriter(IApplicationDbContext context) : IUserWriter
             user.AccountId);
     }
 
-    public async Task UpdateUserAsync(UserDto userDto, CancellationToken cancellationToken)
+    public async Task UpdateUserAsync(UpdateUserDto userDto, CancellationToken cancellationToken)
     {
         var user = await context.Users.FindAsync([userDto.UserId], cancellationToken)
             ?? throw new NotFoundException(nameof(User), $"{userDto.UserId}");
