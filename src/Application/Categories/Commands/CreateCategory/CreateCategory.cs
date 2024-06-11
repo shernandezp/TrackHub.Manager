@@ -1,13 +1,8 @@
-﻿using Common.Application.Attributes;
-using Common.Domain.Constants;
-using TrackHub.Manager.Application.Categories.Events;
-using TrackHub.Manager.Domain.Interfaces;
-using TrackHub.Manager.Domain.Models;
-using TrackHub.Manager.Domain.Records;
+﻿using TrackHub.Manager.Application.Categories.Events;
 
 namespace TrackHub.Manager.Application.Categories.Commands.CreateCategory;
 
-[Authorize(Resource = Resources.SettingsScreen, Action = Actions.View)]
+[Authorize(Resource = Resources.SettingsScreen, Action = Actions.Read)]
 public record CreateCategoryCommand : IRequest<CategoryVm>
 {
     public required CategoryDto Category { get; set; }

@@ -5,7 +5,7 @@ public class Account(string name, string? description, short type, bool active) 
 {
     public Guid AccountId { get; private set; } = Guid.NewGuid();
 
-    public required string Name { get; set; } = name;
+    public string Name { get; set; } = name;
 
     public string? Description { get; set; } = description;
 

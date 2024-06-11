@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using TrackHub.Manager.Infrastructure.Interfaces;
 
 namespace TrackHub.Manager.Infrastructure;
 

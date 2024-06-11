@@ -1,11 +1,6 @@
-﻿using Common.Application.Attributes;
-using Common.Domain.Constants;
-using TrackHub.Manager.Domain.Interfaces;
-using TrackHub.Manager.Domain.Models;
+﻿namespace TrackHub.Manager.Application.Categories.Queries.GetCategory;
 
-namespace TrackHub.Manager.Application.Categories.Queries.GetCategory;
-
-[Authorize(Resource = Resources.MapScreen, Action = Actions.View)]
+[Authorize(Resource = Resources.MapScreen, Action = Actions.Read)]
 public readonly record struct GetCategoryQuery(Guid Id) : IRequest<CategoryVm>;
 
 public class GetCategoryQueryHandler(ICategoryReader reader) : IRequestHandler<GetCategoryQuery, CategoryVm>
