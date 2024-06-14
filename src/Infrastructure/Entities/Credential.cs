@@ -1,7 +1,7 @@
 ﻿using Common.Infrastructure;
 
 namespace TrackHub.Manager.Infrastructure.Entities;
-public sealed class Credential(string uri, string username, string password, string key, string key2, string salt, string? token, DateTime? tokenExpiration, string? refreshToken, Guid operatorId) : BaseAuditableEntity
+public sealed class Credential(string uri, string username, string password, string key, string key2, string salt, Guid operatorId) : BaseAuditableEntity
 {
     private Operator? _operator;
 
@@ -12,9 +12,10 @@ public sealed class Credential(string uri, string username, string password, str
     public string Key { get; set; } = key;
     public string Key2 { get; set; } = key2;
     public string Salt { get; set; } = salt;
-    public string? Token { get; set; } = token;
-    public DateTime? TokenExpiration { get; set; } = tokenExpiration;
-    public string? RefreshToken { get; set; } = refreshToken;
+    public string? Token { get; set; }
+    public DateTime? TokenExpiration { get; set; }
+    public string? RefreshToken { get; set; }
+    public DateTime? RefreshTokenExpiration { get; set; }
     public Guid OperatorId { get; set; } = operatorId;
 
     public Operator Operator

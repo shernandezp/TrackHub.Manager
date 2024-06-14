@@ -1,7 +1,7 @@
 ﻿using Common.Domain.Enums;
 
 namespace TrackHub.Manager.Infrastructure.Readers;
-public sealed class AccountReader(IApplicationDbContext context)
+public sealed class AccountReader(IApplicationDbContext context) : IAccountReader
 {
     public async Task<AccountVm> GetAccountAsync(Guid id, CancellationToken cancellationToken)
         => await context.Accounts

@@ -19,10 +19,7 @@ public sealed class AccountWriter(IApplicationDbContext context) : IAccountWrite
             account.Name,
             account.Description,
             (AccountType)account.Type,
-            account.Active,
-            [],
-            [],
-            []);
+            account.Active);
     }
 
     public async Task UpdateAccountAsync(UpdateAccountDto accountDto, CancellationToken cancellationToken)

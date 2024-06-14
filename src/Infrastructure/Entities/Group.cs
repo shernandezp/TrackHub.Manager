@@ -1,11 +1,11 @@
 ﻿using Common.Infrastructure;
 
 namespace TrackHub.Manager.Infrastructure.Entities;
-public sealed class Group(long groupId, string name, string description, bool isMaster, bool active, Guid accountId) : BaseAuditableEntity
+public sealed class Group(string name, string description, bool isMaster, bool active, Guid accountId) : BaseAuditableEntity
 {
     private Account? _account;
 
-    public long GroupId { get; set; } = groupId;
+    public long GroupId { get; set; }
     public string Name { get; set; } = name;
     public string Description { get; set; } = description;
     public bool IsMaster { get; set; } = isMaster;
