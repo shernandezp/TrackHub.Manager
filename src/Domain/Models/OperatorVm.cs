@@ -7,5 +7,5 @@ public readonly record struct OperatorVm(
     string? EmailAddress,
     string? Address,
     string? ContactName,
-    int ProtocolType
+    ProtocolType ProtocolType
     );

@@ -1,4 +1,4 @@
-﻿namespace TrackHub.Manager.Application.Users.Queries.GetUser;
+﻿namespace TrackHub.Manager.Application.Users.Queries.Get;
 
 public class GetUserValidator : AbstractValidator<GetUserQuery>
 {

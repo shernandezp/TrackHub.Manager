@@ -1,4 +1,4 @@
-﻿using TrackHub.Manager.Application.Users.Queries.GetUser;
+﻿using TrackHub.Manager.Application.Users.Queries.Get;
 
 namespace TrackHub.Manager.Web.GraphQL.Query;
 

@@ -1,6 +1,6 @@
 ﻿namespace TrackHub.Manager.Application.Users.Commands.Delete;
 
-[Authorize(Resource = Resources.AccountScreen, Action = Actions.Edit)]
+[Authorize(Resource = Resources.Users, Action = Actions.Delete)]
 public record DeleteUserCommand(Guid Id) : IRequest;
 
 public class DeleteUserCommandHandler(IUserWriter writer) : IRequestHandler<DeleteUserCommand>

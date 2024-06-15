@@ -29,11 +29,17 @@ public static class DependencyInjection
         services.AddScoped<ICredentialWriter, CredentialWriter>();
         services.AddScoped<ICredentialReader, CredentialReader>();
         services.AddScoped<IDeviceWriter, DeviceWriter>();
+        services.AddScoped<IDeviceGroupWriter, DeviceGroupWriter>();
         services.AddScoped<IDeviceReader, DeviceReader>();
         services.AddScoped<IGroupWriter, GroupWriter>();
         services.AddScoped<IGroupReader, GroupReader>();
+        services.AddScoped<IOperatorWriter, OperatorWriter>();
+        services.AddScoped<IOperatorReader, OperatorReader>();
+        services.AddScoped<ITransporterWriter, TransporterWriter>();
+        services.AddScoped<ITransporterReader, TransporterReader>();
         services.AddScoped<IUserWriter, UserWriter>();
         services.AddScoped<IUserReader, UserReader>();
+        services.AddScoped<IUserGroupWriter, UserGroupWriter>();
 
         return services;
     }

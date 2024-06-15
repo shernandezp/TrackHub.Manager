@@ -3,15 +3,15 @@
 namespace TrackHub.Manager.Infrastructure.Writers;
 public sealed class CredentialWriter(IApplicationDbContext context) : ICredentialWriter
 {
-    public async Task<CredentialVm> CreateCredentialAsync(CredentialDto credentialDto, string salt, CancellationToken cancellationToken)
+    public async Task<CredentialVm> CreateCredentialAsync(CredentialDto credentialDto, byte[] key, CancellationToken cancellationToken)
     {
         var credential = new Credential(
             credentialDto.Uri,
-            credentialDto.Username,
-            credentialDto.Password,
-            credentialDto.Key,
-            credentialDto.Key2,
-            salt,
+            credentialDto.Username.EncryptStringToBase64_Aes(key),
+            credentialDto.Password.EncryptStringToBase64_Aes(key),
+            credentialDto.Key.EncryptStringToBase64_Aes(key),
+            credentialDto.Key2.EncryptStringToBase64_Aes(key),
+            Convert.ToBase64String(key),
             credentialDto.OperatorId);
 
         await context.Credentials.AddAsync(credential, cancellationToken);
