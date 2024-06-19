@@ -3,7 +3,6 @@
 public interface IApplicationDbContext
 {
     DbSet<Account> Accounts { get; set; }
-    DbSet<Category> Categories { get; set; }
     DbSet<Credential> Credentials { get; set; }
     DbSet<Device> Devices { get; set; }
     DbSet<DeviceGroup> DeviceGroups { get; set; }

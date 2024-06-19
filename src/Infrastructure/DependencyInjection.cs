@@ -24,8 +24,6 @@ public static class DependencyInjection
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
         services.AddScoped<IAccountWriter, AccountWriter>();
         services.AddScoped<IAccountReader, AccountReader>();
-        services.AddScoped<ICategoryWriter, CategoryWriter>();
-        services.AddScoped<ICategoryReader, CategoryReader>();
         services.AddScoped<ICredentialWriter, CredentialWriter>();
         services.AddScoped<ICredentialReader, CredentialReader>();
         services.AddScoped<IDeviceWriter, DeviceWriter>();

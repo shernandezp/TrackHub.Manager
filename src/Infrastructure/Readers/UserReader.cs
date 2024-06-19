@@ -10,4 +10,15 @@ public sealed class UserReader(IApplicationDbContext context) : IUserReader
                 u.Active,
                 u.AccountId))
             .FirstAsync(cancellationToken);
+
+    public async Task<IReadOnlyCollection<UserVm>> GetUsersByAccountAsync(Guid accountId, CancellationToken cancellationToken)
+        => await context.Users
+            .Where(u => u.AccountId == accountId)
+            .Select(u => new UserVm(
+                u.UserId,
+                u.Username,
+                u.Active,
+                u.AccountId))
+            .Distinct()
+            .ToListAsync(cancellationToken);
 }

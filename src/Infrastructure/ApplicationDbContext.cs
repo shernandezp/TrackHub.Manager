@@ -10,7 +10,6 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     }
 
     public DbSet<Account> Accounts { get; set; }
-    public DbSet<Category> Categories { get; set; }
     public DbSet<Credential> Credentials { get; set; }
     public DbSet<Device> Devices { get; set; }
     public DbSet<DeviceGroup> DeviceGroups { get; set; }
