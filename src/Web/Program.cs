@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplicationServices();
 builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
-builder.Services.AddWebServices("Router API");
+builder.Services.AddWebServices("Manager API");
 
 // Add HealthChecks
 builder.Services.AddHealthChecks()
