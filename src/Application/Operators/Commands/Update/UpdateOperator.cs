@@ -1,6 +1,6 @@
 ﻿namespace TrackHub.Manager.Application.Operators.Commands.Update;
 
-[Authorize(Resource = Resources.Accounts, Action = Actions.Edit)]
+[Authorize(Resource = Resources.Operators, Action = Actions.Edit)]
 public readonly record struct UpdateOperatorCommand(UpdateOperatorDto Operator) : IRequest;
 
 public class UpdateOperatorCommandHandler(IOperatorWriter writer) : IRequestHandler<UpdateOperatorCommand>

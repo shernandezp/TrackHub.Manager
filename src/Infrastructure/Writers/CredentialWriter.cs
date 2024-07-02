@@ -23,8 +23,7 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
             credential.Username,
             credential.Password,
             credential.Key,
-            credential.Key2,
-            credential.OperatorId);
+            credential.Key2);
     }
 
     public async Task UpdateCredentialAsync(UpdateCredentialDto credentialDto, byte[] key, CancellationToken cancellationToken)
@@ -46,7 +45,7 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task UpdateCredentialTokenAsync(UpdateCredentialTokenDto credentialDto, byte[] key, CancellationToken cancellationToken)
+    public async Task UpdateTokenAsync(UpdateTokenDto credentialDto, byte[] key, CancellationToken cancellationToken)
     {
         var credential = await context.Credentials.FindAsync([credentialDto.CredentialId], cancellationToken)
             ?? throw new NotFoundException(nameof(Credential), $"{credentialDto.CredentialId}");

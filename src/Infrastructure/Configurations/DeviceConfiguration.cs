@@ -12,12 +12,17 @@ public sealed class DeviceConfiguration : IEntityTypeConfiguration<Device>
         //Column names
         builder.Property(x => x.DeviceId).HasColumnName("id");
         builder.Property(x => x.Identifier).HasColumnName("identifier");
+        builder.Property(x => x.Serial).HasColumnName("serial");
         builder.Property(x => x.Name).HasColumnName("name");
         builder.Property(x => x.Description).HasColumnName("description");
         builder.Property(x => x.DeviceTypeId).HasColumnName("devicetypeid");
 
         builder.Property(t => t.Name)
             .HasMaxLength(ColumnMetadata.DefaultNameLength)
+            .IsRequired();
+
+        builder.Property(t => t.Serial)
+            .HasMaxLength(ColumnMetadata.DefaultFieldLength)
             .IsRequired();
 
         builder.Property(t => t.Identifier)

@@ -1,6 +1,6 @@
 ﻿namespace TrackHub.Manager.Application.Operators.Commands.Create;
 
-[Authorize(Resource = Resources.Accounts, Action = Actions.Write)]
+[Authorize(Resource = Resources.Operators, Action = Actions.Write)]
 public readonly record struct CreateOperatorCommand(OperatorDto Operator) : IRequest<OperatorVm>;
 
 public class CreateOperatorCommandHandler(IOperatorWriter writer) : IRequestHandler<CreateOperatorCommand, OperatorVm>

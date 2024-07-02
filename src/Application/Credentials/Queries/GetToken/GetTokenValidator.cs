@@ -1,8 +1,8 @@
 ﻿namespace TrackHub.Manager.Application.CredentialToken.Queries.GetToken;
 
-public class GetCredentialTokenValidator : AbstractValidator<GetCredentialTokenQuery>
+public class GetTokenValidator : AbstractValidator<GetTokenQuery>
 {
-    public GetCredentialTokenValidator()
+    public GetTokenValidator()
     {
         RuleFor(x => x.Id)
             .NotEmpty();

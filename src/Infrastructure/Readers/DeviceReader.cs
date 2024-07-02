@@ -9,6 +9,7 @@ public sealed class DeviceReader(IApplicationDbContext context) : IDeviceReader
             .Select(d => new DeviceVm(
                 d.DeviceId,
                 d.Identifier,
+                d.Serial,
                 d.Name,
                 (DeviceType)d.DeviceTypeId,
                 d.Description))
@@ -21,6 +22,7 @@ public sealed class DeviceReader(IApplicationDbContext context) : IDeviceReader
             .Select(d => new DeviceVm(
                 d.DeviceId,
                 d.Identifier,
+                d.Serial,
                 d.Name,
                 (DeviceType)d.DeviceTypeId,
                 d.Description))
@@ -35,6 +37,7 @@ public sealed class DeviceReader(IApplicationDbContext context) : IDeviceReader
             .Distinct()
             .Select(d => new DeviceVm(d.DeviceId,
                 d.Identifier,
+                d.Serial,
                 d.Name,
                 (DeviceType)d.DeviceTypeId,
                 d.Description))
@@ -48,6 +51,7 @@ public sealed class DeviceReader(IApplicationDbContext context) : IDeviceReader
             .Distinct()
             .Select(d => new DeviceVm(d.DeviceId,
                 d.Identifier,
+                d.Serial,
                 d.Name,
                 (DeviceType)d.DeviceTypeId,
                 d.Description))

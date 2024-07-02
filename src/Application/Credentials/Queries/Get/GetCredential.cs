@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace TrackHub.Manager.Application.Credentials.Queries.Get;
 
-[Authorize(Resource = Resources.Accounts, Action = Actions.Read)]
+[Authorize(Resource = Resources.Credentials, Action = Actions.Read)]
 public readonly record struct GetCredentialQuery(Guid Id) : IRequest<CredentialVm>;
 
 public class GetCredentialsQueryHandler(ICredentialReader reader, IConfiguration configuration) : IRequestHandler<GetCredentialQuery, CredentialVm>

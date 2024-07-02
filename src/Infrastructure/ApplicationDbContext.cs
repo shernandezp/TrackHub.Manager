@@ -13,6 +13,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Credential> Credentials { get; set; }
     public DbSet<Device> Devices { get; set; }
     public DbSet<DeviceGroup> DeviceGroups { get; set; }
+    public DbSet<DeviceOperator> DeviceOperators { get; set; }
     public DbSet<Group> Groups { get; set; }
     public DbSet<Operator> Operators { get; set; }
     public DbSet<Transporter> Transporters { get; set; }

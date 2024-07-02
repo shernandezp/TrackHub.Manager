@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace TrackHub.Manager.Application.Credentials.Command.Create;
 
-[Authorize(Resource = Resources.Accounts, Action = Actions.Write)]
+[Authorize(Resource = Resources.Credentials, Action = Actions.Write)]
 public readonly record struct CreateCredentialCommand(CredentialDto Credential) : IRequest<CredentialVm>;
 
 public class CreateCredentialCommandHandler(ICredentialWriter writer, IConfiguration configuration) : IRequestHandler<CreateCredentialCommand, CredentialVm>

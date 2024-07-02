@@ -1,6 +1,6 @@
 ﻿namespace TrackHub.Manager.Application.Credentials.Command.Delete;
 
-[Authorize(Resource = Resources.Accounts, Action = Actions.Delete)]
+[Authorize(Resource = Resources.Credentials, Action = Actions.Delete)]
 public record DeleteCredentialCommand(Guid Id) : IRequest;
 
 public class DeleteCredentialCommandHandler(ICredentialWriter writer) : IRequestHandler<DeleteCredentialCommand>

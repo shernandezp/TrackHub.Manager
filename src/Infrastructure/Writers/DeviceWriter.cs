@@ -7,6 +7,7 @@ public sealed class DeviceWriter(IApplicationDbContext context) : IDeviceWriter
     {
         var device = new Device(
             deviceDto.Identifier,
+            deviceDto.Serial,
             deviceDto.Name,
             (short)deviceDto.DeviceTypeId,
             deviceDto.Description);
@@ -17,6 +18,7 @@ public sealed class DeviceWriter(IApplicationDbContext context) : IDeviceWriter
         return new DeviceVm(
             device.DeviceId,
             device.Identifier,
+            device.Serial,
             device.Name,
             (DeviceType)device.DeviceTypeId,
             device.Description);
@@ -29,6 +31,7 @@ public sealed class DeviceWriter(IApplicationDbContext context) : IDeviceWriter
 
         device.Name = deviceDto.Name;
         device.Identifier = deviceDto.Identifier;
+        device.Serial = deviceDto.Serial;
         device.DeviceTypeId = (short)deviceDto.DeviceTypeId;
         device.Description = deviceDto.Description;
 

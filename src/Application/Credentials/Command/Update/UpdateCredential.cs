@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace TrackHub.Manager.Application.Credentials.Command.Update;
 
-[Authorize(Resource = Resources.Accounts, Action = Actions.Edit)]
+[Authorize(Resource = Resources.Credentials, Action = Actions.Edit)]
 public readonly record struct UpdateCredentialCommand(UpdateCredentialDto Credential) : IRequest;
 
 public class UpdateCredentialCommandHandler(ICredentialWriter writer, IConfiguration configuration) : IRequestHandler<UpdateCredentialCommand>

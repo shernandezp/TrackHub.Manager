@@ -5,5 +5,4 @@ public readonly record struct CredentialVm(
     string Username,
     string Password,
     string Key,
-    string Key2,
-    Guid OperatorId);
+    string Key2);

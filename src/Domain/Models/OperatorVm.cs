@@ -1,4 +1,5 @@
 ﻿namespace TrackHub.Manager.Domain.Models;
+
 public readonly record struct OperatorVm(
     Guid OperatorId,
     string Name,
@@ -7,5 +8,6 @@ public readonly record struct OperatorVm(
     string? EmailAddress,
     string? Address,
     string? ContactName,
-    ProtocolType ProtocolType
+    ProtocolType ProtocolType,
+    CredentialTokenVm? Credential
     );

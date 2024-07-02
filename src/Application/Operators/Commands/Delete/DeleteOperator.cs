@@ -1,6 +1,6 @@
 ﻿namespace TrackHub.Manager.Application.Operators.Commands.Delete;
 
-[Authorize(Resource = Resources.Accounts, Action = Actions.Delete)]
+[Authorize(Resource = Resources.Operators, Action = Actions.Delete)]
 public record DeleteOperatorCommand(Guid Id) : IRequest;
 
 public class DeleteOperatorCommandHandler(IOperatorWriter writer) : IRequestHandler<DeleteOperatorCommand>

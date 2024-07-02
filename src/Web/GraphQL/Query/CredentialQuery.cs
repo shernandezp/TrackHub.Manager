@@ -8,6 +8,6 @@ public partial class Query
     public async Task<CredentialVm> GetCredential([Service] ISender sender, [AsParameters] GetCredentialQuery query)
         => await sender.Send(query);
 
-    public async Task<CredentialTokenVm> GetCredentialTokenAccount([Service] ISender sender, [AsParameters] GetCredentialTokenQuery query)
+    public async Task<TokenVm> GetToken([Service] ISender sender, [AsParameters] GetTokenQuery query)
         => await sender.Send(query);
 }

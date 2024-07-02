@@ -6,6 +6,7 @@ public interface IApplicationDbContext
     DbSet<Credential> Credentials { get; set; }
     DbSet<Device> Devices { get; set; }
     DbSet<DeviceGroup> DeviceGroups { get; set; }
+    DbSet<DeviceOperator> DeviceOperators { get; set; }
     DbSet<Group> Groups { get; set; }
     DbSet<Operator> Operators { get; set; }
     DbSet<Transporter> Transporters { get; set; }

@@ -26,7 +26,8 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
             @operator.EmailAddress,
             @operator.Address,
             @operator.ContactName,
-            (ProtocolType)@operator.ProtocolType);
+            (ProtocolType)@operator.ProtocolType,
+            null);
     }
 
     public async Task UpdateOperatorAsync(UpdateOperatorDto operatorDto, CancellationToken cancellationToken)

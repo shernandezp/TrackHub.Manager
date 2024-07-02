@@ -17,7 +17,7 @@ public partial class Mutation
         return true;
     }
 
-    public async Task<bool> UpdateCredentialToken([Service] ISender sender, Guid id, UpdateCredentialTokenCommand command)
+    public async Task<bool> UpdateToken([Service] ISender sender, Guid id, UpdateTokenCommand command)
     {
         if (id != command.Credential.CredentialId) return false;
         await sender.Send(command);

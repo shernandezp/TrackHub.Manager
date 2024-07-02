@@ -14,7 +14,8 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                 o.EmailAddress,
                 o.Address,
                 o.ContactName,
-                (ProtocolType)o.ProtocolType))
+                (ProtocolType)o.ProtocolType,
+                null))
             .FirstAsync(cancellationToken);
 
     public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsByAccountAsync(Guid accountId, CancellationToken cancellationToken)
@@ -28,6 +29,64 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                 o.EmailAddress,
                 o.Address,
                 o.ContactName,
-                (ProtocolType)o.ProtocolType))
+                (ProtocolType)o.ProtocolType,
+                null))
+            .ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsByUserAsync(Guid userId, CancellationToken cancellationToken)
+        => await context.Users
+            .Where(u => u.UserId == userId)
+            .SelectMany(u => u.Groups)
+            .SelectMany(g => g.Devices)
+            .SelectMany(d => d.Operators)
+            .Distinct()
+            .Select(o => new OperatorVm(
+                o.OperatorId,
+                o.Name,
+                o.Description,
+                o.PhoneNumber,
+                o.EmailAddress,
+                o.Address,
+                o.ContactName,
+                (ProtocolType)o.ProtocolType,
+                o.Credential == null ? null : new CredentialTokenVm(
+                    o.Credential.CredentialId,
+                    o.Credential.Uri,
+                    o.Credential.Username,
+                    o.Credential.Password,
+                    o.Credential.Key,
+                    o.Credential.Key2,
+                    o.Credential.Token,
+                    o.Credential.TokenExpiration,
+                    o.Credential.RefreshToken,
+                    o.Credential.RefreshTokenExpiration)))
+            .ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsByGroupAsync(long groupId, CancellationToken cancellationToken)
+        => await context.Groups
+            .Where(u => u.GroupId == groupId)
+            .SelectMany(g => g.Devices)
+            .SelectMany(d => d.Operators)
+            .Distinct()
+            .Select(o => new OperatorVm(
+                o.OperatorId,
+                o.Name,
+                o.Description,
+                o.PhoneNumber,
+                o.EmailAddress,
+                o.Address,
+                o.ContactName,
+                (ProtocolType)o.ProtocolType,
+                o.Credential == null ? null : new CredentialTokenVm(
+                    o.Credential.CredentialId,
+                    o.Credential.Uri,
+                    o.Credential.Username,
+                    o.Credential.Password,
+                    o.Credential.Key,
+                    o.Credential.Key2,
+                    o.Credential.Token,
+                    o.Credential.TokenExpiration,
+                    o.Credential.RefreshToken,
+                    o.Credential.RefreshTokenExpiration)))
             .ToListAsync(cancellationToken);
 }

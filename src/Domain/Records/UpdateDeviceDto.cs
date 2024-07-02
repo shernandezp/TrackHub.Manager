@@ -1,8 +1,9 @@
-﻿
-namespace TrackHub.Manager.Domain.Records;
+﻿namespace TrackHub.Manager.Domain.Records;
+
 public readonly record struct UpdateDeviceDto(
     Guid DeviceId,
-    string Identifier,
+    int Identifier,
+    string Serial,
     string Name,
     DeviceType DeviceTypeId,
     string? Description

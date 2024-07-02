@@ -1,8 +1,8 @@
 ﻿namespace TrackHub.Manager.Application.Credentials.Command.UpdateToken;
 
-public sealed class UpdateCredentialTokenValidator : AbstractValidator<UpdateCredentialTokenCommand>
+public sealed class UpdateTokenValidator : AbstractValidator<UpdateTokenCommand>
 {
-    public UpdateCredentialTokenValidator()
+    public UpdateTokenValidator()
     {
         RuleFor(v => v.Credential)
             .NotEmpty();
