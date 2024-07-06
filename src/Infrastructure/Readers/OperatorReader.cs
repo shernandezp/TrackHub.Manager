@@ -5,6 +5,7 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
 {
     public async Task<OperatorVm> GetOperatorAsync(Guid id, CancellationToken cancellationToken)
         => await context.Operators
+            .Include(o => o.Credential)
             .Where(o => o.OperatorId.Equals(id))
             .Select(o => new OperatorVm(
                 o.OperatorId,
@@ -15,7 +16,17 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                 o.Address,
                 o.ContactName,
                 (ProtocolType)o.ProtocolType,
-                null))
+                o.Credential == null ? null : new CredentialTokenVm(
+                    o.Credential.CredentialId,
+                    o.Credential.Uri,
+                    o.Credential.Username,
+                    o.Credential.Password,
+                    o.Credential.Key,
+                    o.Credential.Key2,
+                    o.Credential.Token,
+                    o.Credential.TokenExpiration,
+                    o.Credential.RefreshToken,
+                    o.Credential.RefreshTokenExpiration)))
             .FirstAsync(cancellationToken);
 
     public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsByAccountAsync(Guid accountId, CancellationToken cancellationToken)

@@ -4,8 +4,6 @@ public class GetDeviceByUserByOperatorValidator : AbstractValidator<GetDeviceByU
 {
     public GetDeviceByUserByOperatorValidator()
     {
-        RuleFor(x => x.UserId)
-            .NotEmpty();
 
         RuleFor(x => x.OperatorId)
             .NotEmpty();
