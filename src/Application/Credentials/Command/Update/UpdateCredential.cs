@@ -1,4 +1,5 @@
 ﻿using Ardalis.GuardClauses;
+using Common.Domain.Extensions;
 using Microsoft.Extensions.Configuration;
 
 namespace TrackHub.Manager.Application.Credentials.Command.Update;
@@ -12,6 +13,7 @@ public class UpdateCredentialCommandHandler(ICredentialWriter writer, IConfigura
     {
         var key = configuration["AppSettings:EncryptionKey"];
         Guard.Against.Null(key, message: "Credential key not found.");
-        await writer.UpdateCredentialAsync(request.Credential, Convert.FromBase64String(key), cancellationToken); 
+        var salt = CryptographyExtensions.GenerateAesKey(256);
+        await writer.UpdateCredentialAsync(request.Credential, salt, key, cancellationToken); 
     }
 }

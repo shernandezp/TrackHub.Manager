@@ -19,8 +19,8 @@ public partial class Query
     public async Task<IReadOnlyCollection<DeviceVm>> GetDevicesByOperatorByGroup([Service] ISender sender, [AsParameters] GetDeviceByGroupByOperatorQuery query)
         => await sender.Send(query);
 
-    public async Task<IReadOnlyCollection<DeviceVm>> GetDevicesByUser([Service] ISender sender, [AsParameters] GetDeviceByUserQuery query)
-        => await sender.Send(query);
+    public async Task<IReadOnlyCollection<DeviceVm>> GetDevicesByUser([Service] ISender sender)
+        => await sender.Send(new GetDeviceByUserQuery());
 
     public async Task<IReadOnlyCollection<DeviceVm>> GetDevicesByUserByOperator([Service] ISender sender, [AsParameters] GetDeviceByUserByOperatorQuery query)
         => await sender.Send(query);

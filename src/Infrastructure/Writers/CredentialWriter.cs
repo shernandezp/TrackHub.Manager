@@ -3,15 +3,15 @@
 namespace TrackHub.Manager.Infrastructure.Writers;
 public sealed class CredentialWriter(IApplicationDbContext context) : ICredentialWriter
 {
-    public async Task<CredentialVm> CreateCredentialAsync(CredentialDto credentialDto, byte[] key, CancellationToken cancellationToken)
+    public async Task<CredentialVm> CreateCredentialAsync(CredentialDto credentialDto, byte[] salt, string key, CancellationToken cancellationToken)
     {
         var credential = new Credential(
             credentialDto.Uri,
-            credentialDto.Username.EncryptStringToBase64_Aes(key),
-            credentialDto.Password.EncryptStringToBase64_Aes(key),
-            credentialDto.Key.EncryptStringToBase64_Aes(key),
-            credentialDto.Key2.EncryptStringToBase64_Aes(key),
-            Convert.ToBase64String(key),
+            credentialDto.Username.EncryptData(key, salt),
+            credentialDto.Password.EncryptData(key, salt),
+            credentialDto.Key?.EncryptData(key, salt),
+            credentialDto.Key2?.EncryptData(key, salt),
+            Convert.ToBase64String(salt),
             credentialDto.OperatorId);
 
         await context.Credentials.AddAsync(credential, cancellationToken);
@@ -26,17 +26,17 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
             credential.Key2);
     }
 
-    public async Task UpdateCredentialAsync(UpdateCredentialDto credentialDto, byte[] key, CancellationToken cancellationToken)
+    public async Task UpdateCredentialAsync(UpdateCredentialDto credentialDto, byte[] salt, string key, CancellationToken cancellationToken)
     {
         var credential = await context.Credentials.FindAsync([credentialDto.CredentialId], cancellationToken)
             ?? throw new NotFoundException(nameof(Credential), $"{credentialDto.CredentialId}");
 
         credential.Uri = credentialDto.Uri;
-        credential.Username = credentialDto.Username.EncryptStringToBase64_Aes(key);
-        credential.Password = credentialDto.Password.EncryptStringToBase64_Aes(key);
-        credential.Key = credentialDto.Key.EncryptStringToBase64_Aes(key);
-        credential.Key2 = credentialDto.Key2.EncryptStringToBase64_Aes(key);
-        credential.Salt = Convert.ToBase64String(key);
+        credential.Username = credentialDto.Username.EncryptData(key, salt);
+        credential.Password = credentialDto.Password.EncryptData(key, salt);
+        credential.Key = credentialDto.Key.EncryptData(key, salt);
+        credential.Key2 = credentialDto.Key2.EncryptData(key, salt);
+        credential.Salt = Convert.ToBase64String(salt);
         credential.Token = null;
         credential.TokenExpiration = null;
         credential.RefreshToken = null;
@@ -45,14 +45,15 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task UpdateTokenAsync(UpdateTokenDto credentialDto, byte[] key, CancellationToken cancellationToken)
+    public async Task UpdateTokenAsync(UpdateTokenDto credentialDto, string key, CancellationToken cancellationToken)
     {
         var credential = await context.Credentials.FindAsync([credentialDto.CredentialId], cancellationToken)
             ?? throw new NotFoundException(nameof(Credential), $"{credentialDto.CredentialId}");
 
-        credential.Token = credentialDto.Token?.EncryptStringToBase64_Aes(key);
+        var salt = Convert.FromBase64String(credential.Salt);
+        credential.Token = credentialDto.Token?.EncryptData(key, salt);
         credential.TokenExpiration = credentialDto.TokenExpiration;
-        credential.RefreshToken = credentialDto.RefreshToken?.EncryptStringToBase64_Aes(key);
+        credential.RefreshToken = credentialDto.RefreshToken?.EncryptData(key, salt);
         credential.RefreshTokenExpiration = credentialDto.RefreshTokenExpiration;
 
         await context.SaveChangesAsync(cancellationToken);

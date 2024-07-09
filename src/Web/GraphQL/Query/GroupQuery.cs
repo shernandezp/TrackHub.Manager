@@ -12,6 +12,6 @@ public partial class Query
     public async Task<IReadOnlyCollection<GroupVm>> GetGroupsByAccount([Service] ISender sender, [AsParameters] GetGroupByAccountQuery query)
         => await sender.Send(query);
 
-    public async Task<IReadOnlyCollection<GroupVm>> GetGroupsByUser([Service] ISender sender, [AsParameters] GetGroupByUserQuery query)
-        => await sender.Send(query);
+    public async Task<IReadOnlyCollection<GroupVm>> GetGroupsByUser([Service] ISender sender)
+        => await sender.Send(new GetGroupByUserQuery());
 }

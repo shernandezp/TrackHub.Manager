@@ -12,6 +12,6 @@ public class UpdateCommandHandler(ICredentialWriter writer, IConfiguration confi
     {
         var key = configuration["AppSettings:EncryptionKey"];
         Guard.Against.Null(key, message: "Credential key not found.");
-        await writer.UpdateTokenAsync(request.Credential, Convert.FromBase64String(key), cancellationToken);
+        await writer.UpdateTokenAsync(request.Credential, key, cancellationToken);
     }
 }

@@ -12,7 +12,7 @@ public class GetTokenQueryHandler(ICredentialReader reader, IConfiguration confi
     {
         var key = configuration["AppSettings:EncryptionKey"];
         Guard.Against.Null(key, message: "CredentialToken key not found.");
-        return await reader.GetTokenAsync(request.Id, Convert.FromBase64String(key), cancellationToken);
+        return await reader.GetTokenAsync(request.Id, key, cancellationToken);
     }
 
 }
