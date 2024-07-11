@@ -31,6 +31,8 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
         var credential = await context.Credentials.FindAsync([credentialDto.CredentialId], cancellationToken)
             ?? throw new NotFoundException(nameof(Credential), $"{credentialDto.CredentialId}");
 
+        context.Credentials.Attach(credential);
+
         credential.Uri = credentialDto.Uri;
         credential.Username = credentialDto.Username.EncryptData(key, salt);
         credential.Password = credentialDto.Password.EncryptData(key, salt);
@@ -50,6 +52,8 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
         var credential = await context.Credentials.FindAsync([credentialDto.CredentialId], cancellationToken)
             ?? throw new NotFoundException(nameof(Credential), $"{credentialDto.CredentialId}");
 
+        context.Credentials.Attach(credential);
+
         var salt = Convert.FromBase64String(credential.Salt);
         credential.Token = credentialDto.Token?.EncryptData(key, salt);
         credential.TokenExpiration = credentialDto.TokenExpiration;
@@ -63,6 +67,8 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
     {
         var credential = await context.Credentials.FindAsync([credentialId], cancellationToken)
             ?? throw new NotFoundException(nameof(Credential), $"{credentialId}");
+
+        context.Credentials.Attach(credential);
 
         context.Credentials.Remove(credential);
         await context.SaveChangesAsync(cancellationToken);

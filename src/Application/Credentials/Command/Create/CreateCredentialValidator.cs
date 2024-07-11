@@ -1,4 +1,5 @@
 ﻿namespace TrackHub.Manager.Application.Credentials.Command.Create;
+
 public sealed class CreateCredentialValidator : AbstractValidator<CreateCredentialCommand>
 {
     public CreateCredentialValidator()
@@ -16,6 +17,8 @@ public sealed class CreateCredentialValidator : AbstractValidator<CreateCredenti
             .NotEmpty();
 
         RuleFor(v => v.Credential.Uri)
-            .NotEmpty();
+            .NotEmpty()
+            .Must(uri => uri.EndsWith('/'))
+            .WithMessage("Credential Uri must end with '/'");
     }
 }

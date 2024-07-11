@@ -35,23 +35,19 @@ public sealed class CredentialConfiguration : IEntityTypeConfiguration<Credentia
             .IsRequired();
 
         builder.Property(t => t.Key)
-            .HasColumnType(ColumnMetadata.TextField)
-            .IsRequired();
+            .HasColumnType(ColumnMetadata.TextField);
 
         builder.Property(t => t.Key2)
-            .HasColumnType(ColumnMetadata.TextField)
-            .IsRequired();
+            .HasColumnType(ColumnMetadata.TextField);
 
         builder.Property(t => t.Salt)
             .HasMaxLength(ColumnMetadata.DefaultFieldLength)
             .IsRequired();
 
         builder.Property(t => t.Token)
-            .HasColumnType(ColumnMetadata.TextField)
-            .IsRequired();
+            .HasColumnType(ColumnMetadata.TextField);
 
         builder.Property(t => t.RefreshToken)
-            .HasColumnType(ColumnMetadata.TextField)
-            .IsRequired();
+            .HasColumnType(ColumnMetadata.TextField);
     }
 }

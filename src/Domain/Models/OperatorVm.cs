@@ -8,6 +8,6 @@ public readonly record struct OperatorVm(
     string? EmailAddress,
     string? Address,
     string? ContactName,
-    ProtocolType ProtocolType,
+    int ProtocolType,
     CredentialTokenVm? Credential
     );

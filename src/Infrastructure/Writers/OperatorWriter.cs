@@ -1,6 +1,4 @@
-﻿using Common.Domain.Enums;
-
-namespace TrackHub.Manager.Infrastructure.Writers;
+﻿namespace TrackHub.Manager.Infrastructure.Writers;
 public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWriter
 {
     public async Task<OperatorVm> CreateOperatorAsync(OperatorDto operatorDto, CancellationToken cancellationToken)
@@ -26,7 +24,7 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
             @operator.EmailAddress,
             @operator.Address,
             @operator.ContactName,
-            (ProtocolType)@operator.ProtocolType,
+            @operator.ProtocolType,
             null);
     }
 

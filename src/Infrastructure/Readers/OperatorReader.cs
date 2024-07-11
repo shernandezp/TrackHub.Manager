@@ -1,6 +1,4 @@
-﻿using Common.Domain.Enums;
-
-namespace TrackHub.Manager.Infrastructure.Readers;
+﻿namespace TrackHub.Manager.Infrastructure.Readers;
 public sealed class OperatorReader(IApplicationDbContext context) : IOperatorReader
 {
     public async Task<OperatorVm> GetOperatorAsync(Guid id, CancellationToken cancellationToken)
@@ -15,7 +13,7 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                 o.EmailAddress,
                 o.Address,
                 o.ContactName,
-                (ProtocolType)o.ProtocolType,
+                o.ProtocolType,
                 o.Credential == null ? null : new CredentialTokenVm(
                     o.Credential.CredentialId,
                     o.Credential.Uri,
@@ -41,7 +39,7 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                 o.EmailAddress,
                 o.Address,
                 o.ContactName,
-                (ProtocolType)o.ProtocolType,
+                o.ProtocolType,
                 null))
             .ToListAsync(cancellationToken);
 
@@ -60,7 +58,7 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                 o.EmailAddress,
                 o.Address,
                 o.ContactName,
-                (ProtocolType)o.ProtocolType,
+                o.ProtocolType,
                 o.Credential == null ? null : new CredentialTokenVm(
                     o.Credential.CredentialId,
                     o.Credential.Uri,
@@ -89,7 +87,7 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                 o.EmailAddress,
                 o.Address,
                 o.ContactName,
-                (ProtocolType)o.ProtocolType,
+                o.ProtocolType,
                 o.Credential == null ? null : new CredentialTokenVm(
                     o.Credential.CredentialId,
                     o.Credential.Uri,
