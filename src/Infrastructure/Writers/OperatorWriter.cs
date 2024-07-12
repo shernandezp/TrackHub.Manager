@@ -1,6 +1,9 @@
 ﻿namespace TrackHub.Manager.Infrastructure.Writers;
+
+// OperatorWriter class responsible for creating, updating, and deleting operators
 public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWriter
 {
+    // CreateOperatorAsync method creates a new operator
     public async Task<OperatorVm> CreateOperatorAsync(OperatorDto operatorDto, CancellationToken cancellationToken)
     {
         var @operator = new Operator(
@@ -28,6 +31,7 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
             null);
     }
 
+    // UpdateOperatorAsync method updates an existing operator
     public async Task UpdateOperatorAsync(UpdateOperatorDto operatorDto, CancellationToken cancellationToken)
     {
         var @operator = await context.Operators.FindAsync([operatorDto.OperatorId], cancellationToken)
@@ -44,6 +48,7 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
         await context.SaveChangesAsync(cancellationToken);
     }
 
+    // DeleteOperatorAsync method deletes an existing operator
     public async Task DeleteOperatorAsync(Guid operatorId, CancellationToken cancellationToken)
     {
         var @operator = await context.Operators.FindAsync([operatorId], cancellationToken)

@@ -1,8 +1,16 @@
 ﻿using Common.Domain.Enums;
 
 namespace TrackHub.Manager.Infrastructure.Writers;
+
+// AccountWriter class is responsible for writing account-related data to the database
 public sealed class AccountWriter(IApplicationDbContext context) : IAccountWriter
 {
+    // Creates a new account asynchronously
+    // Parameters:
+    // - accountDto: The account data transfer object
+    // - cancellationToken: The cancellation token
+    // Returns:
+    // - The created account view model
     public async Task<AccountVm> CreateAccountAsync(AccountDto accountDto, CancellationToken cancellationToken)
     {
         var account = new Account(
@@ -22,9 +30,13 @@ public sealed class AccountWriter(IApplicationDbContext context) : IAccountWrite
             account.Active);
     }
 
+    // Updates an existing account asynchronously
+    // Parameters:
+    // - accountDto: The updated account data transfer object
+    // - cancellationToken: The cancellation token
     public async Task UpdateAccountAsync(UpdateAccountDto accountDto, CancellationToken cancellationToken)
     {
-        var account = await context.Accounts.FindAsync([accountDto.AccountId], cancellationToken)
+        var account = await context.Accounts.FindAsync(accountDto.AccountId, cancellationToken)
             ?? throw new NotFoundException(nameof(Account), $"{accountDto.AccountId}");
 
         account.Name = accountDto.Name;
@@ -35,9 +47,13 @@ public sealed class AccountWriter(IApplicationDbContext context) : IAccountWrite
         await context.SaveChangesAsync(cancellationToken);
     }
 
+    // Deletes an account asynchronously
+    // Parameters:
+    // - accountId: The ID of the account to delete
+    // - cancellationToken: The cancellation token
     public async Task DeleteAccountAsync(Guid accountId, CancellationToken cancellationToken)
     {
-        var account = await context.Accounts.FindAsync([accountId], cancellationToken)
+        var account = await context.Accounts.FindAsync(accountId, cancellationToken)
             ?? throw new NotFoundException(nameof(Account), $"{accountId}");
 
         context.Accounts.Remove(account);

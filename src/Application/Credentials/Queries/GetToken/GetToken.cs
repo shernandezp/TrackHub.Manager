@@ -6,13 +6,14 @@ namespace TrackHub.Manager.Application.CredentialToken.Queries.GetToken;
 [Authorize(Resource = Resources.Credentials, Action = Actions.Read)]
 public readonly record struct GetTokenQuery(Guid Id) : IRequest<TokenVm>;
 
+// Handles the GetTokenQuery and returns a TokenVm
 public class GetTokenQueryHandler(ICredentialReader reader, IConfiguration configuration) : IRequestHandler<GetTokenQuery, TokenVm>
 {
+    // Handles the GetTokenQuery and returns a TokenVm
     public async Task<TokenVm> Handle(GetTokenQuery request, CancellationToken cancellationToken)
     {
         var key = configuration["AppSettings:EncryptionKey"];
         Guard.Against.Null(key, message: "CredentialToken key not found.");
         return await reader.GetTokenAsync(request.Id, key, cancellationToken);
     }
-
 }

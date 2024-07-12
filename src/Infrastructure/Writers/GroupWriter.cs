@@ -1,6 +1,16 @@
 ﻿namespace TrackHub.Manager.Infrastructure.Writers;
+
+/// <summary>
+/// Writer class for managing groups.
+/// </summary>
 public sealed class GroupWriter(IApplicationDbContext context) : IGroupWriter
 {
+    /// <summary>
+    /// Creates a new group.
+    /// </summary>
+    /// <param name="groupDto">The group data transfer object.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The created group view model.</returns>
     public async Task<GroupVm> CreateGroupAsync(GroupDto groupDto, CancellationToken cancellationToken)
     {
         var group = new Group(
@@ -22,6 +32,11 @@ public sealed class GroupWriter(IApplicationDbContext context) : IGroupWriter
             group.AccountId);
     }
 
+    /// <summary>
+    /// Updates an existing group.
+    /// </summary>
+    /// <param name="groupDto">The updated group data transfer object.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     public async Task UpdateGroupAsync(UpdateGroupDto groupDto, CancellationToken cancellationToken)
     {
         var group = await context.Groups.FindAsync([groupDto.GroupId], cancellationToken)
@@ -35,6 +50,11 @@ public sealed class GroupWriter(IApplicationDbContext context) : IGroupWriter
         await context.SaveChangesAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// Deletes a group.
+    /// </summary>
+    /// <param name="groupId">The ID of the group to delete.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     public async Task DeleteGroupAsync(Guid groupId, CancellationToken cancellationToken)
     {
         var group = await context.Groups.FindAsync([groupId], cancellationToken)

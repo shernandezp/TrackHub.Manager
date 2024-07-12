@@ -1,6 +1,14 @@
 ﻿namespace TrackHub.Manager.Infrastructure.Writers;
+
+// UserWriter class for handling user-related operations
 public sealed class UserWriter(IApplicationDbContext context) : IUserWriter
 {
+    // Creates a new user asynchronously
+    // Parameters:
+    // - userDto: The user data transfer object
+    // - cancellationToken: The cancellation token
+    // Returns:
+    // - The created user view model
     public async Task<UserVm> CreateUserAsync(UserDto userDto, CancellationToken cancellationToken)
     {
         var user = new User(
@@ -19,6 +27,10 @@ public sealed class UserWriter(IApplicationDbContext context) : IUserWriter
             user.AccountId);
     }
 
+    // Updates an existing user asynchronously
+    // Parameters:
+    // - userDto: The updated user data transfer object
+    // - cancellationToken: The cancellation token
     public async Task UpdateUserAsync(UpdateUserDto userDto, CancellationToken cancellationToken)
     {
         var user = await context.Users.FindAsync([userDto.UserId], cancellationToken)
@@ -30,6 +42,10 @@ public sealed class UserWriter(IApplicationDbContext context) : IUserWriter
         await context.SaveChangesAsync(cancellationToken);
     }
 
+    // Deletes a user asynchronously
+    // Parameters:
+    // - userId: The ID of the user to delete
+    // - cancellationToken: The cancellation token
     public async Task DeleteUserAsync(Guid userId, CancellationToken cancellationToken)
     {
         var user = await context.Users.FindAsync([userId], cancellationToken)

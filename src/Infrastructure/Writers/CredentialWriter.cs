@@ -1,8 +1,18 @@
 ﻿using Common.Domain.Extensions;
 
 namespace TrackHub.Manager.Infrastructure.Writers;
+
+// This class represents a writer for credentials in the infrastructure layer.
 public sealed class CredentialWriter(IApplicationDbContext context) : ICredentialWriter
 {
+    // Creates a new credential asynchronously.
+    // Parameters:
+    // - credentialDto: The credential data transfer object.
+    // - salt: The salt used for encryption.
+    // - key: The encryption key.
+    // - cancellationToken: The cancellation token.
+    // Returns:
+    // - The created credential view model.
     public async Task<CredentialVm> CreateCredentialAsync(CredentialDto credentialDto, byte[] salt, string key, CancellationToken cancellationToken)
     {
         var credential = new Credential(
@@ -26,6 +36,12 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
             credential.Key2);
     }
 
+    // Updates an existing credential asynchronously.
+    // Parameters:
+    // - credentialDto: The updated credential data transfer object.
+    // - salt: The salt used for encryption.
+    // - key: The encryption key.
+    // - cancellationToken: The cancellation token.
     public async Task UpdateCredentialAsync(UpdateCredentialDto credentialDto, byte[] salt, string key, CancellationToken cancellationToken)
     {
         var credential = await context.Credentials.FindAsync([credentialDto.CredentialId], cancellationToken)
@@ -47,6 +63,11 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
         await context.SaveChangesAsync(cancellationToken);
     }
 
+    // Updates the token of an existing credential asynchronously.
+    // Parameters:
+    // - credentialDto: The updated token data transfer object.
+    // - key: The encryption key.
+    // - cancellationToken: The cancellation token.
     public async Task UpdateTokenAsync(UpdateTokenDto credentialDto, string key, CancellationToken cancellationToken)
     {
         var credential = await context.Credentials.FindAsync([credentialDto.CredentialId], cancellationToken)
@@ -63,6 +84,10 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
         await context.SaveChangesAsync(cancellationToken);
     }
 
+    // Deletes a credential asynchronously.
+    // Parameters:
+    // - credentialId: The ID of the credential to delete.
+    // - cancellationToken: The cancellation token.
     public async Task DeleteCredentialAsync(Guid credentialId, CancellationToken cancellationToken)
     {
         var credential = await context.Credentials.FindAsync([credentialId], cancellationToken)

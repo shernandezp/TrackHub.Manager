@@ -1,6 +1,9 @@
 ﻿namespace TrackHub.Manager.Infrastructure.Writers;
+
+// DeviceGroupWriter class for writing device group data
 public sealed class DeviceGroupWriter(IApplicationDbContext context) : IDeviceGroupWriter
 {
+    // Create a new device group asynchronously
     public async Task<DeviceGroupVm> CreateDeviceGroupAsync(DeviceGroupDto deviceGroupDto, CancellationToken cancellationToken)
     {
         var deviceGroup = new DeviceGroup
@@ -17,6 +20,7 @@ public sealed class DeviceGroupWriter(IApplicationDbContext context) : IDeviceGr
             deviceGroup.GroupId);
     }
 
+    // Delete a device group asynchronously
     public async Task DeleteDeviceGroupAsync(Guid deviceId, long groupId, CancellationToken cancellationToken)
     {
         var deviceGroup = await context.DeviceGroups.FindAsync([deviceId, groupId], cancellationToken)

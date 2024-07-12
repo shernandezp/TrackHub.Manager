@@ -1,8 +1,11 @@
 ﻿using Common.Domain.Enums;
 
 namespace TrackHub.Manager.Infrastructure.Writers;
+
+// This class represents a writer for the Transporter entity
 public sealed class TransporterWriter(IApplicationDbContext context) : ITransporterWriter
 {
+    // Creates a new Transporter entity and saves it to the database
     public async Task<TransporterVm> CreateTransporterAsync(TransporterDto transporterDto, CancellationToken cancellationToken)
     {
         var transporter = new Transporter(
@@ -22,6 +25,7 @@ public sealed class TransporterWriter(IApplicationDbContext context) : ITranspor
             transporter.DeviceId);
     }
 
+    // Updates an existing Transporter entity in the database
     public async Task UpdateTransporterAsync(UpdateTransporterDto transporterDto, CancellationToken cancellationToken)
     {
         var transporter = await context.Transporters.FindAsync([transporterDto.TransporterId], cancellationToken)
@@ -35,6 +39,7 @@ public sealed class TransporterWriter(IApplicationDbContext context) : ITranspor
         await context.SaveChangesAsync(cancellationToken);
     }
 
+    // Deletes a Transporter entity from the database
     public async Task DeleteTransporterAsync(Guid transporterId, CancellationToken cancellationToken)
     {
         var transporter = await context.Transporters.FindAsync([transporterId], cancellationToken)
