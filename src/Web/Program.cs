@@ -22,9 +22,20 @@ builder.Services
     .AddQueryType<Query>()
     .AddMutationType<Mutation>();
 
+builder.Services.AddCors(options => options
+    .AddPolicy("AllowFrontend",
+        builder => builder
+                    .WithOrigins("http://localhost:3000")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()));
+
 var app = builder.Build();
 
 app.UseHeaderPropagation();
+
+// Enable CORS
+app.UseCors("AllowFrontend");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -47,13 +58,6 @@ app.UseExceptionHandler(options => { });
 app.Map("/", () => Results.Redirect("/api"));
 app.MapEndpoints(Assembly.GetExecutingAssembly());
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapGraphQL();
-}
-else 
-{
-    app.MapGraphQL().RequireAuthorization();
-}
+app.MapGraphQL();
 
 app.Run();

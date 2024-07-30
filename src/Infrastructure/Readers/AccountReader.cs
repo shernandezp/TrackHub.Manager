@@ -27,4 +27,16 @@ public sealed class AccountReader(IApplicationDbContext context) : IAccountReade
                 (AccountType)a.Type,
                 a.Active))
             .ToListAsync(cancellationToken);
+
+    // Retrieves an account by user ID
+    public async Task<AccountVm> GetAccountByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+        => await context.Users
+                .Where(u => u.UserId == userId)
+                .Select(u => new AccountVm(
+                    u.Account.AccountId,
+                    u.Account.Name,
+                    u.Account.Description,
+                    (AccountType)u.Account.Type,
+                    u.Account.Active))
+                .FirstAsync(cancellationToken);
 }

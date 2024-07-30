@@ -1,6 +1,6 @@
 ﻿namespace TrackHub.Manager.Application.Accounts.Queries.GetAll;
 
-[Authorize(Resource = Resources.Accounts, Action = Actions.Read)]
+[Authorize(Resource = Resources.ManageAccounts, Action = Actions.Read)]
 public readonly record struct GetAccountsQuery() : IRequest<IReadOnlyCollection<AccountVm>>;
 
 public class GetAccountsQueryHandler(IAccountReader reader) : IRequestHandler<GetAccountsQuery, IReadOnlyCollection<AccountVm>>
