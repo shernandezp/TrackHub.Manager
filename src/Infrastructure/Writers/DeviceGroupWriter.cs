@@ -1,4 +1,6 @@
-﻿namespace TrackHub.Manager.Infrastructure.Writers;
+﻿using TrackHub.Manager.Infrastructure.Entities;
+
+namespace TrackHub.Manager.Infrastructure.Writers;
 
 // DeviceGroupWriter class for writing device group data
 public sealed class DeviceGroupWriter(IApplicationDbContext context) : IDeviceGroupWriter
@@ -25,6 +27,8 @@ public sealed class DeviceGroupWriter(IApplicationDbContext context) : IDeviceGr
     {
         var deviceGroup = await context.DeviceGroups.FindAsync([deviceId, groupId], cancellationToken)
             ?? throw new NotFoundException(nameof(DeviceGroup), $"{deviceId},{groupId}");
+
+        context.DeviceGroups.Attach(deviceGroup);
 
         context.DeviceGroups.Remove(deviceGroup);
         await context.SaveChangesAsync(cancellationToken);

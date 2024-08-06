@@ -1,4 +1,5 @@
 ﻿using Common.Domain.Enums;
+using TrackHub.Manager.Infrastructure.Entities;
 
 namespace TrackHub.Manager.Infrastructure.Writers;
 
@@ -27,7 +28,8 @@ public sealed class AccountWriter(IApplicationDbContext context) : IAccountWrite
             account.Name,
             account.Description,
             (AccountType)account.Type,
-            account.Active);
+            account.Active,
+            account.LastModified);
     }
 
     // Updates an existing account asynchronously
@@ -38,6 +40,8 @@ public sealed class AccountWriter(IApplicationDbContext context) : IAccountWrite
     {
         var account = await context.Accounts.FindAsync(accountDto.AccountId, cancellationToken)
             ?? throw new NotFoundException(nameof(Account), $"{accountDto.AccountId}");
+
+        context.Accounts.Attach(account);
 
         account.Name = accountDto.Name;
         account.Description = accountDto.Description;
@@ -55,6 +59,8 @@ public sealed class AccountWriter(IApplicationDbContext context) : IAccountWrite
     {
         var account = await context.Accounts.FindAsync(accountId, cancellationToken)
             ?? throw new NotFoundException(nameof(Account), $"{accountId}");
+
+        context.Accounts.Attach(account);
 
         context.Accounts.Remove(account);
         await context.SaveChangesAsync(cancellationToken);

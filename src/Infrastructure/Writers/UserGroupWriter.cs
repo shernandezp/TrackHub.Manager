@@ -1,4 +1,6 @@
-﻿namespace TrackHub.Manager.Infrastructure.Writers;
+﻿using TrackHub.Manager.Infrastructure.Entities;
+
+namespace TrackHub.Manager.Infrastructure.Writers;
 
 // This class represents a writer for UserGroup entities in the infrastructure layer.
 public sealed class UserGroupWriter(IApplicationDbContext context) : IUserGroupWriter
@@ -36,6 +38,8 @@ public sealed class UserGroupWriter(IApplicationDbContext context) : IUserGroupW
     {
         var userGroup = await context.UserGroups.FindAsync([userId, groupId], cancellationToken)
             ?? throw new NotFoundException(nameof(UserGroup), $"{userId},{groupId}");
+
+        context.UserGroups.Attach(userGroup);
 
         context.UserGroups.Remove(userGroup);
         await context.SaveChangesAsync(cancellationToken);

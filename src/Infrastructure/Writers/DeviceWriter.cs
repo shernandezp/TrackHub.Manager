@@ -1,4 +1,5 @@
 ﻿using Common.Domain.Enums;
+using TrackHub.Manager.Infrastructure.Entities;
 
 namespace TrackHub.Manager.Infrastructure.Writers;
 // This class represents a writer for the Device entity
@@ -40,6 +41,8 @@ public sealed class DeviceWriter(IApplicationDbContext context) : IDeviceWriter
         var device = await context.Devices.FindAsync(deviceDto.DeviceId, cancellationToken)
             ?? throw new NotFoundException(nameof(Device), $"{deviceDto.DeviceId}");
 
+        context.Devices.Attach(device);
+
         device.Name = deviceDto.Name;
         device.Identifier = deviceDto.Identifier;
         device.Serial = deviceDto.Serial;
@@ -57,6 +60,8 @@ public sealed class DeviceWriter(IApplicationDbContext context) : IDeviceWriter
     {
         var device = await context.Devices.FindAsync(deviceId, cancellationToken)
             ?? throw new NotFoundException(nameof(Device), $"{deviceId}");
+
+        context.Devices.Attach(device);
 
         context.Devices.Remove(device);
         await context.SaveChangesAsync(cancellationToken);

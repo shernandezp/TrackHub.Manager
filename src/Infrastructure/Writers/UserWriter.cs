@@ -1,4 +1,6 @@
-﻿namespace TrackHub.Manager.Infrastructure.Writers;
+﻿using TrackHub.Manager.Infrastructure.Entities;
+
+namespace TrackHub.Manager.Infrastructure.Writers;
 
 // UserWriter class for handling user-related operations
 public sealed class UserWriter(IApplicationDbContext context) : IUserWriter
@@ -36,6 +38,8 @@ public sealed class UserWriter(IApplicationDbContext context) : IUserWriter
         var user = await context.Users.FindAsync([userDto.UserId], cancellationToken)
             ?? throw new NotFoundException(nameof(User), $"{userDto.UserId}");
 
+        context.Users.Attach(user);
+
         user.Username = userDto.Username;
         user.Active = userDto.Active;
 
@@ -50,6 +54,8 @@ public sealed class UserWriter(IApplicationDbContext context) : IUserWriter
     {
         var user = await context.Users.FindAsync([userId], cancellationToken)
             ?? throw new NotFoundException(nameof(User), $"{userId}");
+
+        context.Users.Attach(user);
 
         context.Users.Remove(user);
         await context.SaveChangesAsync(cancellationToken);

@@ -37,6 +37,8 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
         var @operator = await context.Operators.FindAsync([operatorDto.OperatorId], cancellationToken)
             ?? throw new NotFoundException(nameof(Operator), $"{operatorDto.OperatorId}");
 
+        context.Operators.Attach(@operator);
+
         @operator.Name = operatorDto.Name;
         @operator.Description = operatorDto.Description;
         @operator.PhoneNumber = operatorDto.PhoneNumber;
@@ -53,6 +55,8 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
     {
         var @operator = await context.Operators.FindAsync([operatorId], cancellationToken)
             ?? throw new NotFoundException(nameof(Operator), $"{operatorId}");
+
+        context.Operators.Attach(@operator);
 
         context.Operators.Remove(@operator);
         await context.SaveChangesAsync(cancellationToken);

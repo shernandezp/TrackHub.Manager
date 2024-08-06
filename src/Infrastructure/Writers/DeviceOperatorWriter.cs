@@ -1,4 +1,6 @@
-﻿namespace TrackHub.Manager.Infrastructure.Writers;
+﻿using TrackHub.Manager.Infrastructure.Entities;
+
+namespace TrackHub.Manager.Infrastructure.Writers;
 
 // This class represents a writer for DeviceOperator entities
 public sealed class DeviceOperatorWriter(IApplicationDbContext context) : IDeviceOperatorWriter
@@ -36,6 +38,8 @@ public sealed class DeviceOperatorWriter(IApplicationDbContext context) : IDevic
     {
         var deviceOperator = await context.DeviceOperators.FindAsync([deviceId, operatorId], cancellationToken)
             ?? throw new NotFoundException(nameof(DeviceOperator), $"{deviceId},{operatorId}");
+
+        context.DeviceOperators.Attach(deviceOperator);
 
         context.DeviceOperators.Remove(deviceOperator);
         await context.SaveChangesAsync(cancellationToken);

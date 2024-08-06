@@ -1,4 +1,5 @@
 ﻿using Common.Domain.Enums;
+using TrackHub.Manager.Infrastructure.Entities;
 
 namespace TrackHub.Manager.Infrastructure.Writers;
 
@@ -31,6 +32,8 @@ public sealed class TransporterWriter(IApplicationDbContext context) : ITranspor
         var transporter = await context.Transporters.FindAsync([transporterDto.TransporterId], cancellationToken)
             ?? throw new NotFoundException(nameof(Transporter), $"{transporterDto.TransporterId}");
 
+        context.Transporters.Attach(transporter);
+
         transporter.Name = transporterDto.Name;
         transporter.Icon = transporterDto.Icon;
         transporter.TransporterTypeId = (short)transporterDto.TransporterTypeId;
@@ -44,6 +47,8 @@ public sealed class TransporterWriter(IApplicationDbContext context) : ITranspor
     {
         var transporter = await context.Transporters.FindAsync([transporterId], cancellationToken)
             ?? throw new NotFoundException(nameof(Transporter), $"{transporterId}");
+
+        context.Transporters.Attach(transporter);
 
         context.Transporters.Remove(transporter);
         await context.SaveChangesAsync(cancellationToken);

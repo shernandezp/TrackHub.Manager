@@ -1,4 +1,6 @@
-﻿namespace TrackHub.Manager.Infrastructure.Writers;
+﻿using TrackHub.Manager.Infrastructure.Entities;
+
+namespace TrackHub.Manager.Infrastructure.Writers;
 
 /// <summary>
 /// Writer class for managing groups.
@@ -42,6 +44,8 @@ public sealed class GroupWriter(IApplicationDbContext context) : IGroupWriter
         var group = await context.Groups.FindAsync([groupDto.GroupId], cancellationToken)
             ?? throw new NotFoundException(nameof(Group), $"{groupDto.GroupId}");
 
+        context.Groups.Attach(group);
+
         group.Name = groupDto.Name;
         group.Description = groupDto.Description;
         group.IsMaster = groupDto.IsMaster;
@@ -62,6 +66,8 @@ public sealed class GroupWriter(IApplicationDbContext context) : IGroupWriter
 
         if (group.IsMaster)
             throw new InvalidOperationException("Master group cannot be deleted.");
+
+        context.Groups.Attach(group);
 
         context.Groups.Remove(group);
         await context.SaveChangesAsync(cancellationToken);

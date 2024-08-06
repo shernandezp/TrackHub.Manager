@@ -14,7 +14,8 @@ public sealed class AccountReader(IApplicationDbContext context) : IAccountReade
                 a.Name,
                 a.Description,
                 (AccountType)a.Type,
-                a.Active))
+                a.Active,
+                a.LastModified))
             .FirstAsync(cancellationToken);
 
     // Retrieves all accounts
@@ -25,7 +26,8 @@ public sealed class AccountReader(IApplicationDbContext context) : IAccountReade
                 a.Name,
                 a.Description,
                 (AccountType)a.Type,
-                a.Active))
+                a.Active,
+                a.LastModified))
             .ToListAsync(cancellationToken);
 
     // Retrieves an account by user ID
@@ -37,6 +39,7 @@ public sealed class AccountReader(IApplicationDbContext context) : IAccountReade
                     u.Account.Name,
                     u.Account.Description,
                     (AccountType)u.Account.Type,
-                    u.Account.Active))
+                    u.Account.Active,
+                    u.Account.LastModified))
                 .FirstAsync(cancellationToken);
 }
