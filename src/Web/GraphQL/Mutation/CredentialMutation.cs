@@ -17,6 +17,13 @@ public partial class Mutation
         return true;
     }
 
+    public async Task<bool> UpdateOperatorCredential([Service] ISender sender, Guid id, UpdateOperatorCredentialCommand command)
+    {
+        if (id != command.Credential.OperatorId) return false;
+        await sender.Send(command);
+        return true;
+    }
+
     public async Task<bool> UpdateToken([Service] ISender sender, Guid id, UpdateTokenCommand command)
     {
         if (id != command.Credential.CredentialId) return false;

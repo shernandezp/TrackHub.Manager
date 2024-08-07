@@ -13,6 +13,9 @@ public partial class Query
     public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsByAccount([Service] ISender sender, [AsParameters] GetOperatorByAccountQuery query)
         => await sender.Send(query);
 
+    public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsByCurrentAccount([Service] ISender sender)
+        => await sender.Send(new GetOperatorByCurrentAccountQuery());
+
     public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsByUser([Service] ISender sender)
         => await sender.Send(new GetOperatorByUserQuery());
 

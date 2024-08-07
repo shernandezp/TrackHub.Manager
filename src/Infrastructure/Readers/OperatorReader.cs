@@ -1,4 +1,6 @@
-﻿namespace TrackHub.Manager.Infrastructure.Readers;
+﻿using Common.Domain.Enums;
+
+namespace TrackHub.Manager.Infrastructure.Readers;
 
 // This class represents a reader for retrieving operator data from the application database.
 public sealed class OperatorReader(IApplicationDbContext context) : IOperatorReader
@@ -21,7 +23,9 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                 o.EmailAddress,
                 o.Address,
                 o.ContactName,
+                (ProtocolType)o.ProtocolType,
                 o.ProtocolType,
+                o.LastModified,
                 o.Credential == null ? null : new CredentialTokenVm(
                     o.Credential.CredentialId,
                     o.Credential.Uri,
@@ -53,7 +57,9 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                 o.EmailAddress,
                 o.Address,
                 o.ContactName,
+                (ProtocolType)o.ProtocolType,
                 o.ProtocolType,
+                o.LastModified,
                 null))
             .ToListAsync(cancellationToken);
 
@@ -78,7 +84,9 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                 o.EmailAddress,
                 o.Address,
                 o.ContactName,
+                (ProtocolType)o.ProtocolType,
                 o.ProtocolType,
+                o.LastModified,
                 o.Credential == null ? null : new CredentialTokenVm(
                     o.Credential.CredentialId,
                     o.Credential.Uri,
@@ -113,7 +121,9 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                 o.EmailAddress,
                 o.Address,
                 o.ContactName,
+                (ProtocolType)o.ProtocolType,
                 o.ProtocolType,
+                o.LastModified,
                 o.Credential == null ? null : new CredentialTokenVm(
                     o.Credential.CredentialId,
                     o.Credential.Uri,

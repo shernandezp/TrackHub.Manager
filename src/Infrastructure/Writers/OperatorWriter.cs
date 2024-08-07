@@ -1,4 +1,6 @@
-﻿namespace TrackHub.Manager.Infrastructure.Writers;
+﻿using Common.Domain.Enums;
+
+namespace TrackHub.Manager.Infrastructure.Writers;
 
 // OperatorWriter class responsible for creating, updating, and deleting operators
 public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWriter
@@ -27,7 +29,9 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
             @operator.EmailAddress,
             @operator.Address,
             @operator.ContactName,
+            (ProtocolType)@operator.ProtocolType,
             @operator.ProtocolType,
+            @operator.LastModified,
             null);
     }
 
