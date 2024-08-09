@@ -13,7 +13,7 @@ public sealed class CreateOperatorValidator : AbstractValidator<CreateOperatorCo
         RuleFor(v => v.Operator.AccountId)
             .NotEmpty();
 
-        RuleFor(v => v.Operator.ProtocolType)
+        RuleFor(v => v.Operator.ProtocolTypeId)
             .NotEmpty();
 
     }

@@ -13,7 +13,7 @@ public sealed class UpdateOperatorValidator : AbstractValidator<UpdateOperatorCo
         RuleFor(v => v.Operator.Name)
             .NotEmpty();
 
-        RuleFor(v => v.Operator.ProtocolType)
+        RuleFor(v => v.Operator.ProtocolTypeId)
             .NotEmpty();
     }
 }

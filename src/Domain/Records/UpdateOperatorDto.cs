@@ -1,4 +1,5 @@
 ﻿namespace TrackHub.Manager.Domain.Records;
+
 public readonly record struct UpdateOperatorDto(
     Guid OperatorId,
     string Name,
@@ -7,5 +8,5 @@ public readonly record struct UpdateOperatorDto(
     string? EmailAddress,
     string? Address,
     string? ContactName,
-    ProtocolType ProtocolType
+    short ProtocolTypeId
     );

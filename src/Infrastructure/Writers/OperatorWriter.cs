@@ -15,7 +15,7 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
             operatorDto.EmailAddress,
             operatorDto.Address,
             operatorDto.ContactName,
-            (short)operatorDto.ProtocolType,
+            operatorDto.ProtocolTypeId,
             operatorDto.AccountId);
 
         await context.Operators.AddAsync(@operator, cancellationToken);
@@ -49,7 +49,7 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
         @operator.EmailAddress = operatorDto.EmailAddress;
         @operator.Address = operatorDto.Address;
         @operator.ContactName = operatorDto.ContactName;
-        @operator.ProtocolType = (short)operatorDto.ProtocolType;
+        @operator.ProtocolType = operatorDto.ProtocolTypeId;
 
         await context.SaveChangesAsync(cancellationToken);
     }

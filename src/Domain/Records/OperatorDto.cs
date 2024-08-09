@@ -6,7 +6,7 @@ public readonly record struct OperatorDto(
     string? EmailAddress,
     string? Address,
     string? ContactName,
-    ProtocolType ProtocolType,
+    short ProtocolTypeId,
     Guid AccountId,
     CredentialDto Credential
     );
