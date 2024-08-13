@@ -6,7 +6,7 @@ namespace TrackHub.Manager.Infrastructure.Writers;
 public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWriter
 {
     // CreateOperatorAsync method creates a new operator
-    public async Task<OperatorVm> CreateOperatorAsync(OperatorDto operatorDto, CancellationToken cancellationToken)
+    public async Task<OperatorVm> CreateOperatorAsync(OperatorDto operatorDto, Guid accountId, CancellationToken cancellationToken)
     {
         var @operator = new Operator(
             operatorDto.Name,
@@ -16,7 +16,7 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
             operatorDto.Address,
             operatorDto.ContactName,
             operatorDto.ProtocolTypeId,
-            operatorDto.AccountId);
+            accountId);
 
         await context.Operators.AddAsync(@operator, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
