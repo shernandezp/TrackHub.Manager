@@ -26,6 +26,21 @@ public sealed class CredentialReader(IApplicationDbContext context) : ICredentia
             .FirstAsync(cancellationToken);
     }
 
+
+    public async Task<CredentialVm> GetCredentialByOperatorAsync(Guid operatorId, string key, CancellationToken cancellationToken)
+    {
+        return await context.Credentials
+            .Where(c => c.OperatorId.Equals(operatorId))
+            .Select(c => new CredentialVm(
+                c.CredentialId,
+                c.Uri,
+                c.Username.DecryptData(key, Convert.FromBase64String(c.Salt)),
+                c.Password.DecryptData(key, Convert.FromBase64String(c.Salt)),
+                c.Key != null ? c.Key.DecryptData(key, Convert.FromBase64String(c.Salt)) : null,
+                c.Key2 != null ? c.Key2.DecryptData(key, Convert.FromBase64String(c.Salt)) : null))
+            .FirstAsync(cancellationToken);
+    }
+
     // Retrieves a token asynchronously
     // Parameters:
     //   id: The ID of the credential

@@ -7,12 +7,6 @@ public sealed class CreateCredentialValidator : AbstractValidator<CreateCredenti
         RuleFor(v => v.Credential)
             .NotEmpty();
 
-        RuleFor(v => v.Credential.Username)
-            .NotEmpty();
-
-        RuleFor(v => v.Credential.Password)
-            .NotEmpty();
-
         RuleFor(v => v.Credential.OperatorId)
             .NotEmpty();
 

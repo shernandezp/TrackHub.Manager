@@ -10,12 +10,6 @@ public sealed class UpdateCredentialValidator : AbstractValidator<UpdateCredenti
         RuleFor(v => v.Credential.CredentialId)
             .NotEmpty();
 
-        RuleFor(v => v.Credential.Username)
-            .NotEmpty();
-
-        RuleFor(v => v.Credential.Password)
-            .NotEmpty();
-
         RuleFor(v => v.Credential.Uri)
             .NotEmpty();
 
