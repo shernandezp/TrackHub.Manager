@@ -10,9 +10,6 @@ public sealed class CreateDeviceValidator : AbstractValidator<CreateDeviceComman
         RuleFor(v => v.Device.Name)
             .NotEmpty();
 
-        RuleFor(v => v.Device.Identifier)
-            .NotEmpty();
-
         RuleFor(v => v.Device.DeviceTypeId)
             .NotEmpty();
     }

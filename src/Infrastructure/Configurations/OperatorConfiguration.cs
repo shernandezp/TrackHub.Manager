@@ -49,10 +49,5 @@ public sealed class OperatorConfiguration : IEntityTypeConfiguration<Operator>
             .WithOne(d => d.Operator)
             .HasForeignKey<Credential>(d => d.OperatorId)
             .IsRequired(false);
-
-        builder
-            .HasMany(e => e.Devices)
-            .WithMany(e => e.Operators)
-            .UsingEntity<DeviceOperator>();
     }
 }

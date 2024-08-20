@@ -7,6 +7,12 @@ public sealed class CreateDeviceOperatorValidator : AbstractValidator<CreateDevi
         RuleFor(v => v.DeviceOperator)
             .NotEmpty();
 
+        RuleFor(v => v.DeviceOperator.Identifier)
+            .NotEmpty();
+
+        RuleFor(v => v.DeviceOperator.Serial)
+            .NotEmpty();
+
         RuleFor(v => v.DeviceOperator.DeviceId)
             .NotEmpty();
 

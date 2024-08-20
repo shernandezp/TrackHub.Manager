@@ -54,18 +54,14 @@
             "type": "string",
             "format": "guid"
           },
-          "identifier": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "serial": {
-            "type": "string"
-          },
           "name": {
             "type": "string"
           },
-          "deviceTypeId": {
+          "deviceType": {
             "$ref": "#/components/schemas/DeviceType"
+          },
+          "deviceTypeId": {
+            "type": "integer"
           },
           "description": {
             "type": "string",

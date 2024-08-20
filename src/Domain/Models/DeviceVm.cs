@@ -2,9 +2,8 @@
 
 public readonly record struct DeviceVm(
     Guid DeviceId,
-    int Identifier,
-    string Serial,
     string Name,
-    DeviceType DeviceTypeId,
+    DeviceType DeviceType,
+    short DeviceTypeId,
     string? Description
     );

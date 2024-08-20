@@ -1,6 +1,4 @@
-﻿using TrackHub.Manager.Infrastructure.Entities;
-
-namespace TrackHub.Manager.Infrastructure.Writers;
+﻿namespace TrackHub.Manager.Infrastructure.Writers;
 
 // This class represents a writer for UserGroup entities in the infrastructure layer.
 public sealed class UserGroupWriter(IApplicationDbContext context) : IUserGroupWriter
@@ -19,7 +17,7 @@ public sealed class UserGroupWriter(IApplicationDbContext context) : IUserGroupW
             GroupId = userGroupDto.GroupId
         };
 
-        await context.UserGroups.AddAsync(userGroup, cancellationToken);
+        await context.UsersGroup.AddAsync(userGroup, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
         return new UserGroupVm(
@@ -36,12 +34,12 @@ public sealed class UserGroupWriter(IApplicationDbContext context) : IUserGroupW
     //   NotFoundException: If the UserGroup with the specified userId and groupId is not found.
     public async Task DeleteUserGroupAsync(Guid userId, long groupId, CancellationToken cancellationToken)
     {
-        var userGroup = await context.UserGroups.FindAsync([userId, groupId], cancellationToken)
+        var userGroup = await context.UsersGroup.FindAsync([userId, groupId], cancellationToken)
             ?? throw new NotFoundException(nameof(UserGroup), $"{userId},{groupId}");
 
-        context.UserGroups.Attach(userGroup);
+        context.UsersGroup.Attach(userGroup);
 
-        context.UserGroups.Remove(userGroup);
+        context.UsersGroup.Remove(userGroup);
         await context.SaveChangesAsync(cancellationToken);
     }
 }

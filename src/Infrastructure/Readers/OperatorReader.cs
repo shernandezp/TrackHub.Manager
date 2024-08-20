@@ -70,11 +70,11 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
     // Returns:
     // - A collection of OperatorVm instances representing the retrieved operators.
     public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsByUserAsync(Guid userId, CancellationToken cancellationToken)
-        => await context.Users
-            .Where(u => u.UserId == userId)
-            .SelectMany(u => u.Groups)
-            .SelectMany(g => g.Devices)
-            .SelectMany(d => d.Operators)
+        => await context.UsersGroup
+            .Where(ug => ug.UserId == userId)
+            .SelectMany(ug => ug.Group.Devices)
+            .SelectMany(d => d.DeviceOperator)
+            .Select(d => d.Operator)
             .Distinct()
             .Select(o => new OperatorVm(
                 o.OperatorId,
@@ -101,40 +101,4 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                     o.Credential.RefreshTokenExpiration)))
             .ToListAsync(cancellationToken);
 
-    // Retrieves a collection of operators by group ID asynchronously.
-    // Parameters:
-    // - groupId: The ID of the group to retrieve operators for.
-    // - cancellationToken: A cancellation token to cancel the operation if needed.
-    // Returns:
-    // - A collection of OperatorVm instances representing the retrieved operators.
-    public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsByGroupAsync(long groupId, CancellationToken cancellationToken)
-        => await context.Groups
-            .Where(u => u.GroupId == groupId)
-            .SelectMany(g => g.Devices)
-            .SelectMany(d => d.Operators)
-            .Distinct()
-            .Select(o => new OperatorVm(
-                o.OperatorId,
-                o.Name,
-                o.Description,
-                o.PhoneNumber,
-                o.EmailAddress,
-                o.Address,
-                o.ContactName,
-                (ProtocolType)o.ProtocolType,
-                o.ProtocolType,
-                o.LastModified,
-                o.Credential == null ? null : new CredentialTokenVm(
-                    o.Credential.CredentialId,
-                    o.Credential.Uri,
-                    o.Credential.Username,
-                    o.Credential.Password,
-                    o.Credential.Salt,
-                    o.Credential.Key,
-                    o.Credential.Key2,
-                    o.Credential.Token,
-                    o.Credential.TokenExpiration,
-                    o.Credential.RefreshToken,
-                    o.Credential.RefreshTokenExpiration)))
-            .ToListAsync(cancellationToken);
 }

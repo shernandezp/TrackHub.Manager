@@ -29,6 +29,7 @@ public static class DependencyInjection
         services.AddScoped<IDeviceWriter, DeviceWriter>();
         services.AddScoped<IDeviceGroupWriter, DeviceGroupWriter>();
         services.AddScoped<IDeviceOperatorWriter, DeviceOperatorWriter>();
+        services.AddScoped<IDeviceOperatorReader, DeviceOperatorReader>();
         services.AddScoped<IDeviceReader, DeviceReader>();
         services.AddScoped<IGroupWriter, GroupWriter>();
         services.AddScoped<IGroupReader, GroupReader>();

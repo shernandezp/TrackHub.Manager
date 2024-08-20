@@ -1,6 +1,4 @@
-﻿using TrackHub.Manager.Infrastructure.Entities;
-
-namespace TrackHub.Manager.Infrastructure.Writers;
+﻿namespace TrackHub.Manager.Infrastructure.Writers;
 
 // This class represents a writer for DeviceOperator entities
 public sealed class DeviceOperatorWriter(IApplicationDbContext context) : IDeviceOperatorWriter
@@ -14,17 +12,43 @@ public sealed class DeviceOperatorWriter(IApplicationDbContext context) : IDevic
     public async Task<DeviceOperatorVm> CreateDeviceOperatorAsync(DeviceOperatorDto deviceOperatorDto, CancellationToken cancellationToken)
     {
         var deviceOperator = new DeviceOperator
-        {
-            DeviceId = deviceOperatorDto.DeviceId,
-            OperatorId = deviceOperatorDto.OperatorId
-        };
+        (
+            deviceOperatorDto.Identifier,
+            deviceOperatorDto.Serial,
+            deviceOperatorDto.DeviceId,
+            deviceOperatorDto.OperatorId
+        );
 
-        await context.DeviceOperators.AddAsync(deviceOperator, cancellationToken);
+        await context.DevicesOperator.AddAsync(deviceOperator, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
         return new DeviceOperatorVm(
+            deviceOperator.DeviceOperatorId,
+            "",
+            deviceOperator.Identifier,
+            deviceOperator.Serial,
             deviceOperator.DeviceId,
             deviceOperator.OperatorId);
+    }
+
+
+    // Updates a DeviceOperator asynchronously
+    // Parameters:
+    //   deviceOperatorDto: The DTO object containing the updated device operator data
+    //   cancellationToken: A token to cancel the operation if needed
+    public async Task UpdateDeviceOperatorAsync(UpdateDeviceOperatorDto deviceOperatorDto, CancellationToken cancellationToken)
+    {
+        var deviceOperator = await context.DevicesOperator.FindAsync(deviceOperatorDto.DeviceOperatorId, cancellationToken)
+            ?? throw new NotFoundException(nameof(Device), $"{deviceOperatorDto.DeviceOperatorId}");
+
+        context.DevicesOperator.Attach(deviceOperator);
+
+        deviceOperator.Identifier = deviceOperatorDto.Identifier;
+        deviceOperator.Serial = deviceOperatorDto.Serial;
+        deviceOperator.DeviceId = deviceOperatorDto.DeviceId;
+        deviceOperator.OperatorId = deviceOperatorDto.OperatorId;
+
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     // Deletes a DeviceOperator asynchronously
@@ -36,12 +60,12 @@ public sealed class DeviceOperatorWriter(IApplicationDbContext context) : IDevic
     //   NotFoundException: If the DeviceOperator with the specified IDs is not found
     public async Task DeleteDeviceOperatorAsync(Guid deviceId, Guid operatorId, CancellationToken cancellationToken)
     {
-        var deviceOperator = await context.DeviceOperators.FindAsync([deviceId, operatorId], cancellationToken)
+        var deviceOperator = await context.DevicesOperator.FindAsync([deviceId, operatorId], cancellationToken)
             ?? throw new NotFoundException(nameof(DeviceOperator), $"{deviceId},{operatorId}");
 
-        context.DeviceOperators.Attach(deviceOperator);
+        context.DevicesOperator.Attach(deviceOperator);
 
-        context.DeviceOperators.Remove(deviceOperator);
+        context.DevicesOperator.Remove(deviceOperator);
         await context.SaveChangesAsync(cancellationToken);
     }
 }

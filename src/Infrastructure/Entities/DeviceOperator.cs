@@ -1,12 +1,14 @@
 ﻿namespace TrackHub.Manager.Infrastructure.Entities;
 
-public sealed class DeviceOperator
+public sealed class DeviceOperator (int identifier, string serial, Guid deviceId, Guid operatorId)
 {
     private Device? _device;
     private Operator? _operator;
-
-    public required Guid DeviceId { get; set; }
-    public required Guid OperatorId { get; set; }
+    public long DeviceOperatorId { get; private set; }
+    public int Identifier { get; set; } = identifier;
+    public string Serial { get; set; } = serial;
+    public Guid DeviceId { get; set; } = deviceId;
+    public Guid OperatorId { get; set; } = operatorId;
 
     public Device Device
     {
@@ -18,4 +20,5 @@ public sealed class DeviceOperator
         get => _operator ?? throw new InvalidOperationException("Operator is not loaded");
         set => _operator = value;
     }
+
 }

@@ -13,9 +13,6 @@ public sealed class UpdateDeviceValidator : AbstractValidator<UpdateDeviceComman
         RuleFor(v => v.Device.Name)
             .NotEmpty();
 
-        RuleFor(v => v.Device.Identifier)
-            .NotEmpty();
-
         RuleFor(v => v.Device.DeviceTypeId)
             .NotEmpty();
     }

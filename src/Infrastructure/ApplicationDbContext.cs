@@ -12,13 +12,13 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Credential> Credentials { get; set; }
     public DbSet<Device> Devices { get; set; }
-    public DbSet<DeviceGroup> DeviceGroups { get; set; }
-    public DbSet<DeviceOperator> DeviceOperators { get; set; }
+    public DbSet<DeviceGroup> DevicesGroup { get; set; }
+    public DbSet<DeviceOperator> DevicesOperator { get; set; }
     public DbSet<Group> Groups { get; set; }
     public DbSet<Operator> Operators { get; set; }
     public DbSet<Transporter> Transporters { get; set; }
     public DbSet<User> Users { get; set; }
-    public DbSet<UserGroup> UserGroups { get; set; }
+    public DbSet<UserGroup> UsersGroup { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
