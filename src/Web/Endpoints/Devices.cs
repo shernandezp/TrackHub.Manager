@@ -1,4 +1,4 @@
-﻿using TrackHub.Manager.Application.Devices.Queries.Get;
+﻿using TrackHub.Manager.Application.Transporters.Queries.Get;
 
 namespace TrackHub.Manager.Web.Endpoints;
 
@@ -11,7 +11,7 @@ public class Devices : EndpointGroupBase
             .MapGet(GetDevice);
     }
 
-    public async Task<DeviceVm> GetDevice(ISender sender, [AsParameters] GetDeviceQuery query)
+    public async Task<TransporterVm> GetDevice(ISender sender, [AsParameters] GetTransporterQuery query)
         => await sender.Send(query);
 
 }

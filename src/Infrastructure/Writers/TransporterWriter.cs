@@ -1,19 +1,21 @@
 ﻿using Common.Domain.Enums;
-using TrackHub.Manager.Infrastructure.Entities;
 
 namespace TrackHub.Manager.Infrastructure.Writers;
-
 // This class represents a writer for the Transporter entity
 public sealed class TransporterWriter(IApplicationDbContext context) : ITransporterWriter
 {
-    // Creates a new Transporter entity and saves it to the database
+    // Creates a new transporter asynchronously
+    // Parameters:
+    // - transporterDto: The transporter data transfer object
+    // - cancellationToken: The cancellation token
+    // Returns:
+    // - The created transporter view model
     public async Task<TransporterVm> CreateTransporterAsync(TransporterDto transporterDto, CancellationToken cancellationToken)
     {
         var transporter = new Transporter(
             transporterDto.Name,
-            (short)transporterDto.TransporterTypeId,
-            transporterDto.Icon,
-            transporterDto.DeviceId);
+            transporterDto.TransporterTypeId,
+            transporterDto.Icon);
 
         await context.Transporters.AddAsync(transporter, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
@@ -22,30 +24,35 @@ public sealed class TransporterWriter(IApplicationDbContext context) : ITranspor
             transporter.TransporterId,
             transporter.Name,
             (TransporterType)transporter.TransporterTypeId,
-            transporter.Icon,
-            transporter.DeviceId);
+            transporter.TransporterTypeId,
+            transporter.Icon);
     }
 
-    // Updates an existing Transporter entity in the database
+    // Updates an existing transporter asynchronously
+    // Parameters:
+    // - transporterDto: The updated transporter data transfer object
+    // - cancellationToken: The cancellation token
     public async Task UpdateTransporterAsync(UpdateTransporterDto transporterDto, CancellationToken cancellationToken)
     {
-        var transporter = await context.Transporters.FindAsync([transporterDto.TransporterId], cancellationToken)
+        var transporter = await context.Transporters.FindAsync(transporterDto.TransporterId, cancellationToken)
             ?? throw new NotFoundException(nameof(Transporter), $"{transporterDto.TransporterId}");
 
         context.Transporters.Attach(transporter);
 
         transporter.Name = transporterDto.Name;
+        transporter.TransporterTypeId = transporterDto.TransporterTypeId;
         transporter.Icon = transporterDto.Icon;
-        transporter.TransporterTypeId = (short)transporterDto.TransporterTypeId;
-        transporter.DeviceId = transporterDto.DeviceId;
 
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    // Deletes a Transporter entity from the database
+    // Deletes a transporter asynchronously
+    // Parameters:
+    // - transporterId: The ID of the transporter to delete
+    // - cancellationToken: The cancellation token
     public async Task DeleteTransporterAsync(Guid transporterId, CancellationToken cancellationToken)
     {
-        var transporter = await context.Transporters.FindAsync([transporterId], cancellationToken)
+        var transporter = await context.Transporters.FindAsync(transporterId, cancellationToken)
             ?? throw new NotFoundException(nameof(Transporter), $"{transporterId}");
 
         context.Transporters.Attach(transporter);

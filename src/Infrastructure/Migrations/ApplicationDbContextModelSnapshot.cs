@@ -17,7 +17,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.7")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -149,78 +149,22 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasColumnType("text")
                         .HasColumnName("description");
 
                     b.Property<short>("DeviceTypeId")
                         .HasColumnType("smallint")
                         .HasColumnName("devicetypeid");
 
-                    b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("name");
-
-                    b.HasKey("DeviceId");
-
-                    b.ToTable("devices", "app");
-                });
-
-            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.DeviceGroup", b =>
-                {
-                    b.Property<Guid>("DeviceId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("deviceid");
-
-                    b.Property<long>("GroupId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("groupid");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("DeviceId", "GroupId");
-
-                    b.HasIndex("GroupId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("device_group", "app");
-                });
-
-            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.DeviceOperator", b =>
-                {
-                    b.Property<long>("DeviceOperatorId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("DeviceOperatorId"));
-
-                    b.Property<Guid>("DeviceId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("deviceid");
-
                     b.Property<int>("Identifier")
                         .HasMaxLength(100)
                         .HasColumnType("integer")
                         .HasColumnName("identifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<Guid>("OperatorId")
                         .HasColumnType("uuid")
@@ -232,13 +176,17 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("serial");
 
-                    b.HasKey("DeviceOperatorId");
+                    b.Property<Guid>("TransporterId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("transporterid");
 
-                    b.HasIndex("DeviceId");
+                    b.HasKey("DeviceId");
 
                     b.HasIndex("OperatorId");
 
-                    b.ToTable("device_operator", "app");
+                    b.HasIndex("TransporterId");
+
+                    b.ToTable("devices", "app");
                 });
 
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.Group", b =>
@@ -376,10 +324,6 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("DeviceId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("deviceid");
-
                     b.Property<short>("Icon")
                         .HasColumnType("smallint")
                         .HasColumnName("icon");
@@ -402,10 +346,24 @@ namespace TrackHub.Manager.Infrastructure.Migrations
 
                     b.HasKey("TransporterId");
 
-                    b.HasIndex("DeviceId")
-                        .IsUnique();
-
                     b.ToTable("transporters", "app");
+                });
+
+            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.TransporterGroup", b =>
+                {
+                    b.Property<long>("GroupId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("groupid");
+
+                    b.Property<Guid>("TransporterId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("transporterid");
+
+                    b.HasKey("GroupId", "TransporterId");
+
+                    b.HasIndex("TransporterId");
+
+                    b.ToTable("transporter_group", "app");
                 });
 
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.User", b =>
@@ -462,46 +420,21 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     b.Navigation("Operator");
                 });
 
-            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.DeviceGroup", b =>
+            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.Device", b =>
                 {
-                    b.HasOne("TrackHub.Manager.Infrastructure.Entities.Device", "Device")
-                        .WithMany()
-                        .HasForeignKey("DeviceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TrackHub.Manager.Infrastructure.Entities.Group", null)
-                        .WithMany()
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TrackHub.Manager.Infrastructure.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Device");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.DeviceOperator", b =>
-                {
-                    b.HasOne("TrackHub.Manager.Infrastructure.Entities.Device", "Device")
-                        .WithMany("DeviceOperator")
-                        .HasForeignKey("DeviceId");
-
                     b.HasOne("TrackHub.Manager.Infrastructure.Entities.Operator", "Operator")
-                        .WithMany("DeviceOperator")
+                        .WithMany("Devices")
                         .HasForeignKey("OperatorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Device");
+                    b.HasOne("TrackHub.Manager.Infrastructure.Entities.Transporter", "Transporter")
+                        .WithMany("Devices")
+                        .HasForeignKey("TransporterId");
 
                     b.Navigation("Operator");
+
+                    b.Navigation("Transporter");
                 });
 
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.Group", b =>
@@ -526,13 +459,23 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     b.Navigation("Account");
                 });
 
-            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.Transporter", b =>
+            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.TransporterGroup", b =>
                 {
-                    b.HasOne("TrackHub.Manager.Infrastructure.Entities.Device", "Device")
-                        .WithOne("Transporter")
-                        .HasForeignKey("TrackHub.Manager.Infrastructure.Entities.Transporter", "DeviceId");
+                    b.HasOne("TrackHub.Manager.Infrastructure.Entities.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Device");
+                    b.HasOne("TrackHub.Manager.Infrastructure.Entities.Transporter", "Transporter")
+                        .WithMany()
+                        .HasForeignKey("TransporterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Transporter");
                 });
 
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.User", b =>
@@ -574,18 +517,16 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.Device", b =>
-                {
-                    b.Navigation("DeviceOperator");
-
-                    b.Navigation("Transporter");
-                });
-
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.Operator", b =>
                 {
                     b.Navigation("Credential");
 
-                    b.Navigation("DeviceOperator");
+                    b.Navigation("Devices");
+                });
+
+            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.Transporter", b =>
+                {
+                    b.Navigation("Devices");
                 });
 #pragma warning restore 612, 618
         }

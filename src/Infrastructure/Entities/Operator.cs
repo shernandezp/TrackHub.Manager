@@ -14,7 +14,7 @@ public sealed class Operator(string name, string? description, string? phoneNumb
     public int ProtocolType { get; set; } = protocolType;
     public Guid AccountId { get; set; } = accountId;
     public Credential? Credential { get; set; }
-    public ICollection<DeviceOperator> DeviceOperator { get; } = [];
+    public ICollection<Device> Devices { get; } = [];
 
     public Account Account
     {

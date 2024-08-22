@@ -1,6 +1,10 @@
 ﻿namespace TrackHub.Manager.Domain.Records;
-public readonly record struct DeviceDto(
+public record struct DeviceDto(
     string Name,
+    int Identifier,
+    string Serial,
     short DeviceTypeId,
-    string? Description
+    string? Description,
+    Guid TransporterId, 
+    Guid OperatorId
     );

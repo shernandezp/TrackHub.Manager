@@ -14,10 +14,16 @@ public sealed class TransporterConfiguration : IEntityTypeConfiguration<Transpor
         builder.Property(x => x.Name).HasColumnName("name");
         builder.Property(x => x.TransporterTypeId).HasColumnName("transportertypeid");
         builder.Property(x => x.Icon).HasColumnName("icon");
-        builder.Property(x => x.DeviceId).HasColumnName("deviceid");
 
         builder.Property(t => t.Name)
             .HasMaxLength(ColumnMetadata.DefaultNameLength)
             .IsRequired();
+
+        builder
+            .HasMany(d => d.Devices)
+            .WithOne(d => d.Transporter)
+            .HasForeignKey(d => d.TransporterId)
+            .IsRequired(false);
+
     }
 }

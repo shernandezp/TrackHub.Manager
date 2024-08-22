@@ -72,8 +72,8 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
     public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsByUserAsync(Guid userId, CancellationToken cancellationToken)
         => await context.UsersGroup
             .Where(ug => ug.UserId == userId)
-            .SelectMany(ug => ug.Group.Devices)
-            .SelectMany(d => d.DeviceOperator)
+            .SelectMany(ug => ug.Group.Transporters)
+            .SelectMany(d => d.Devices)
             .Select(d => d.Operator)
             .Distinct()
             .Select(o => new OperatorVm(

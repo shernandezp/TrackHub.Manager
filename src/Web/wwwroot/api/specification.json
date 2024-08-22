@@ -30,7 +30,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DeviceVm"
+                  "$ref": "#/components/schemas/TransporterVm"
                 }
               }
             }
@@ -46,49 +46,56 @@
   },
   "components": {
     "schemas": {
-      "DeviceVm": {
+      "TransporterVm": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "deviceId": {
+          "transporterId": {
             "type": "string",
             "format": "guid"
           },
           "name": {
             "type": "string"
           },
-          "deviceType": {
-            "$ref": "#/components/schemas/DeviceType"
+          "transporterType": {
+            "$ref": "#/components/schemas/TransporterType"
           },
-          "deviceTypeId": {
+          "transporterTypeId": {
             "type": "integer"
           },
-          "description": {
-            "type": "string",
-            "nullable": true
+          "icon": {
+            "type": "integer"
           }
         }
       },
-      "DeviceType": {
+      "TransporterType": {
         "type": "integer",
         "description": "",
         "x-enumNames": [
-          "Unknown",
-          "Aviation",
-          "Camera",
-          "Cycling",
-          "Cellular",
-          "Drones",
-          "EmergencyLocator",
-          "Fitness",
-          "Handheld",
-          "Marine",
-          "OBDScanner",
-          "PetTracking",
-          "Phone",
-          "Satellite",
-          "Smartwatch",
-          "Wearable"
+          "Aircraft",
+          "Asset",
+          "Bicycle",
+          "Boat",
+          "Car",
+          "CargoContainer",
+          "ConstructionVehicle",
+          "Child",
+          "DeliveryVan",
+          "Drone",
+          "ElderlyPerson",
+          "FleetVehicle",
+          "HeavyEquipment",
+          "Livestock",
+          "Motorcycle",
+          "Package",
+          "Person",
+          "Pet",
+          "SchoolBus",
+          "Scooter",
+          "Taxi",
+          "Tool",
+          "Truck",
+          "Tractor"
         ],
         "enum": [
           0,
@@ -106,7 +113,15 @@
           12,
           13,
           14,
-          15
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
         ]
       }
     },

@@ -1,24 +1,24 @@
-﻿using TrackHub.Manager.Application.DeviceOperator.Commands.Create;
-using TrackHub.Manager.Application.DeviceOperator.Commands.Delete;
-using TrackHub.Manager.Application.DeviceOperator.Commands.Update;
+﻿using TrackHub.Manager.Application.Device.Commands.Create;
+using TrackHub.Manager.Application.Device.Commands.Delete;
+using TrackHub.Manager.Application.Device.Commands.Update;
 
 namespace TrackHub.Manager.Web.GraphQL.Mutation;
 
 public partial class Mutation
 {
-    public async Task<DeviceOperatorVm> CreateDeviceOperator([Service] ISender sender, CreateDeviceOperatorCommand command)
+    public async Task<DeviceVm> CreateDevice([Service] ISender sender, CreateDeviceCommand command)
         => await sender.Send(command);
 
-    public async Task<bool> UpdateDeviceOperator([Service] ISender sender, long id, UpdateDeviceOperatorCommand command)
+    public async Task<bool> UpdateDevice([Service] ISender sender, Guid id, UpdateDeviceCommand command)
     {
-        if (id != command.DeviceOperator.DeviceOperatorId) return false;
+        if (id != command.Device.DeviceId) return false;
         await sender.Send(command);
         return true;
     }
 
-    public async Task<Guid> DeleteDeviceOperator([Service] ISender sender, Guid deviceId, Guid operatorId)
+    public async Task<Guid> DeleteDevice([Service] ISender sender, Guid deviceId)
     {
-        await sender.Send(new DeleteDeviceOperatorCommand(deviceId, operatorId));
+        await sender.Send(new DeleteDeviceCommand(deviceId));
         return deviceId;
     }
 }

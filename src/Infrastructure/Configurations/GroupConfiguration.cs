@@ -31,8 +31,8 @@ public sealed class GroupConfiguration : IEntityTypeConfiguration<Group>
             .UsingEntity<UserGroup>();
 
         builder
-            .HasMany(e => e.Devices)
+            .HasMany(e => e.Transporters)
             .WithMany(e => e.Groups)
-            .UsingEntity<DeviceGroup>();
+            .UsingEntity<TransporterGroup>();
     }
 }

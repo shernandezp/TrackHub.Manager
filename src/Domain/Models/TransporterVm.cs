@@ -1,8 +1,9 @@
 ﻿namespace TrackHub.Manager.Domain.Models;
-public record struct TransporterVm(
+
+public readonly record struct TransporterVm(
     Guid TransporterId,
     string Name,
-    TransporterType TransporterTypeId,
-    short Icon,
-    Guid? DeviceId
+    TransporterType TransporterType,
+    short TransporterTypeId,
+    short Icon
     );

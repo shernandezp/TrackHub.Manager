@@ -2,7 +2,7 @@
 
 public sealed class Position
 {
-    private Device? _device;
+    private Transporter? _transporter;
 
     public long PositionId { get; set; }
     public Guid DeviceId { get; set; }
@@ -19,10 +19,10 @@ public sealed class Position
     public string? Country { get; set; }
     public string? Attributes { get; set; } //json with ignition, mileage, Hobbs Meter, temperature, etc.
 
-    public Device Device
+    public Transporter Transporter
     {
-        get => _device ?? throw new InvalidOperationException("Device is not loaded");
-        set => _device = value;
+        get => _transporter ?? throw new InvalidOperationException("Transporter is not loaded");
+        set => _transporter = value;
     }
 
 }

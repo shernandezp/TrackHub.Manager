@@ -1,9 +1,10 @@
 ﻿namespace TrackHub.Manager.Domain.Models;
-
-public readonly record struct DeviceVm(
+public record struct DeviceVm(
     Guid DeviceId,
     string Name,
-    DeviceType DeviceType,
+    int Identifier,
+    string Serial,
     short DeviceTypeId,
-    string? Description
-    );
+    string? Description,
+    Guid TransporterId, 
+    Guid OperatorId);

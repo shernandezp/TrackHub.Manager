@@ -1,8 +1,8 @@
 ﻿namespace TrackHub.Manager.Domain.Records;
-public record struct UpdateTransporterDto(
+
+public readonly record struct UpdateTransporterDto(
     Guid TransporterId,
     string Name,
-    TransporterType TransporterTypeId,
-    short Icon,
-    Guid DeviceId
+    short TransporterTypeId,
+    short Icon
     );

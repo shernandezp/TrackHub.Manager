@@ -12,7 +12,7 @@ public sealed class Group(string name, string description, bool isMaster, bool a
     public bool Active { get; set; } = active;
     public Guid AccountId { get; set; } = accountId;
     public ICollection<User> Users { get; } = [];
-    public ICollection<Device> Devices { get; } = [];
+    public ICollection<Transporter> Transporters { get; } = [];
 
     public Account Account
     {
