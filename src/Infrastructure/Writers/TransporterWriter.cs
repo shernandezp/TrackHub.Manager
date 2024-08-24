@@ -14,8 +14,7 @@ public sealed class TransporterWriter(IApplicationDbContext context) : ITranspor
     {
         var transporter = new Transporter(
             transporterDto.Name,
-            transporterDto.TransporterTypeId,
-            transporterDto.Icon);
+            transporterDto.TransporterTypeId);
 
         await context.Transporters.AddAsync(transporter, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
@@ -24,8 +23,7 @@ public sealed class TransporterWriter(IApplicationDbContext context) : ITranspor
             transporter.TransporterId,
             transporter.Name,
             (TransporterType)transporter.TransporterTypeId,
-            transporter.TransporterTypeId,
-            transporter.Icon);
+            transporter.TransporterTypeId);
     }
 
     // Updates an existing transporter asynchronously
@@ -41,7 +39,6 @@ public sealed class TransporterWriter(IApplicationDbContext context) : ITranspor
 
         transporter.Name = transporterDto.Name;
         transporter.TransporterTypeId = transporterDto.TransporterTypeId;
-        transporter.Icon = transporterDto.Icon;
 
         await context.SaveChangesAsync(cancellationToken);
     }
@@ -60,4 +57,5 @@ public sealed class TransporterWriter(IApplicationDbContext context) : ITranspor
         context.Transporters.Remove(transporter);
         await context.SaveChangesAsync(cancellationToken);
     }
+
 }

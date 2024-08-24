@@ -5,4 +5,5 @@ public interface ITransporterGroupWriter
 {
     Task<TransporterGroupVm> CreateTransporterGroupAsync(TransporterGroupDto transporterGroupDto, CancellationToken cancellationToken);
     Task DeleteTransporterGroupAsync(Guid transporterId, long groupId, CancellationToken cancellationToken);
+    Task DeleteTransporterGroupsAsync(Guid transporterId, CancellationToken cancellationToken);
 }

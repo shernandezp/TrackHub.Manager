@@ -1,11 +1,11 @@
 ﻿namespace TrackHub.Manager.Infrastructure.Entities;
 
-public sealed class DevicePosition
+public sealed class TransporterPosition
 {
     private Transporter? _transporter;
 
     public int DevicePositionId { get; set; }
-    public Guid DeviceId { get; set; }
+    public Guid TransporterId { get; set; }
     public double Latitude { get; set; }
     public double Longitude { get; set; }
     public int Altitude { get; set; }

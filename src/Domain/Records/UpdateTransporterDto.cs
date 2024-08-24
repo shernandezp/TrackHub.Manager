@@ -3,6 +3,5 @@
 public readonly record struct UpdateTransporterDto(
     Guid TransporterId,
     string Name,
-    short TransporterTypeId,
-    short Icon
+    short TransporterTypeId
     );

@@ -5,6 +5,7 @@ public sealed class Position
     private Transporter? _transporter;
 
     public long PositionId { get; set; }
+    public Guid TransporterId { get; set; }
     public Guid DeviceId { get; set; }
     public double Latitude { get; set; }
     public double Longitude { get; set; }

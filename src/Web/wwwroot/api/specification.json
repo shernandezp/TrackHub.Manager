@@ -62,9 +62,6 @@
           },
           "transporterTypeId": {
             "type": "integer"
-          },
-          "icon": {
-            "type": "integer"
           }
         }
       },
@@ -98,7 +95,6 @@
           "Tractor"
         ],
         "enum": [
-          0,
           1,
           2,
           3,
@@ -121,7 +117,8 @@
           20,
           21,
           22,
-          23
+          23,
+          24
         ]
       }
     },

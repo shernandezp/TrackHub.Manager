@@ -13,7 +13,6 @@ public sealed class TransporterConfiguration : IEntityTypeConfiguration<Transpor
         builder.Property(x => x.TransporterId).HasColumnName("id");
         builder.Property(x => x.Name).HasColumnName("name");
         builder.Property(x => x.TransporterTypeId).HasColumnName("transportertypeid");
-        builder.Property(x => x.Icon).HasColumnName("icon");
 
         builder.Property(t => t.Name)
             .HasMaxLength(ColumnMetadata.DefaultNameLength)

@@ -4,6 +4,5 @@ public readonly record struct TransporterVm(
     Guid TransporterId,
     string Name,
     TransporterType TransporterType,
-    short TransporterTypeId,
-    short Icon
+    short TransporterTypeId
     );

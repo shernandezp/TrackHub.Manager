@@ -1,4 +1,6 @@
-﻿namespace TrackHub.Manager.Infrastructure.Writers;
+﻿using Common.Domain.Enums;
+
+namespace TrackHub.Manager.Infrastructure.Writers;
 
 // This class represents a writer for Device entities
 public sealed class DeviceWriter(IApplicationDbContext context) : IDeviceWriter
@@ -30,6 +32,7 @@ public sealed class DeviceWriter(IApplicationDbContext context) : IDeviceWriter
             device.Name,
             device.Identifier,
             device.Serial,
+            (DeviceType)device.DeviceTypeId,
             device.DeviceTypeId,
             device.Description,
             device.TransporterId,
@@ -50,11 +53,9 @@ public sealed class DeviceWriter(IApplicationDbContext context) : IDeviceWriter
 
         device.Name = deviceDto.Name;
         device.Identifier = deviceDto.Identifier;
-        device.Serial = deviceDto.Serial;
         device.DeviceTypeId = deviceDto.DeviceTypeId;
         device.Description = deviceDto.Description;
         device.TransporterId = deviceDto.TransporterId;
-        device.OperatorId = deviceDto.OperatorId;
 
         await context.SaveChangesAsync(cancellationToken);
     }

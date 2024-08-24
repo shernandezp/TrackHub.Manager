@@ -4,6 +4,7 @@ public record struct DeviceVm(
     string Name,
     int Identifier,
     string Serial,
+    DeviceType DeviceType,
     short DeviceTypeId,
     string? Description,
     Guid TransporterId, 

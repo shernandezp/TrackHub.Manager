@@ -1,25 +1,18 @@
-﻿using TrackHub.Manager.Application.Transporters.Queries.Get;
-using TrackHub.Manager.Application.Transporters.Queries.GetByAccount;
-using TrackHub.Manager.Application.Transporters.Queries.GetByGroup;
-using TrackHub.Manager.Application.Transporters.Queries.GetByUser;
+﻿using TrackHub.Manager.Application.Device.Queries.Get;
+using TrackHub.Manager.Application.Device.Queries.GetByAccount;
+using TrackHub.Manager.Application.Device.Queries.GetByOperator;
 
 namespace TrackHub.Manager.Web.GraphQL.Query;
 
 public partial class Query
 {
-    public async Task<TransporterVm> GetTransporter([Service] ISender sender, [AsParameters] GetTransporterQuery query)
+
+    public async Task<DeviceVm> GetDevice([Service] ISender sender, [AsParameters] GetDeviceQuery query)
         => await sender.Send(query);
 
-    public async Task<IReadOnlyCollection<TransporterVm>> GetTransportersByAccount([Service] ISender sender, [AsParameters] GetTransporterByAccountQuery query)
+    public async Task<IReadOnlyCollection<DeviceVm>> GetDeviceByUserByOperator([Service] ISender sender, [AsParameters] GetDeviceByUserByOperatorQuery query)
         => await sender.Send(query);
 
-    public async Task<IReadOnlyCollection<TransporterVm>> GetTransportersByCurrentAccount([Service] ISender sender)
-        => await sender.Send(new GetTransportersByCurrentAccountQuery());
-
-    public async Task<IReadOnlyCollection<TransporterVm>> GetTransportersByGroup([Service] ISender sender, [AsParameters] GetTransporterByGroupQuery query)
-        => await sender.Send(query);
-
-    public async Task<IReadOnlyCollection<TransporterVm>> GetTransportersByUser([Service] ISender sender)
-        => await sender.Send(new GetTransporterByUserQuery());
-
+    public async Task<IReadOnlyCollection<DeviceVm>> GetDevicesByAccount([Service] ISender sender)
+        => await sender.Send(new GetDevicesByAccountQuery());
 }

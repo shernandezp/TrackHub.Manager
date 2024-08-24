@@ -11,6 +11,7 @@ internal class DeviceConfiguration : IEntityTypeConfiguration<Device>
 
         //Column names
         builder.Property(x => x.DeviceId).HasColumnName("id");
+        builder.Property(x => x.Name).HasColumnName("name");
         builder.Property(x => x.Identifier).HasColumnName("identifier");
         builder.Property(x => x.Serial).HasColumnName("serial");
         builder.Property(x => x.DeviceTypeId).HasColumnName("devicetypeid");

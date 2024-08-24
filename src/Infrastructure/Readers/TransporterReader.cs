@@ -18,9 +18,24 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
                 d.TransporterId,
                 d.Name,
                 (TransporterType)d.TransporterTypeId,
-                d.TransporterTypeId,
-                d.Icon))
+                d.TransporterTypeId))
             .FirstAsync(cancellationToken);
+
+    // GetTransporterAsync method retrieves a transporter by its name
+    // Parameters:
+    // - name: The name of the transporter
+    // - cancellationToken: A cancellation token to cancel the operation
+    // Returns:
+    // - Task<TransporterVm>: A task that represents the asynchronous operation. The task result contains the TransporterVm object.
+    public async Task<TransporterVm> GetTransporterAsync(string name, CancellationToken cancellationToken)
+        => await context.Transporters
+            .Where(d => d.Name.Equals(name))
+            .Select(d => new TransporterVm(
+                d.TransporterId,
+                d.Name,
+                (TransporterType)d.TransporterTypeId,
+                d.TransporterTypeId))
+            .FirstOrDefaultAsync(cancellationToken);
 
     // GetTransportersByGroupAsync method retrieves transporters by group ID
     // Parameters:
@@ -36,8 +51,7 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
                 d.TransporterId,
                 d.Name,
                 (TransporterType)d.TransporterTypeId,
-                d.TransporterTypeId,
-                d.Icon))
+                d.TransporterTypeId))
             .Distinct()
             .ToListAsync(cancellationToken);
 
@@ -57,8 +71,7 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
                 d.TransporterId,
                 d.Name,
                 (TransporterType)d.TransporterTypeId,
-                d.TransporterTypeId,
-                d.Icon))
+                d.TransporterTypeId))
             .ToListAsync(cancellationToken);
 
     // GetTransportersByAccountAsync method retrieves transporters by account ID
@@ -77,8 +90,7 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
                 d.TransporterId,
                 d.Name,
                 (TransporterType)d.TransporterTypeId,
-                d.TransporterTypeId,
-                d.Icon))
+                d.TransporterTypeId))
             .ToListAsync(cancellationToken);
 
 
