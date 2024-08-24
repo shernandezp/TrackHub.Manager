@@ -83,14 +83,15 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
     public async Task<IReadOnlyCollection<TransporterVm>> GetTransportersByAccountAsync(Guid accountId, CancellationToken cancellationToken)
         => await context.Accounts
             .Where(a => a.AccountId == accountId)
-            .SelectMany(a => a.Groups)
-            .SelectMany(g => g.Transporters)
+            .SelectMany(a => a.Operators)
+            .SelectMany(o => o.Devices)
+            .Select(d => d.Transporter)
             .Distinct()
-            .Select(d => new TransporterVm(
-                d.TransporterId,
-                d.Name,
-                (TransporterType)d.TransporterTypeId,
-                d.TransporterTypeId))
+            .Select(t => new TransporterVm(
+                t.TransporterId,
+                t.Name,
+                (TransporterType)t.TransporterTypeId,
+                t.TransporterTypeId))
             .ToListAsync(cancellationToken);
 
 
