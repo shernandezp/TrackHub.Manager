@@ -6,6 +6,7 @@ namespace TrackHub.Manager.Infrastructure.Readers;
 public sealed class AccountReader(IApplicationDbContext context) : IAccountReader
 {
     // Retrieves an account by ID
+    // Returns an AccountVm object
     public async Task<AccountVm> GetAccountAsync(Guid id, CancellationToken cancellationToken)
         => await context.Accounts
             .Where(a => a.AccountId.Equals(id))
@@ -19,6 +20,7 @@ public sealed class AccountReader(IApplicationDbContext context) : IAccountReade
             .FirstAsync(cancellationToken);
 
     // Retrieves all accounts
+    // Returns a collection of AccountVm objects
     public async Task<IReadOnlyCollection<AccountVm>> GetAccountsAsync(CancellationToken cancellationToken)
         => await context.Accounts
             .Select(a => new AccountVm(
@@ -29,17 +31,4 @@ public sealed class AccountReader(IApplicationDbContext context) : IAccountReade
                 a.Active,
                 a.LastModified))
             .ToListAsync(cancellationToken);
-
-    // Retrieves an account by user ID
-    public async Task<AccountVm> GetAccountByUserIdAsync(Guid userId, CancellationToken cancellationToken)
-        => await context.Users
-                .Where(u => u.UserId == userId)
-                .Select(u => new AccountVm(
-                    u.Account.AccountId,
-                    u.Account.Name,
-                    u.Account.Description,
-                    (AccountType)u.Account.Type,
-                    u.Account.Active,
-                    u.Account.LastModified))
-                .FirstAsync(cancellationToken);
 }
