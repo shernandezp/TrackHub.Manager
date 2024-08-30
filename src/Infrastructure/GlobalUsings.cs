@@ -1,9 +1,0 @@
-﻿global using TrackHub.Manager.Domain.Interfaces;
-global using TrackHub.Manager.Domain.Records;
-global using TrackHub.Manager.Infrastructure.Interfaces;
-global using Ardalis.GuardClauses;
-global using Microsoft.EntityFrameworkCore;
-global using TrackHub.Manager.Infrastructure.Entities;
-global using TrackHub.Manager.Domain.Models;
-global using TrackHub.Manager.Infrastructure.Readers;
-global using TrackHub.Manager.Infrastructure.Writers;

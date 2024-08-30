@@ -5,6 +5,7 @@ public readonly record struct AccountVm(
     string Name,
     string? Description,
     AccountType Type,
+    short TypeId,
     bool Active,
     DateTimeOffset LastModified
     );

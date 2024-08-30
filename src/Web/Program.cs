@@ -1,6 +1,6 @@
 using System.Reflection;
 using Common.Application;
-using TrackHub.Manager.Infrastructure;
+using TrackHub.Manager.Infrastructure.ManagerDB;
 using TrackHub.Manager.Web.GraphQL.Mutation;
 using TrackHub.Manager.Web.GraphQL.Query;
 
@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplicationServices();
 builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddAppSecurityContext();
 builder.Services.AddWebServices("Manager API");
 
 // Add HealthChecks

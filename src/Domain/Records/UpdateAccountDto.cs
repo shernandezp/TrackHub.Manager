@@ -3,6 +3,6 @@ public readonly record struct UpdateAccountDto(
     Guid AccountId,
     string Name,
     string? Description,
-    AccountType Type,
+    short Type,
     bool Active
     );
