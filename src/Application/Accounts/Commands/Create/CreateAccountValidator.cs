@@ -9,7 +9,7 @@ public sealed class CreateAccountValidator : AbstractValidator<CreateAccountComm
         RuleFor(v => v.Account.Name)
             .NotEmpty();
 
-        RuleFor(v => v.Account.Type)
+        RuleFor(v => v.Account.TypeId)
             .NotEmpty();
     }
 }

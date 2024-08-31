@@ -3,7 +3,7 @@
 public readonly record struct AccountDto(
     string Name,
     string? Description,
-    AccountType Type,
+    short TypeId,
     bool Active,
     string Password,
     string EmailAddress,

@@ -16,7 +16,7 @@ public sealed class AccountWriter(IApplicationDbContext context) : IAccountWrite
         var account = new Account(
             accountDto.Name,
             accountDto.Description,
-            (short)accountDto.Type,
+            accountDto.TypeId,
             accountDto.Active);
 
         await context.Accounts.AddAsync(account, cancellationToken);
@@ -45,24 +45,24 @@ public sealed class AccountWriter(IApplicationDbContext context) : IAccountWrite
 
         account.Name = accountDto.Name;
         account.Description = accountDto.Description;
-        account.Type = accountDto.Type;
-        account.Active = accountDto.Active;
+        account.Type = accountDto.TypeId;
 
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    // Deletes an account asynchronously
+    // Disables an account asynchronously
     // Parameters:
-    // - accountId: The ID of the account to delete
+    // - accountId: The account ID
     // - cancellationToken: The cancellation token
-    public async Task DeleteAccountAsync(Guid accountId, CancellationToken cancellationToken)
+    public async Task DisableAccountAsync(Guid accountId, CancellationToken cancellationToken)
     {
         var account = await context.Accounts.FindAsync(accountId, cancellationToken)
             ?? throw new NotFoundException(nameof(Account), $"{accountId}");
 
         context.Accounts.Attach(account);
 
-        context.Accounts.Remove(account);
+        account.Active = false;
+
         await context.SaveChangesAsync(cancellationToken);
     }
 }
