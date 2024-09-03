@@ -1,6 +1,6 @@
 ﻿namespace TrackHub.Manager.Application.Accounts.Commands.Create;
 
-[Authorize(Resource = Resources.Accounts, Action = Actions.Write)]
+[Authorize(Resource = Resources.ManageAccounts, Action = Actions.Write)]
 public readonly record struct CreateAccountCommand(AccountDto Account) : IRequest<AccountVm>;
 
 public class CreateAccountCommandHandler(IAccountWriter writer, ISecurityWriter securityWriter) : IRequestHandler<CreateAccountCommand, AccountVm>

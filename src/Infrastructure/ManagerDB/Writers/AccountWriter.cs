@@ -46,22 +46,7 @@ public sealed class AccountWriter(IApplicationDbContext context) : IAccountWrite
         account.Name = accountDto.Name;
         account.Description = accountDto.Description;
         account.Type = accountDto.TypeId;
-
-        await context.SaveChangesAsync(cancellationToken);
-    }
-
-    // Disables an account asynchronously
-    // Parameters:
-    // - accountId: The account ID
-    // - cancellationToken: The cancellation token
-    public async Task DisableAccountAsync(Guid accountId, CancellationToken cancellationToken)
-    {
-        var account = await context.Accounts.FindAsync(accountId, cancellationToken)
-            ?? throw new NotFoundException(nameof(Account), $"{accountId}");
-
-        context.Accounts.Attach(account);
-
-        account.Active = false;
+        account.Active = accountDto.Active;
 
         await context.SaveChangesAsync(cancellationToken);
     }

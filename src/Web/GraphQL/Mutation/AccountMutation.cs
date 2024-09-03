@@ -1,5 +1,4 @@
 ﻿using TrackHub.Manager.Application.Accounts.Commands.Create;
-using TrackHub.Manager.Application.Accounts.Commands.Disable;
 using TrackHub.Manager.Application.Accounts.Commands.Update;
 
 namespace TrackHub.Manager.Web.GraphQL.Mutation;
@@ -14,11 +13,5 @@ public partial class Mutation
         if (id != command.Account.AccountId) return false;
         await sender.Send(command);
         return true;
-    }
-
-    public async Task<Guid> DisableAccount([Service] ISender sender, Guid id)
-    {
-        await sender.Send(new DisableAccountCommand(id));
-        return id;
     }
 }
