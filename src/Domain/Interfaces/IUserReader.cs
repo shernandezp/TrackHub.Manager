@@ -3,4 +3,5 @@ public interface IUserReader
 {
     Task<UserVm> GetUserAsync(Guid id, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<UserVm>> GetUsersByAccountAsync(Guid accountId, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<UserVm>> GetUsersByGroupAsync(long groupId, CancellationToken cancellationToken);
 }

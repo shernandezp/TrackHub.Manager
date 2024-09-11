@@ -1,7 +1,7 @@
 ﻿namespace TrackHub.Manager.Application.Groups.Queries.Get;
 
 [Authorize(Resource = Resources.Groups, Action = Actions.Read)]
-public readonly record struct GetGroupQuery(Guid Id) : IRequest<GroupVm>;
+public readonly record struct GetGroupQuery(long Id) : IRequest<GroupVm>;
 
 public class GetGroupsQueryHandler(IGroupReader reader) : IRequestHandler<GetGroupQuery, GroupVm>
 {

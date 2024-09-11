@@ -34,7 +34,7 @@ public sealed class UserGroupWriter(IApplicationDbContext context) : IUserGroupW
     //   NotFoundException: If the UserGroup with the specified userId and groupId is not found.
     public async Task DeleteUserGroupAsync(Guid userId, long groupId, CancellationToken cancellationToken)
     {
-        var userGroup = await context.UsersGroup.FindAsync([userId, groupId], cancellationToken)
+        var userGroup = await context.UsersGroup.FindAsync([groupId, userId], cancellationToken)
             ?? throw new NotFoundException(nameof(UserGroup), $"{userId},{groupId}");
 
         context.UsersGroup.Attach(userGroup);

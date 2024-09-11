@@ -1,7 +1,7 @@
 ﻿namespace TrackHub.Manager.Application.Groups.Commands.Delete;
 
 [Authorize(Resource = Resources.Groups, Action = Actions.Delete)]
-public record DeleteGroupCommand(Guid Id) : IRequest;
+public record DeleteGroupCommand(long Id) : IRequest;
 
 public class DeleteGroupCommandHandler(IGroupWriter writer) : IRequestHandler<DeleteGroupCommand>
 {

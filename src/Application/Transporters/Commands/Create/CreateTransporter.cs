@@ -1,6 +1,6 @@
 ﻿namespace TrackHub.Manager.Application.Transporters.Commands.Create;
 
-[Authorize(Resource = Resources.Devices, Action = Actions.Write)]
+[Authorize(Resource = Resources.Transporters, Action = Actions.Write)]
 public readonly record struct CreateTransporterCommand(TransporterDto Transporter) : IRequest<TransporterVm>;
 
 public class CreateTransporterCommandHandler(ITransporterWriter writer) : IRequestHandler<CreateTransporterCommand, TransporterVm>

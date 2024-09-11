@@ -1,6 +1,6 @@
 ﻿namespace TrackHub.Manager.Application.Transporters.Commands.Update;
 
-[Authorize(Resource = Resources.Devices, Action = Actions.Edit)]
+[Authorize(Resource = Resources.Transporters, Action = Actions.Edit)]
 public readonly record struct UpdateTransporterCommand(UpdateTransporterDto Transporter) : IRequest;
 
 public class UpdateTransporterCommandHandler(ITransporterWriter writer) : IRequestHandler<UpdateTransporterCommand>

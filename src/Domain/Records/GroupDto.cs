@@ -2,7 +2,5 @@
 public readonly record struct GroupDto(
     string Name,
     string Description,
-    bool IsMaster,
-    bool Active,
-    Guid AccountId
+    bool Active
     );

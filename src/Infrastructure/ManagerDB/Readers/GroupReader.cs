@@ -9,14 +9,13 @@ public sealed class GroupReader(IApplicationDbContext context) : IGroupReader
     //   cancellationToken: A token to cancel the operation.
     // Returns:
     //   A Task that represents the asynchronous operation. The task result contains the GroupVm object.
-    public async Task<GroupVm> GetGroupAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<GroupVm> GetGroupAsync(long id, CancellationToken cancellationToken)
         => await context.Groups
             .Where(d => d.GroupId.Equals(id))
             .Select(d => new GroupVm(
                 d.GroupId,
                 d.Name,
                 d.Description,
-                d.IsMaster,
                 d.Active,
                 d.AccountId))
             .FirstAsync(cancellationToken);
@@ -36,7 +35,6 @@ public sealed class GroupReader(IApplicationDbContext context) : IGroupReader
                 d.GroupId,
                 d.Name,
                 d.Description,
-                d.IsMaster,
                 d.Active,
                 d.AccountId))
             .ToListAsync(cancellationToken);
@@ -56,7 +54,6 @@ public sealed class GroupReader(IApplicationDbContext context) : IGroupReader
                 d.GroupId,
                 d.Name,
                 d.Description,
-                d.IsMaster,
                 d.Active,
                 d.AccountId))
             .ToListAsync(cancellationToken);

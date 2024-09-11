@@ -1,6 +1,6 @@
 ﻿namespace TrackHub.Manager.Application.Transporters.Commands.Delete;
 
-[Authorize(Resource = Resources.Devices, Action = Actions.Delete)]
+[Authorize(Resource = Resources.Transporters, Action = Actions.Delete)]
 public record DeleteTransporterCommand(Guid Id) : IRequest;
 
 public class DeleteTransporterCommandHandler(ITransporterWriter writer) : IRequestHandler<DeleteTransporterCommand>

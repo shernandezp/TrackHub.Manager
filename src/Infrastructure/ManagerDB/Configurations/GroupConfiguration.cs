@@ -13,7 +13,6 @@ public sealed class GroupConfiguration : IEntityTypeConfiguration<Group>
         builder.Property(x => x.GroupId).HasColumnName("id");
         builder.Property(x => x.Name).HasColumnName("name");
         builder.Property(x => x.Description).HasColumnName("description");
-        builder.Property(x => x.IsMaster).HasColumnName("ismaster");
         builder.Property(x => x.Active).HasColumnName("active");
         builder.Property(x => x.AccountId).HasColumnName("accountid");
 

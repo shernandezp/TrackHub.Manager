@@ -1,6 +1,6 @@
 ﻿namespace TrackHub.Manager.Application.TransporterGroup.Commands.Delete;
 
-[Authorize(Resource = Resources.Devices, Action = Actions.Delete)]
+[Authorize(Resource = Resources.Groups, Action = Actions.Delete)]
 public readonly record struct DeleteTransporterGroupCommand(Guid TransporterId, long GroupId) : IRequest;
 
 public class DeleteTransporterGroupCommandHandler(ITransporterGroupWriter writer) : IRequestHandler<DeleteTransporterGroupCommand>

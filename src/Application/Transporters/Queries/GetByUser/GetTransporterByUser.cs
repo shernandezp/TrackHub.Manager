@@ -2,7 +2,7 @@
 
 namespace TrackHub.Manager.Application.Transporters.Queries.GetByUser;
 
-[Authorize(Resource = Resources.Devices, Action = Actions.Read)]
+[Authorize(Resource = Resources.Transporters, Action = Actions.Read)]
 public readonly record struct GetTransporterByUserQuery() : IRequest<IReadOnlyCollection<TransporterVm>>;
 
 public class GetTransportersQueryHandler(ITransporterReader reader, IUser user) : IRequestHandler<GetTransporterByUserQuery, IReadOnlyCollection<TransporterVm>>

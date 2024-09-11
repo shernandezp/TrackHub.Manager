@@ -16,8 +16,5 @@ public sealed class UpdateGroupValidator : AbstractValidator<UpdateGroupCommand>
         RuleFor(v => v.Group.Description)
             .NotEmpty();
 
-        RuleFor(v => v.Group.IsMaster)
-            .NotEmpty();
-
     }
 }

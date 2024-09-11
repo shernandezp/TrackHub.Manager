@@ -1,6 +1,4 @@
-﻿using TrackHub.Manager.Infrastructure.ManagerDB.Entities;
-
-namespace TrackHub.Manager.Infrastructure.ManagerDB.Writers;
+﻿namespace TrackHub.Manager.Infrastructure.ManagerDB.Writers;
 
 /// <summary>
 /// Writer class for managing groups.
@@ -13,14 +11,13 @@ public sealed class GroupWriter(IApplicationDbContext context) : IGroupWriter
     /// <param name="groupDto">The group data transfer object.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The created group view model.</returns>
-    public async Task<GroupVm> CreateGroupAsync(GroupDto groupDto, CancellationToken cancellationToken)
+    public async Task<GroupVm> CreateGroupAsync(GroupDto groupDto, Guid accountId, CancellationToken cancellationToken)
     {
         var group = new Group(
             groupDto.Name,
             groupDto.Description,
-            groupDto.IsMaster,
             groupDto.Active,
-            groupDto.AccountId);
+            accountId);
 
         await context.Groups.AddAsync(group, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
@@ -29,7 +26,6 @@ public sealed class GroupWriter(IApplicationDbContext context) : IGroupWriter
             group.GroupId,
             group.Name,
             group.Description,
-            group.IsMaster,
             group.Active,
             group.AccountId);
     }
@@ -48,7 +44,6 @@ public sealed class GroupWriter(IApplicationDbContext context) : IGroupWriter
 
         group.Name = groupDto.Name;
         group.Description = groupDto.Description;
-        group.IsMaster = groupDto.IsMaster;
         group.Active = groupDto.Active;
 
         await context.SaveChangesAsync(cancellationToken);
@@ -59,13 +54,10 @@ public sealed class GroupWriter(IApplicationDbContext context) : IGroupWriter
     /// </summary>
     /// <param name="groupId">The ID of the group to delete.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    public async Task DeleteGroupAsync(Guid groupId, CancellationToken cancellationToken)
+    public async Task DeleteGroupAsync(long groupId, CancellationToken cancellationToken)
     {
         var group = await context.Groups.FindAsync([groupId], cancellationToken)
             ?? throw new NotFoundException(nameof(Group), $"{groupId}");
-
-        if (group.IsMaster)
-            throw new InvalidOperationException("Master group cannot be deleted.");
 
         context.Groups.Attach(group);
 

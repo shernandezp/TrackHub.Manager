@@ -1,6 +1,6 @@
 ﻿namespace TrackHub.Manager.Application.TransporterGroup.Commands.Create;
 
-[Authorize(Resource = Resources.Devices, Action = Actions.Write)]
+[Authorize(Resource = Resources.Groups, Action = Actions.Write)]
 public readonly record struct CreateTransporterGroupCommand(TransporterGroupDto TransporterGroup) : IRequest<TransporterGroupVm>;
 
 public class CreateTransporterGroupCommandHandler(ITransporterGroupWriter writer) : IRequestHandler<CreateTransporterGroupCommand, TransporterGroupVm>

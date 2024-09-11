@@ -32,7 +32,7 @@ public sealed class TransporterGroupWriter(IApplicationDbContext context) : ITra
     // - cancellationToken: The cancellation token
     public async Task DeleteTransporterGroupAsync(Guid transporterId, long groupId, CancellationToken cancellationToken)
     {
-        var transporterGroup = await context.TransportersGroup.FindAsync([transporterId, groupId], cancellationToken);
+        var transporterGroup = await context.TransportersGroup.FindAsync([groupId, transporterId], cancellationToken);
 
         if (transporterGroup != default)
         {
