@@ -1,4 +1,5 @@
 ﻿namespace TrackHub.Manager.Application.Accounts.Commands.Update;
+
 public sealed class UpdateAccountValidator : AbstractValidator<UpdateAccountCommand>
 {
     public UpdateAccountValidator()

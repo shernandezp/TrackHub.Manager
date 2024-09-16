@@ -18,5 +18,11 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(t => t.Username)
             .HasMaxLength(ColumnMetadata.DefaultUserNameLength)
             .IsRequired();
+
+        builder
+            .HasOne(d => d.UserSettings)
+            .WithOne(d => d.User)
+            .HasForeignKey<UserSettings>(d => d.UserId)
+            .IsRequired(false);
     }
 }

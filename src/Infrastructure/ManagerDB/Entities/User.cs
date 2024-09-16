@@ -12,6 +12,7 @@ public sealed class User(Guid userId,
     public bool Active { get; set; } = active;
     public Guid AccountId { get; set; } = accountId;
     public ICollection<Group> Groups { get; set; } = [];
+    public UserSettings? UserSettings { get; set; }
 
     public Account Account
     {

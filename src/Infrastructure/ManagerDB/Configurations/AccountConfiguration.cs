@@ -41,5 +41,11 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             .WithOne(e => e.Account)
             .HasForeignKey(e => e.AccountId)
             .IsRequired();
+
+        builder
+            .HasOne(d => d.AccountSettings)
+            .WithOne(d => d.Account)
+            .HasForeignKey<AccountSettings>(d => d.AccountId)
+            .IsRequired(false);
     }
 }

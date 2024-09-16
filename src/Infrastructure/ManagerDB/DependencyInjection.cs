@@ -22,6 +22,8 @@ public static class DependencyInjection
         services.AddHeaderPropagation(o => o.Headers.Add("Authorization"));
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+        services.AddScoped<IAccountSettingsWriter, AccountSettingsWriter>();
+        services.AddScoped<IAccountSettingsReader, AccountSettingsReader>();
         services.AddScoped<IAccountWriter, AccountWriter>();
         services.AddScoped<IAccountReader, AccountReader>();
         services.AddScoped<ICredentialWriter, CredentialWriter>();
@@ -37,6 +39,8 @@ public static class DependencyInjection
         services.AddScoped<IOperatorReader, OperatorReader>();
         services.AddScoped<IUserWriter, UserWriter>();
         services.AddScoped<IUserReader, UserReader>();
+        services.AddScoped<IUserSettingsWriter, UserSettingsWriter>();
+        services.AddScoped<IUserSettingsReader, UserSettingsReader>();
         services.AddScoped<IUserGroupWriter, UserGroupWriter>();
 
         return services;
