@@ -6,6 +6,7 @@ public class UserSettings(Guid userId)
 
     public string Language { get; set; } = string.Empty;
     public string Style { get; set; } = "light";
+    public string Navbar { get; set; } = "none";
     public Guid UserId { get; set; } = userId;
 
     public User User

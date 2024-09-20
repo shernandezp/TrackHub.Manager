@@ -15,6 +15,7 @@ public sealed class UserSettingsReader(IApplicationDbContext context) : IUserSet
             .Select(a => new UserSettingsVm(
                 a.Language,
                 a.Style,
+                a.Navbar,
                 a.UserId))
             .FirstAsync(cancellationToken);
 

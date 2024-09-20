@@ -19,6 +19,7 @@ public sealed class UserSettingsWriter(IApplicationDbContext context) : IUserSet
         return new UserSettingsVm(
             userSettings.Language,
             userSettings.Style,
+            userSettings.Navbar,
             userSettings.UserId);
     }
 
@@ -38,6 +39,7 @@ public sealed class UserSettingsWriter(IApplicationDbContext context) : IUserSet
 
         userSettings.Language = userSettingsDto.Language;
         userSettings.Style = userSettingsDto.Style;
+        userSettings.Navbar = userSettingsDto.Navbar;
 
         await context.SaveChangesAsync(cancellationToken);
     }

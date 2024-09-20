@@ -10,9 +10,6 @@ public sealed class UpdateAccountSettingsValidator : AbstractValidator<UpdateAcc
         RuleFor(v => v.AccountSettings.AccountId)
             .NotEmpty();
 
-        RuleFor(v => v.AccountSettings.StoreLastPosition)
-            .NotEmpty();
-
         RuleFor(v => v.AccountSettings.Maps)
             .NotEmpty();
     }

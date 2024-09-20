@@ -10,8 +10,6 @@ public class GetUserSettingsQueryHandler(IUserSettingsReader reader, IUser user)
     private Guid UserId { get; } = user.Id is null ? throw new UnauthorizedAccessException() : new Guid(user.Id);
     // This method handles the GetUserSettingsQuery and returns an UserSettingsVm
     public async Task<UserSettingsVm> Handle(GetUserSettingsQuery request, CancellationToken cancellationToken)
-    {
-        return await reader.GetUserSettingsAsync(UserId, cancellationToken);
-    }
+        => await reader.GetUserSettingsAsync(UserId, cancellationToken);
 
 }

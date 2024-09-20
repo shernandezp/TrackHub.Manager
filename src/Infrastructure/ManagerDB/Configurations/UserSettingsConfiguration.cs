@@ -15,6 +15,7 @@ public sealed class UserSettingsConfiguration : IEntityTypeConfiguration<UserSet
         builder.Property(x => x.UserId).HasColumnName("id");
         builder.Property(x => x.Language).HasColumnName("language");
         builder.Property(x => x.Style).HasColumnName("style");
+        builder.Property(x => x.Navbar).HasColumnName("navbar");
 
     }
 }
