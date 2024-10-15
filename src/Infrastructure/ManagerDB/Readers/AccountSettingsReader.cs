@@ -15,7 +15,12 @@ public sealed class AccountSettingsReader(IApplicationDbContext context) : IAcco
             .Select(a => new AccountSettingsVm(
                 a.AccountId,
                 a.Maps,
-                a.StoreLastPosition))
+                a.MapsKey,
+                a.OnlineTimeLapse,
+                a.StoreLastPosition,
+                a.StoringTimeLapse,
+                a.RefreshMap,
+                a.RefreshMapTimer))
             .FirstAsync(cancellationToken);
 
 }

@@ -12,5 +12,14 @@ public sealed class UpdateAccountSettingsValidator : AbstractValidator<UpdateAcc
 
         RuleFor(v => v.AccountSettings.Maps)
             .NotEmpty();
+
+        RuleFor(v => v.AccountSettings.OnlineTimeLapse)
+            .GreaterThanOrEqualTo(5);
+
+        RuleFor(v => v.AccountSettings.StoringTimeLapse)
+            .GreaterThanOrEqualTo(60);
+
+        RuleFor(v => v.AccountSettings.RefreshMapTimer)
+            .GreaterThanOrEqualTo(60);
     }
 }

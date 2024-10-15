@@ -19,7 +19,12 @@ public sealed class AccountSettingsWriter(IApplicationDbContext context) : IAcco
         return new AccountSettingsVm(
             accountSettings.AccountId,
             accountSettings.Maps,
-            accountSettings.StoreLastPosition);
+            accountSettings.MapsKey,
+            accountSettings.OnlineTimeLapse,
+            accountSettings.StoreLastPosition,
+            accountSettings.StoringTimeLapse,
+            accountSettings.RefreshMap,
+            accountSettings.RefreshMapTimer);
     }
 
     /// <summary>
@@ -36,8 +41,13 @@ public sealed class AccountSettingsWriter(IApplicationDbContext context) : IAcco
 
         context.AccountSettings.Attach(accountSettings);
 
-        accountSettings.StoreLastPosition = accountSettingsDto.StoreLastPosition;
         accountSettings.Maps = accountSettingsDto.Maps;
+        accountSettings.MapsKey = accountSettingsDto.MapsKey;
+        accountSettings.OnlineTimeLapse = accountSettingsDto.OnlineTimeLapse;
+        accountSettings.StoreLastPosition = accountSettingsDto.StoreLastPosition;
+        accountSettings.StoringTimeLapse = accountSettingsDto.StoringTimeLapse;
+        accountSettings.RefreshMap = accountSettingsDto.RefreshMap;
+        accountSettings.RefreshMapTimer = accountSettingsDto.RefreshMapTimer;
 
         await context.SaveChangesAsync(cancellationToken);
     }

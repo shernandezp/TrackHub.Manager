@@ -6,9 +6,12 @@ public class AccountSettings (Guid accountId)
 
     public Guid AccountId { get; set; } = accountId;
     public string Maps { get; set; } = "OSM";
+    public string? MapsKey { get; set; } = "";
+    public int OnlineTimeLapse { get; set; } = 60;
     public bool StoreLastPosition { get; set; } = false;
-    //Background service running each x minutes on the server side to update the position of the devices
-    //Fallback method in the router to get the last known position from the db
+    public int StoringTimeLapse { get; set; } = 360;
+    public bool RefreshMap { get; set; } = false;
+    public int RefreshMapTimer { get; set; } = 60;
 
     public Account Account
     {
