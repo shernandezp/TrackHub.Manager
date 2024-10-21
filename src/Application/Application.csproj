@@ -18,4 +18,10 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="TransporterPosition\Commands\Update\GetByUser\" />
+    <Folder Include="TransporterPosition\Commands\Update\GetByOperator\" />
+    <Folder Include="TransporterPosition\Queries\" />
+  </ItemGroup>
+
 </Project>

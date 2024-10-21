@@ -9,6 +9,7 @@ public sealed class DeviceDeleted
         public class EventHandler(
             ITransporterWriter transporterWriter,
             ITransporterGroupWriter transporterGroupWriter,
+            ITransporterPositionWriter transporterPositionWriter,
             IDeviceReader deviceReader) : INotificationHandler<Notification>
         {
             // Handles the notification.
@@ -20,6 +21,7 @@ public sealed class DeviceDeleted
                 if (!exists) 
                 {
                     await transporterGroupWriter.DeleteTransporterGroupsAsync(notification.TransporterId, cancellationToken);
+                    await transporterPositionWriter.DeleteTransporterPositionAsync(notification.TransporterId, cancellationToken);
                     await transporterWriter.DeleteTransporterAsync(notification.TransporterId, cancellationToken);
                 }
             }

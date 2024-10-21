@@ -5,12 +5,12 @@ namespace TrackHub.Manager.Infrastructure.ManagerDB.Writers;
 // This class represents a writer for Device entities
 public sealed class DeviceWriter(IApplicationDbContext context) : IDeviceWriter
 {
-    // Creates a new Device asynchronously
-    // Parameters:
-    //   deviceDto: The DTO object containing the device data
-    //   cancellationToken: A token to cancel the operation if needed
-    // Returns:
-    //   A Task representing the asynchronous operation. The task result contains the created DeviceVm
+    /// <summary>
+    /// Creates a new Device asynchronously
+    /// </summary>
+    /// <param name="deviceDto">The DTO object containing the device data</param>
+    /// <param name="cancellationToken">A token to cancel the operation if needed</param>
+    /// <returns>A Task representing the asynchronous operation. The task result contains the created DeviceVm</returns>
     public async Task<DeviceVm> CreateDeviceAsync(DeviceDto deviceDto, CancellationToken cancellationToken)
     {
         var device = new Device
@@ -39,11 +39,13 @@ public sealed class DeviceWriter(IApplicationDbContext context) : IDeviceWriter
             device.OperatorId);
     }
 
-
-    // Updates a Device asynchronously
-    // Parameters:
-    //   deviceDto: The DTO object containing the updated device data
-    //   cancellationToken: A token to cancel the operation if needed
+    /// <summary>
+    /// Updates a Device asynchronously
+    /// </summary>
+    /// <param name="deviceDto">The DTO object containing the updated device data</param>
+    /// <param name="cancellationToken">A token to cancel the operation if needed</param>
+    /// <returns></returns>
+    /// <exception cref="NotFoundException">If the Device with the specified IDs is not found</exception>
     public async Task UpdateDeviceAsync(UpdateDeviceDto deviceDto, CancellationToken cancellationToken)
     {
         var device = await context.Devices.FindAsync(deviceDto.DeviceId, cancellationToken)
@@ -60,12 +62,13 @@ public sealed class DeviceWriter(IApplicationDbContext context) : IDeviceWriter
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    // Deletes a Device asynchronously
-    // Parameters:
-    //   deviceId: The ID of the device associated with the Device
-    //   cancellationToken: A token to cancel the operation if needed
-    // Throws:
-    //   NotFoundException: If the Device with the specified IDs is not found
+    /// <summary>
+    /// Deletes a Device asynchronously
+    /// </summary>
+    /// <param name="deviceId">The ID of the device associated with the Device</param>
+    /// <param name="cancellationToken">A token to cancel the operation if needed</param>
+    /// <returns></returns>
+    /// <exception cref="NotFoundException">If the Device with the specified IDs is not found</exception>
     public async Task DeleteDeviceAsync(Guid deviceId, CancellationToken cancellationToken)
     {
         var device = await context.Devices.FindAsync([deviceId], cancellationToken)

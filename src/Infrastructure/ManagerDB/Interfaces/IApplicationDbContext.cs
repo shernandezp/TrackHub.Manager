@@ -10,9 +10,11 @@ public interface IApplicationDbContext
     DbSet<Device> Devices { get; set; }
     DbSet<Group> Groups { get; set; }
     DbSet<Operator> Operators { get; set; }
+    DbSet<TransporterPosition> TransporterPositions { get; set; }
     DbSet<User> Users { get; set; }
     DbSet<UserGroup> UsersGroup { get; set; }
     public DbSet<UserSettings> UserSettings { get; set; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    Task BulkInsertAsync<T>(IList<T> entities, string? property = null, CancellationToken cancellationToken = default) where T : class;
 }

@@ -36,7 +36,7 @@ public sealed class AccountSettingsWriter(IApplicationDbContext context) : IAcco
     /// <exception cref="NotFoundException"></exception>
     public async Task UpdateAccountSettingsAsync(AccountSettingsDto accountSettingsDto, CancellationToken cancellationToken)
     {
-        var accountSettings = await context.AccountSettings.FindAsync(accountSettingsDto.AccountId, cancellationToken)
+        var accountSettings = await context.AccountSettings.FindAsync([accountSettingsDto.AccountId, cancellationToken], cancellationToken: cancellationToken)
             ?? throw new NotFoundException(nameof(AccountSettings), $"{accountSettingsDto.AccountId}");
 
         context.AccountSettings.Attach(accountSettings);

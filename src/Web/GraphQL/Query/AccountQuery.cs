@@ -12,8 +12,11 @@ public partial class Query
     public async Task<AccountVm> GetAccountByUser([Service] ISender sender)
         => await sender.Send(new GetAccountByUserQuery());
 
-    public async Task<AccountSettingsVm> GetAccountSettings([Service] ISender sender)
-        => await sender.Send(new GetAccountSettingsQuery());
+    public async Task<AccountSettingsVm> GetAccountSettings([Service] ISender sender, [AsParameters] GetAccountSettingsQuery query)
+        => await sender.Send(query);
+
+    public async Task<AccountSettingsVm> GetAccountSettingsByUser([Service] ISender sender)
+        => await sender.Send(new GetAccountSettingsByUserQuery());
 
     public async Task<IReadOnlyCollection<AccountVm>> GetAccounts([Service] ISender sender)
         => await sender.Send(new GetAccountsQuery());

@@ -9,4 +9,5 @@ public sealed class Transporter(string name, short transporterTypeId) : BaseAudi
 
     public ICollection<Group> Groups { get; set; } = [];
     public ICollection<Device> Devices { get; set; } = [];
+    public TransporterPosition? Position { get; set; }
 }

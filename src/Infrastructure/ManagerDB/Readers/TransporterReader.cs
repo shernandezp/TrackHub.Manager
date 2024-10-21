@@ -5,12 +5,12 @@ namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 // TransporterReader class for reading transporter information
 public sealed class TransporterReader(IApplicationDbContext context) : ITransporterReader
 {
-    // GetTransporterAsync method retrieves a transporter by its ID
-    // Parameters:
-    // - id: The ID of the transporter
-    // - cancellationToken: A cancellation token to cancel the operation
-    // Returns:
-    // - Task<TransporterVm>: A task that represents the asynchronous operation. The task result contains the TransporterVm object.
+    /// <summary>
+    /// GetTransporterAsync method retrieves a transporter by its ID 
+    /// </summary>
+    /// <param name="id">The ID of the transporter</param>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the TransporterVm object.</returns>
     public async Task<TransporterVm> GetTransporterAsync(Guid id, CancellationToken cancellationToken)
         => await context.Transporters
             .Where(d => d.TransporterId.Equals(id))
@@ -21,12 +21,12 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
                 d.TransporterTypeId))
             .FirstAsync(cancellationToken);
 
-    // GetTransporterAsync method retrieves a transporter by its name
-    // Parameters:
-    // - name: The name of the transporter
-    // - cancellationToken: A cancellation token to cancel the operation
-    // Returns:
-    // - Task<TransporterVm>: A task that represents the asynchronous operation. The task result contains the TransporterVm object.
+    /// <summary>
+    /// GetTransporterAsync method retrieves a transporter by its name
+    /// </summary>
+    /// <param name="name">The name of the transporter</param>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the TransporterVm object.</returns>
     public async Task<TransporterVm> GetTransporterAsync(string name, CancellationToken cancellationToken)
         => await context.Transporters
             .Where(d => d.Name.Equals(name))
@@ -37,12 +37,12 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
                 d.TransporterTypeId))
             .FirstOrDefaultAsync(cancellationToken);
 
-    // GetTransportersByGroupAsync method retrieves transporters by group ID
-    // Parameters:
-    // - groupId: The ID of the group
-    // - cancellationToken: A cancellation token to cancel the operation
-    // Returns:
-    // - Task<IReadOnlyCollection<TransporterVm>>: A task that represents the asynchronous operation. The task result contains a collection of TransporterVm objects.
+    /// <summary>
+    /// GetTransportersByGroupAsync method retrieves transporters by group ID
+    /// </summary>
+    /// <param name="groupId">The ID of the group</param>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of TransporterVm objects.</returns>
     public async Task<IReadOnlyCollection<TransporterVm>> GetTransportersByGroupAsync(long groupId, CancellationToken cancellationToken)
         => await context.Groups
             .Where(g => g.GroupId == groupId)
@@ -55,12 +55,12 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
             .Distinct()
             .ToListAsync(cancellationToken);
 
-    // GetTransportersByUserAsync method retrieves transporters by user ID
-    // Parameters:
-    // - userId: The ID of the user
-    // - cancellationToken: A cancellation token to cancel the operation
-    // Returns:
-    // - Task<IReadOnlyCollection<TransporterVm>>: A task that represents the asynchronous operation. The task result contains a collection of TransporterVm objects.
+    /// <summary>
+    /// GetTransportersByUserAsync method retrieves transporters by user ID
+    /// </summary>
+    /// <param name="userId">The ID of the user</param>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of TransporterVm objects.</returns>
     public async Task<IReadOnlyCollection<TransporterVm>> GetTransportersByUserAsync(Guid userId, CancellationToken cancellationToken)
         => await context.Users
             .Where(u => u.UserId == userId)
@@ -74,12 +74,12 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
                 d.TransporterTypeId))
             .ToListAsync(cancellationToken);
 
-    // GetTransportersByAccountAsync method retrieves transporters by account ID
-    // Parameters:
-    // - accountId: The ID of the account
-    // - cancellationToken: A cancellation token to cancel the operation
-    // Returns:
-    // - Task<IReadOnlyCollection<TransporterVm>>: A task that represents the asynchronous operation. The task result contains a collection of TransporterVm objects.
+    /// <summary>
+    /// GetTransportersByAccountAsync method retrieves transporters by account ID
+    /// </summary>
+    /// <param name="accountId">The ID of the account</param>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of TransporterVm objects.</returns>
     public async Task<IReadOnlyCollection<TransporterVm>> GetTransportersByAccountAsync(Guid accountId, CancellationToken cancellationToken)
         => await context.Accounts
             .Where(a => a.AccountId == accountId)

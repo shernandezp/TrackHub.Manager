@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TrackHub.Manager.Infrastructure.ManagerDB;
@@ -11,9 +12,11 @@ using TrackHub.Manager.Infrastructure.ManagerDB;
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241018231334_AddTrasporterPosition")]
+    partial class AddTrasporterPosition
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -438,7 +441,7 @@ namespace TrackHub.Manager.Infrastructure.ManagerDB.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("eventId");
 
-                    b.Property<Guid?>("GeometryId")
+                    b.Property<Guid>("GeometryId")
                         .HasColumnType("uuid")
                         .HasColumnName("geometryid");
 

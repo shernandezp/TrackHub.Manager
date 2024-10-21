@@ -31,6 +31,7 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
             @operator.ContactName,
             (ProtocolType)@operator.ProtocolType,
             @operator.ProtocolType,
+            @operator.AccountId,
             @operator.LastModified,
             null);
     }

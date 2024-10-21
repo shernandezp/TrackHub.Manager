@@ -9,16 +9,17 @@ public sealed class Position
     public Guid DeviceId { get; set; }
     public double Latitude { get; set; }
     public double Longitude { get; set; }
-    public int Altitude { get; set; }
-    public DateTime DeviceDateTime { get; set; }
-    public int Speed { get; set; }
-    public int Course { get; set; }
+    public double? Altitude { get; set; }
+    public DateTimeOffset DeviceDateTime { get; set; }
+    public DateTimeOffset? ServerDateTime { get; set; }
+    public double Speed { get; set; }
+    public double? Course { get; set; }
     public int? EventId { get; set; }
     public string? Address { get; set; }
     public string? City { get; set; }
     public string? State { get; set; }
     public string? Country { get; set; }
-    public string? Attributes { get; set; } //json with ignition, mileage, Hobbs Meter, temperature, etc.
+    public string? Attributes { get; set; }
 
     public Transporter Transporter
     {

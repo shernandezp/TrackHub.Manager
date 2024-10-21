@@ -10,6 +10,7 @@ public readonly record struct OperatorVm(
     string? ContactName,
     ProtocolType ProtocolType,
     int ProtocolTypeId,
+    Guid AccountId,
     DateTimeOffset LastModified,
-    CredentialTokenVm? Credential
+    CredentialTokenVm? Credential 
     );

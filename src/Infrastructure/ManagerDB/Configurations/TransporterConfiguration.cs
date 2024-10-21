@@ -24,5 +24,10 @@ public sealed class TransporterConfiguration : IEntityTypeConfiguration<Transpor
             .HasForeignKey(d => d.TransporterId)
             .IsRequired(false);
 
+        builder
+            .HasOne(d => d.Position)
+            .WithOne(d => d.Transporter)
+            .HasForeignKey<TransporterPosition>(d => d.TransporterId)
+            .IsRequired(false);
     }
 }
