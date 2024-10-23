@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using EFCore.BulkExtensions;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB;
 
@@ -29,13 +28,4 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
         base.OnModelCreating(builder);
     }
 
-    public async Task BulkInsertAsync<T>(IList<T> entities, string? property = null, CancellationToken cancellationToken = default) where T : class
-    {
-        var bulkConfig = new BulkConfig();
-        if (!string.IsNullOrEmpty(property)) 
-        {
-            bulkConfig.UpdateByProperties = [property];
-        }
-        await this.BulkInsertOrUpdateAsync(entities, bulkConfig, cancellationToken: cancellationToken);
-    }
 }

@@ -3,6 +3,8 @@
 public record struct TransporterPositionVm(
     Guid TransporterPositionId,
     Guid TransporterId,
+    string DeviceName,
+    TransporterType TransporterType,
     Guid? GeometryId,
     double Latitude,
     double Longitude,

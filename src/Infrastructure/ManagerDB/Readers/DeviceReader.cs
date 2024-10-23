@@ -62,7 +62,7 @@ public sealed class DeviceReader(IApplicationDbContext context) : IDeviceReader
             .SelectMany(d => d.Devices)
             .Where(d => d.OperatorId == operatorId)
             .Select(d => new DeviceTransporterVm(
-                d.DeviceId,
+                d.TransporterId,
                 d.Identifier,
                 d.Serial,
                 d.Transporter.Name,

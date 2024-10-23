@@ -16,5 +16,4 @@ public interface IApplicationDbContext
     public DbSet<UserSettings> UserSettings { get; set; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
-    Task BulkInsertAsync<T>(IList<T> entities, string? property = null, CancellationToken cancellationToken = default) where T : class;
 }

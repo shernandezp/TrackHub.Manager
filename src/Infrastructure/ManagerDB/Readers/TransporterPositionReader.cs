@@ -1,4 +1,6 @@
-﻿namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
+﻿using Common.Domain.Enums;
+
+namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
 public sealed class TransporterPositionReader(IApplicationDbContext context) : ITransporterPositionReader
 {
@@ -20,6 +22,8 @@ public sealed class TransporterPositionReader(IApplicationDbContext context) : I
             .Select(tp => new TransporterPositionVm(
                 tp!.TransporterPositionId,
                 tp.TransporterId,
+                tp.Transporter.Name,
+                (TransporterType)tp.Transporter.TransporterTypeId,
                 tp.GeometryId,
                 tp.Latitude,
                 tp.Longitude,
@@ -49,6 +53,8 @@ public sealed class TransporterPositionReader(IApplicationDbContext context) : I
             .Select(tp => new TransporterPositionVm(
                 tp!.TransporterPositionId,
                 tp.TransporterId,
+                tp.Transporter.Name,
+                (TransporterType)tp.Transporter.TransporterTypeId,
                 tp.GeometryId,
                 tp.Latitude,
                 tp.Longitude,

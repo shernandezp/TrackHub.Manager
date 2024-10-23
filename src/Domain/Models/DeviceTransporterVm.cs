@@ -1,6 +1,7 @@
 ﻿namespace TrackHub.Manager.Domain.Models;
+
 public record struct DeviceTransporterVm(
-    Guid DeviceId,
+    Guid TransporterId,
     int Identifier,
     string Serial,
     string Name,

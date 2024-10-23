@@ -1,54 +1,9 @@
-﻿namespace TrackHub.Manager.Infrastructure.ManagerDB.Writers;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace TrackHub.Manager.Infrastructure.ManagerDB.Writers;
 
 public sealed class TransporterPositionWriter(IApplicationDbContext context) : ITransporterPositionWriter
 {
-
-    /// <summary>
-    /// This method will create a new TransporterPosition in the database
-    /// </summary>
-    /// <param name="positionDto">The TransporterPosition data transfer object</param>
-    /// <param name="cancellationToken">The cancellation token</param>
-    /// <returns>The TransporterPosition view model</returns>
-    public async Task<TransporterPositionVm> CreateTransporterPositionAsync(TransporterPositionDto positionDto, CancellationToken cancellationToken)
-    {
-        var position = new TransporterPosition
-        (
-            positionDto.TransporterId,
-            positionDto.GeometryId,
-            positionDto.Latitude,
-            positionDto.Longitude,
-            positionDto.Altitude,
-            positionDto.DeviceDateTime,
-            positionDto.Speed,
-            positionDto.Course,
-            positionDto.EventId,
-            positionDto.Address,
-            positionDto.City,
-            positionDto.State,
-            positionDto.Country,
-            positionDto.Attributes
-        );
-
-        await context.TransporterPositions.AddAsync(position, cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
-
-        return new TransporterPositionVm(
-            position.TransporterPositionId,
-            position.TransporterId,
-            position.GeometryId,
-            position.Latitude,
-            position.Longitude,
-            position.Altitude,
-            position.DeviceDateTime,
-            position.Speed,
-            position.Course,
-            position.EventId,
-            position.Address,
-            position.City,
-            position.State,
-            position.Country,
-            position.Attributes);
-    }
 
     /// <summary>
     /// Bulk insert transporter positions
@@ -76,7 +31,13 @@ public sealed class TransporterPositionWriter(IApplicationDbContext context) : I
                 positionDto.Attributes
             )).ToList();
 
-        await context.BulkInsertAsync(positions, "transporterid", cancellationToken);
+        //await context.BulkInsertAsync(positions, "TransporterId", "TransporterPositionId", cancellationToken);
+        foreach (var position in positions)
+        {
+            await context.TransporterPositions.AddOrUpdateAsync(position, p => p.TransporterId, ["TransporterPositionId"], cancellationToken);
+        }
+
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
