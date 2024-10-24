@@ -17,4 +17,4 @@ public record struct TransporterPositionVm(
     string? City,
     string? State,
     string? Country,
-    string? Attributes);
+    AttributesVm? Attributes);

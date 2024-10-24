@@ -1,5 +1,4 @@
 ﻿using Common.Domain.Constants;
-using Common.Infrastructure.Converters;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Configurations;
@@ -26,10 +25,9 @@ public sealed class TransporterPositionConfiguration : IEntityTypeConfiguration<
         builder.Property(x => x.State).HasColumnName("state");
         builder.Property(x => x.Country).HasColumnName("country");
 
-        builder.Property(x => x.Attributes)
-                   .HasColumnName("attributes")
-                   .HasColumnType("json")
-                   .HasConversion(new JsonStringConverter());
+        builder.Property(e => e.Attributes)
+            .HasColumnName("attributes")
+            .HasColumnType("json");
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿namespace TrackHub.Manager.Domain.Records;
+
 public record struct TransporterPositionDto(
     Guid TransporterId,
     Guid? GeometryId,
@@ -13,5 +14,5 @@ public record struct TransporterPositionDto(
     string? City,
     string? State,
     string? Country,
-    string Attributes
+    AttributesDto? Attributes
     );

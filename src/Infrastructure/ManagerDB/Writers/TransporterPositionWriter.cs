@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace TrackHub.Manager.Infrastructure.ManagerDB.Writers;
+﻿namespace TrackHub.Manager.Infrastructure.ManagerDB.Writers;
 
 public sealed class TransporterPositionWriter(IApplicationDbContext context) : ITransporterPositionWriter
 {
@@ -28,10 +26,17 @@ public sealed class TransporterPositionWriter(IApplicationDbContext context) : I
                 positionDto.City,
                 positionDto.State,
                 positionDto.Country,
-                positionDto.Attributes
+                positionDto.Attributes == null ? null :
+                    new AttributesVm
+                    (
+                        positionDto.Attributes?.Ignition,
+                        positionDto.Attributes?.Satellites,
+                        positionDto.Attributes?.Mileage,
+                        positionDto.Attributes?.HobbsMeter,
+                        positionDto.Attributes?.Temperature
+                    )
             )).ToList();
 
-        //await context.BulkInsertAsync(positions, "TransporterId", "TransporterPositionId", cancellationToken);
         foreach (var position in positions)
         {
             await context.TransporterPositions.AddOrUpdateAsync(position, p => p.TransporterId, ["TransporterPositionId"], cancellationToken);
@@ -66,7 +71,13 @@ public sealed class TransporterPositionWriter(IApplicationDbContext context) : I
         position.City = positionDto.City;
         position.State = positionDto.State;
         position.Country = positionDto.Country;
-        position.Attributes = positionDto.Attributes;
+        position.Attributes = positionDto.Attributes == null ? null : new AttributesVm(
+            positionDto.Attributes?.Ignition,
+            positionDto.Attributes?.Satellites,
+            positionDto.Attributes?.Mileage,
+            positionDto.Attributes?.HobbsMeter,
+            positionDto.Attributes?.Temperature
+        );
 
         await context.SaveChangesAsync(cancellationToken);
     }

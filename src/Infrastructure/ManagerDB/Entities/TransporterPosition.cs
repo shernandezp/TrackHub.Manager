@@ -14,12 +14,12 @@ public sealed class TransporterPosition(
     string? city,
     string? state,
     string? country,
-    string? attributes
+    AttributesVm? attributes
     )
 {
     private Transporter? _transporter;
 
-    public Guid TransporterPositionId { get; set; } = Guid.NewGuid();
+    public Guid TransporterPositionId { get; set; }
     public Guid TransporterId { get; set; } = transporterId;
     public Guid? GeometryId { get; set; } = geometryId;
     public double Latitude { get; set; } = latitude;
@@ -33,7 +33,7 @@ public sealed class TransporterPosition(
     public string? City { get; set; } = city;
     public string? State { get; set; } = state;
     public string? Country { get; set; } = country;
-    public string? Attributes { get; set; } = attributes;
+    public AttributesVm? Attributes { get; set; } = attributes;
 
     public Transporter Transporter
     {

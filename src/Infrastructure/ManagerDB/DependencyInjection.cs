@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
+using Npgsql;
 using TrackHub.Manager.Infrastructure.ManagerDB;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -12,10 +15,19 @@ public static class DependencyInjection
 
         Guard.Against.Null(connectionString, message: "Connection string 'DefaultConnection' not found.");
 
+        // Configure NpgsqlDataSourceBuilder and enable dynamic JSON serialization
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+        dataSourceBuilder.ConfigureJsonOptions(new JsonSerializerOptions
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        });
+        dataSourceBuilder.EnableDynamicJson();
+        var dataSource = dataSourceBuilder.Build();
+
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseNpgsql(connectionString, o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
+            options.UseNpgsql(dataSource, o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
             options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
 
