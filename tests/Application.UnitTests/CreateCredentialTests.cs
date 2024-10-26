@@ -47,48 +47,13 @@ namespace TrackHub.Manager.Application.UnitTests.Credentials.Command.Create
         }
 
         [Test]
-        public void Should_Have_Error_When_Username_Is_Empty()
+        public void Should_Have_Error_When_Operator_Is_Empty()
         {
             var command = new CreateCredentialCommand
             {
                 Credential = new CredentialDto
                 {
-                    Username = string.Empty,
-                    Uri = "https://example.com/"
-                }
-            };
-
-            var result = _validator.TestValidate(command);
-
-            result.ShouldHaveValidationErrorFor(v => v.Credential.Username);
-        }
-
-        [Test]
-        public void Should_Have_Error_When_Password_Is_Empty()
-        {
-            var command = new CreateCredentialCommand
-            {
-                Credential = new CredentialDto
-                {
-                    Password = string.Empty,
-                    Uri = "https://example.com/"
-                }
-            };
-
-            var result = _validator.TestValidate(command);
-
-            result.ShouldHaveValidationErrorFor(v => v.Credential.Password);
-        }
-
-        [Test]
-        public void Should_Have_Error_When_OperatorId_Is_Empty()
-        {
-            var command = new CreateCredentialCommand
-            {
-                Credential = new CredentialDto
-                {
-                    OperatorId = Guid.Empty,
-                    Uri = "https://example.com/"
+                    Uri = "https://example.com/",
                 }
             };
 

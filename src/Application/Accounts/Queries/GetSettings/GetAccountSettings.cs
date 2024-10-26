@@ -7,5 +7,4 @@ public class GetAccountSettingsQueryHandler(IAccountSettingsReader reader) : IRe
 {
     public async Task<AccountSettingsVm> Handle(GetAccountSettingsQuery request, CancellationToken cancellationToken)
         => await reader.GetAccountSettingsAsync(request.Id, cancellationToken);
-
 }

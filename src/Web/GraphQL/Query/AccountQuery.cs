@@ -15,6 +15,9 @@ public partial class Query
     public async Task<AccountSettingsVm> GetAccountSettings([Service] ISender sender, [AsParameters] GetAccountSettingsQuery query)
         => await sender.Send(query);
 
+    public async Task<IReadOnlyCollection<AccountSettingsVm>> GetAccountsSettings([Service] ISender sender, [AsParameters] GetAccountsSettingsQuery query)
+        => await sender.Send(query);
+
     public async Task<AccountSettingsVm> GetAccountSettingsByUser([Service] ISender sender)
         => await sender.Send(new GetAccountSettingsByUserQuery());
 

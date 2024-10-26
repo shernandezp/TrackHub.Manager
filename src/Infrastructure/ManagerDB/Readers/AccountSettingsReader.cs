@@ -1,4 +1,6 @@
-﻿namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
+﻿using TrackHub.Manager.Domain;
+
+namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
 // AccountSettingsReader class for reading account settings data
 public sealed class AccountSettingsReader(IApplicationDbContext context) : IAccountSettingsReader
@@ -23,4 +25,27 @@ public sealed class AccountSettingsReader(IApplicationDbContext context) : IAcco
                 a.RefreshMapTimer))
             .FirstAsync(cancellationToken);
 
+    /// <summary>
+    /// Retrieves a collection of account settings
+    /// </summary>
+    /// <param name="filters">Filters</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Returns a collection of AccountSettingsVm objects</returns>
+    public async Task<IReadOnlyCollection<AccountSettingsVm>> GetAccountSettingsAsync(Filters filters, CancellationToken cancellationToken)
+    {
+        var query = context.AccountSettings.AsQueryable();
+        query = filters.Apply(query);
+
+        return await query
+            .Select(a => new AccountSettingsVm(
+                a.AccountId,
+                a.Maps,
+                a.MapsKey,
+                a.OnlineTimeLapse,
+                a.StoreLastPosition,
+                a.StoringTimeLapse,
+                a.RefreshMap,
+                a.RefreshMapTimer))
+            .ToListAsync(cancellationToken);
+    }
 }
