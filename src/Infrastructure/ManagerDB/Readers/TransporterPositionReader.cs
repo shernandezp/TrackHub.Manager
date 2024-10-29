@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Common.Domain.Enums;
+﻿using Common.Domain.Enums;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
@@ -29,7 +28,7 @@ public sealed class TransporterPositionReader(IApplicationDbContext context) : I
                 tp.Latitude,
                 tp.Longitude,
                 tp.Altitude,
-                tp.DeviceDateTime,
+                new(tp.DateTime, tp.Offset),
                 tp.Speed,
                 tp.Course,
                 tp.EventId,
@@ -60,7 +59,7 @@ public sealed class TransporterPositionReader(IApplicationDbContext context) : I
                 tp.Latitude,
                 tp.Longitude,
                 tp.Altitude,
-                tp.DeviceDateTime,
+                new(tp.DateTime, tp.Offset),
                 tp.Speed,
                 tp.Course,
                 tp.EventId,

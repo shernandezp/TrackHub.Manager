@@ -13,9 +13,9 @@ public sealed class Credential(string uri, string username, string password, str
     public string? Key2 { get; set; } = key2;
     public string Salt { get; set; } = salt;
     public string? Token { get; set; }
-    public DateTime? TokenExpiration { get; set; }
+    public DateTimeOffset? TokenExpiration { get; set; }
     public string? RefreshToken { get; set; }
-    public DateTime? RefreshTokenExpiration { get; set; }
+    public DateTimeOffset? RefreshTokenExpiration { get; set; }
     public Guid OperatorId { get; set; } = operatorId;
 
     public Operator Operator

@@ -1,12 +1,13 @@
 ﻿namespace TrackHub.Manager.Infrastructure.ManagerDB.Entities;
 
-public sealed class TransporterPosition(
+public class TransporterPosition(
     Guid transporterId,
     Guid? geometryId,
     double latitude,
     double longitude,
     double? altitude,
-    DateTimeOffset deviceDateTime,
+    DateTime dateTime,
+    TimeSpan offset,
     double speed,
     double? course,
     int? eventId,
@@ -25,7 +26,8 @@ public sealed class TransporterPosition(
     public double Latitude { get; set; } = latitude;
     public double Longitude { get; set; } = longitude;
     public double? Altitude { get; set; } = altitude;
-    public DateTimeOffset DeviceDateTime { get; set; } = deviceDateTime;
+    public DateTime DateTime { get; set; } = dateTime;
+    public TimeSpan Offset { get; set; } = offset;
     public double Speed { get; set; } = speed;
     public double? Course { get; set; } = course;
     public int? EventId { get; set; } = eventId;

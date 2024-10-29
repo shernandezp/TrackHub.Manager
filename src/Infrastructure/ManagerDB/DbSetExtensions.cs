@@ -17,12 +17,12 @@ public static class DbSetExtensions
     /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     public static async Task AddOrUpdateAsync<TEntity, TKey>(
-    this DbSet<TEntity> dbSet,
-    TEntity entity,
-    Expression<Func<TEntity, TKey>> keySelector,
-    IEnumerable<string> excludeProperties,
-    CancellationToken cancellationToken = default)
-    where TEntity : class
+        this DbSet<TEntity> dbSet,
+        TEntity entity,
+        Expression<Func<TEntity, TKey>> keySelector,
+        IEnumerable<string> excludeProperties,
+        CancellationToken cancellationToken = default)
+        where TEntity : class
     {
         // Get the key value
         var keyValue = keySelector.Compile().Invoke(entity);
@@ -56,7 +56,7 @@ public static class DbSetExtensions
             var properties = entry.Properties.Select(p => p.Metadata.Name).ToList();
 
             // Determine properties to include in the update
-            var propertiesToInclude = properties.Except(excludeProperties).Except(excludeProperties);
+            var propertiesToInclude = properties.Except(excludeProperties);
 
             // Manually update each property
             foreach (var property in propertiesToInclude)
@@ -64,8 +64,15 @@ public static class DbSetExtensions
                 var propertyInfo = typeof(TEntity).GetProperty(property);
                 if (propertyInfo != null)
                 {
-                    entry.Property(property).CurrentValue = propertyInfo.GetValue(entity);
-                    entry.Property(property).IsModified = true;
+                    var oldValue = propertyInfo.GetValue(existingEntity);
+                    var newValue = propertyInfo.GetValue(entity);
+
+                    // Compare old and new values
+                    if (!Equals(oldValue, newValue))
+                    {
+                        entry.Property(property).CurrentValue = newValue;
+                        entry.Property(property).IsModified = true;
+                    }
                 }
             }
         }

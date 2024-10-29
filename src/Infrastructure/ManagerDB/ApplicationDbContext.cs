@@ -2,13 +2,8 @@
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB;
 
-public class ApplicationDbContext : DbContext, IApplicationDbContext
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IApplicationDbContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-    {
-        //AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-    }
-
     public DbSet<Account> Accounts { get; set; }
     public DbSet<AccountSettings> AccountSettings { get; set; }
     public DbSet<Credential> Credentials { get; set; }

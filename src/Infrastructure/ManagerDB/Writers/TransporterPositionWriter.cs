@@ -18,7 +18,8 @@ public sealed class TransporterPositionWriter(IApplicationDbContext context) : I
                 positionDto.Latitude,
                 positionDto.Longitude,
                 positionDto.Altitude,
-                positionDto.DeviceDateTime,
+                positionDto.DeviceDateTime.UtcDateTime,
+                positionDto.DeviceDateTime.Offset,
                 positionDto.Speed,
                 positionDto.Course,
                 positionDto.EventId,
@@ -63,7 +64,8 @@ public sealed class TransporterPositionWriter(IApplicationDbContext context) : I
         position.Latitude = positionDto.Latitude;
         position.Longitude = positionDto.Longitude;
         position.Altitude = positionDto.Altitude;
-        position.DeviceDateTime = positionDto.DeviceDateTime;
+        position.DateTime = positionDto.DeviceDateTime.UtcDateTime;
+        position.Offset = positionDto.DeviceDateTime.Offset;
         position.Speed = positionDto.Speed;
         position.Course = positionDto.Course;
         position.EventId = positionDto.EventId;

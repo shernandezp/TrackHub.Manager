@@ -1,6 +1,6 @@
 ﻿namespace TrackHub.Manager.Domain.Models;
 public readonly record struct TokenVm(
     string? Token,
-    DateTime? TokenExpiration,
+    DateTimeOffset? TokenExpiration,
     string? RefreshToken,
-    DateTime? RefreshTokenExpiration);
+    DateTimeOffset? RefreshTokenExpiration);

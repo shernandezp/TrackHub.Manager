@@ -11,7 +11,7 @@ builder.Services.AddApplicationServices();
 builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddAppSecurityContext();
-builder.Services.AddWebServices("Manager API");
+builder.Services.AddWebServices();
 
 // Add HealthChecks
 builder.Services.AddHealthChecks()

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TrackHub.Manager.Domain.Models;
@@ -12,9 +13,11 @@ using TrackHub.Manager.Infrastructure.ManagerDB;
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241028031839_FixTimestamp")]
+    partial class FixTimestamp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -147,7 +150,7 @@ namespace TrackHub.Manager.Infrastructure.ManagerDB.Migrations
                         .HasColumnType("text")
                         .HasColumnName("refreshtoken");
 
-                    b.Property<DateTimeOffset?>("RefreshTokenExpiration")
+                    b.Property<DateTime?>("RefreshTokenExpiration")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Salt")
@@ -160,7 +163,7 @@ namespace TrackHub.Manager.Infrastructure.ManagerDB.Migrations
                         .HasColumnType("text")
                         .HasColumnName("token");
 
-                    b.Property<DateTimeOffset?>("TokenExpiration")
+                    b.Property<DateTime?>("TokenExpiration")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("tokenexpiration");
 
@@ -431,9 +434,9 @@ namespace TrackHub.Manager.Infrastructure.ManagerDB.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("course");
 
-                    b.Property<DateTime>("DateTime")
+                    b.Property<DateTimeOffset>("DeviceDateTime")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("datetime");
+                        .HasColumnName("devicedatetime");
 
                     b.Property<int?>("EventId")
                         .HasColumnType("integer")
@@ -450,10 +453,6 @@ namespace TrackHub.Manager.Infrastructure.ManagerDB.Migrations
                     b.Property<double>("Longitude")
                         .HasColumnType("double precision")
                         .HasColumnName("longitude");
-
-                    b.Property<TimeSpan>("Offset")
-                        .HasColumnType("interval")
-                        .HasColumnName("offset");
 
                     b.Property<double>("Speed")
                         .HasColumnType("double precision")
