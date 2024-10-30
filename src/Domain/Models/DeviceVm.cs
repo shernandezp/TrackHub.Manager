@@ -7,5 +7,5 @@ public record struct DeviceVm(
     DeviceType DeviceType,
     short DeviceTypeId,
     string? Description,
-    Guid TransporterId, 
+    Guid? TransporterId, 
     Guid OperatorId);

@@ -10,6 +10,6 @@ public class GetDeviceByUserByOperatorQueryHandler(IDeviceReader reader, IUser u
     private Guid UserId { get; } = user.Id is null ? throw new UnauthorizedAccessException() : new Guid(user.Id);
 
     public async Task<IReadOnlyCollection<DeviceTransporterVm>> Handle(GetDeviceByUserByOperatorQuery request, CancellationToken cancellationToken)
-        => await reader.GetDevicesByUserAsync(UserId, request.OperatorId, cancellationToken);
+        => await reader.GetDeviceTransporterByUserAsync(UserId, request.OperatorId, cancellationToken);
 
 }

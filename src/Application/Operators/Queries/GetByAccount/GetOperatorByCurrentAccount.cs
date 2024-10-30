@@ -1,4 +1,5 @@
 ﻿using Common.Application.Interfaces;
+using Common.Domain.Helpers;
 
 namespace TrackHub.Manager.Application.Operators.Queries.GetByAccount;
 
@@ -14,7 +15,8 @@ public class GetOperatorsCurrentAccountQueryHandler(IOperatorReader reader, IUse
         // Get the account associated with the current user
         var user = await userReader.GetUserAsync(UserId, cancellationToken);
         // Get the operators associated with the account
-        return await reader.GetOperatorsByAccountAsync(user.AccountId, cancellationToken);
+        var filters = new Filters(new Dictionary<string, object> {{ "AccountId", user.AccountId }});
+        return await reader.GetOperatorsAsync(filters, cancellationToken);
     }
 
 }

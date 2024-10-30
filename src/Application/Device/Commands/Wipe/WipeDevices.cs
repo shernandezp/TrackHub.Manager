@@ -18,7 +18,10 @@ public class WipeDevicesCommandHandler(
         foreach (var device in devices)
         {
             await writer.DeleteDeviceAsync(device.DeviceId, cancellationToken);
-            await publisher.Publish(new DeviceDeleted.Notification(device.TransporterId, device.DeviceId), cancellationToken);
+            if (device.TransporterId != null)
+            {
+                await publisher.Publish(new DeviceDeleted.Notification(device.TransporterId.Value, device.DeviceId), cancellationToken);
+            }
         }
     }
 }

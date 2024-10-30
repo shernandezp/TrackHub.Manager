@@ -12,12 +12,13 @@ public class ProcessDeviceCommandHandler(
     ITransporterWriter transporterWriter,
     ITransporterReader transporterReader) : IRequestHandler<ProcessDeviceCommand, bool>
 {
-    // Handles the ProcessDeviceCommand
-    // Parameters:
-    // - request: The ProcessDeviceCommand object
-    // - cancellationToken: A token to cancel the operation if needed
-    // Returns:
-    // - A Task representing the asynchronous operation. The task result contains a boolean value indicating the success of the operation
+
+    /// <summary>
+    /// Handles the ProcessDeviceCommand
+    /// </summary>
+    /// <param name="request">The ProcessDeviceCommand object</param>
+    /// <param name="cancellationToken">A token to cancel the operation if needed</param>
+    /// <returns>A Task representing the asynchronous operation. The task result contains a boolean value indicating the success of the operation</returns>
     public async Task<bool> Handle(ProcessDeviceCommand request, CancellationToken cancellationToken)
     {
         var transporter = await GetTransporter(request.ProcessDevice, cancellationToken);
@@ -48,12 +49,12 @@ public class ProcessDeviceCommandHandler(
         return true;
     }
 
-    // GetTransporter method retrieves a transporter by the device name, it gets created if it doesn't exist
-    // Parameters:
-    // - device: The ProcessDeviceDto object
-    // - cancellationToken: A token to cancel the operation if needed
-    // Returns:
-    // - A Task representing the asynchronous operation. The task result contains the TransporterVm object
+    /// <summary>
+    /// GetTransporter method retrieves a transporter by the device name, it gets created if it doesn't exist
+    /// </summary>
+    /// <param name="device">The ProcessDeviceDto object</param>
+    /// <param name="cancellationToken">A token to cancel the operation if needed</param>
+    /// <returns>A Task representing the asynchronous operation. The task result contains the TransporterVm object</returns>
     private async Task<TransporterVm> GetTransporter(ProcessDeviceDto device, CancellationToken cancellationToken)
     {
         var transporter = await transporterReader.GetTransporterAsync(device.Name, cancellationToken);

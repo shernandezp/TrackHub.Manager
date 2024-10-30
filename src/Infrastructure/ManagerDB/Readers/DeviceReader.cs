@@ -1,4 +1,5 @@
 ﻿using Common.Domain.Enums;
+using Common.Domain.Helpers;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
@@ -55,20 +56,43 @@ public sealed class DeviceReader(IApplicationDbContext context) : IDeviceReader
     /// <param name="operatorId">The ID of the operator</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
     /// <returns>Task<IReadOnlyCollection<DeviceTransporterVm>>: A task that represents the asynchronous operation. The task result contains a collection of DeviceVm objects.</returns>
-    public async Task<IReadOnlyCollection<DeviceTransporterVm>> GetDevicesByUserAsync(Guid userId, Guid operatorId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<DeviceTransporterVm>> GetDeviceTransporterByUserAsync(Guid userId, Guid operatorId, CancellationToken cancellationToken)
         => await context.UsersGroup
             .Where(ug => ug.UserId == userId)
             .SelectMany(ug => ug.Group.Transporters)
             .SelectMany(d => d.Devices)
-            .Where(d => d.OperatorId == operatorId)
+            .Where(d => d.OperatorId == operatorId && d.TransporterId != null)
             .Select(d => new DeviceTransporterVm(
-                d.TransporterId,
+                d.TransporterId!.Value,
                 d.Identifier,
                 d.Serial,
                 d.Transporter.Name,
                 (TransporterType)d.Transporter.TransporterTypeId,
                 d.Transporter.TransporterTypeId))
             .ToListAsync(cancellationToken);
+
+    /// <summary>
+    /// Retrieve a collection of devices by filters
+    /// </summary>
+    /// <param name="filters">The filters to apply</param>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of DeviceTransporterVm objects</returns>
+    public async Task<IReadOnlyCollection<DeviceTransporterVm>> GetDeviceTransportersAsync(Filters filters, CancellationToken cancellationToken)
+    {
+        var query = context.Devices.AsQueryable();
+        query = filters.Apply(query);
+
+        return await query
+            .Where(d => d.TransporterId != null)
+            .Select(d => new DeviceTransporterVm(
+                d.TransporterId!.Value,
+                d.Identifier,
+                d.Serial,
+                d.Transporter.Name,
+                (TransporterType)d.Transporter.TransporterTypeId,
+                d.Transporter.TransporterTypeId))
+            .ToListAsync(cancellationToken);
+    }
 
     /// <summary>
     /// Retrieves a collection of devices by account ID

@@ -1,5 +1,6 @@
 ﻿using TrackHub.Manager.Application.Accounts.Queries.Get;
 using TrackHub.Manager.Application.Accounts.Queries.GetAll;
+using TrackHub.Manager.Application.Accounts.Queries.GetMaster;
 using TrackHub.Manager.Application.Accounts.Queries.GetSettings;
 
 namespace TrackHub.Manager.Web.GraphQL.Query;
@@ -15,7 +16,7 @@ public partial class Query
     public async Task<AccountSettingsVm> GetAccountSettings([Service] ISender sender, [AsParameters] GetAccountSettingsQuery query)
         => await sender.Send(query);
 
-    public async Task<IReadOnlyCollection<AccountSettingsVm>> GetAccountsSettings([Service] ISender sender, [AsParameters] GetAccountsSettingsQuery query)
+    public async Task<IReadOnlyCollection<AccountSettingsVm>> GetAccountSettingsMaster([Service] ISender sender, [AsParameters] GetAccountSettingsMasterQuery query)
         => await sender.Send(query);
 
     public async Task<AccountSettingsVm> GetAccountSettingsByUser([Service] ISender sender)

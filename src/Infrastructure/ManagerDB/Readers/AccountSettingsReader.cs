@@ -1,4 +1,4 @@
-﻿using TrackHub.Manager.Domain;
+﻿using Common.Domain.Helpers;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 

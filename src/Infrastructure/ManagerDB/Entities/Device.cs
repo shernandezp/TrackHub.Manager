@@ -1,6 +1,6 @@
 ﻿namespace TrackHub.Manager.Infrastructure.ManagerDB.Entities;
 
-public sealed class Device (string name, int identifier, string serial, short deviceTypeId, string? description, Guid transporterId, Guid operatorId)
+public sealed class Device (string name, int identifier, string serial, short deviceTypeId, string? description, Guid? transporterId, Guid operatorId)
 {
     private Transporter? _transporter;
     private Operator? _operator;
@@ -10,7 +10,7 @@ public sealed class Device (string name, int identifier, string serial, short de
     public string Serial { get; set; } = serial;
     public short DeviceTypeId { get; set; } = deviceTypeId;
     public string? Description { get; set; } = description;
-    public Guid TransporterId { get; set; } = transporterId;
+    public Guid? TransporterId { get; set; } = transporterId;
     public Guid OperatorId { get; set; } = operatorId;
 
     public Transporter Transporter

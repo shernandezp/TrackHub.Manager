@@ -1,4 +1,6 @@
-﻿namespace TrackHub.Manager.Domain.Interfaces;
+﻿using Common.Domain.Helpers;
+
+namespace TrackHub.Manager.Domain.Interfaces;
 
 public interface IAccountSettingsReader
 {

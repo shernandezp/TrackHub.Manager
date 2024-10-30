@@ -1,4 +1,5 @@
 ﻿using Common.Domain.Enums;
+using Common.Domain.Helpers;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
@@ -45,12 +46,15 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
     /// <summary>
     /// Retrieves a collection of operators by account ID asynchronously.
     /// </summary>
-    /// <param name="accountId">The ID of the account to retrieve operators for.</param>
+    /// <param name="filters">Filters.</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation if needed.</param>
     /// <returns>A collection of OperatorVm instances representing the retrieved operators.</returns>
-    public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsByAccountAsync(Guid accountId, CancellationToken cancellationToken)
-        => await context.Operators
-            .Where(o => o.AccountId == accountId)
+    public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsAsync(Filters filters, CancellationToken cancellationToken)
+    {
+        var query = context.Operators.AsQueryable();
+        query = filters.Apply(query);
+
+        return await query
             .Select(o => new OperatorVm(
                 o.OperatorId,
                 o.Name,
@@ -65,6 +69,7 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                 o.LastModified,
                 null))
             .ToListAsync(cancellationToken);
+    }
 
     /// <summary>
     /// Retrieves a collection of operators by user ID asynchronously.
