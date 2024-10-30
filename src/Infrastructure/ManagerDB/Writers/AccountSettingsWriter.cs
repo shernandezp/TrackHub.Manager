@@ -20,11 +20,11 @@ public sealed class AccountSettingsWriter(IApplicationDbContext context) : IAcco
             accountSettings.AccountId,
             accountSettings.Maps,
             accountSettings.MapsKey,
-            accountSettings.OnlineTimeLapse,
+            accountSettings.OnlineInterval,
             accountSettings.StoreLastPosition,
-            accountSettings.StoringTimeLapse,
+            accountSettings.StoringInterval,
             accountSettings.RefreshMap,
-            accountSettings.RefreshMapTimer);
+            accountSettings.RefreshMapInterval);
     }
 
     /// <summary>
@@ -43,11 +43,11 @@ public sealed class AccountSettingsWriter(IApplicationDbContext context) : IAcco
 
         accountSettings.Maps = accountSettingsDto.Maps;
         accountSettings.MapsKey = accountSettingsDto.MapsKey;
-        accountSettings.OnlineTimeLapse = accountSettingsDto.OnlineTimeLapse;
+        accountSettings.OnlineInterval = accountSettingsDto.OnlineInterval;
         accountSettings.StoreLastPosition = accountSettingsDto.StoreLastPosition;
-        accountSettings.StoringTimeLapse = accountSettingsDto.StoringTimeLapse;
+        accountSettings.StoringInterval = accountSettingsDto.StoringInterval;
         accountSettings.RefreshMap = accountSettingsDto.RefreshMap;
-        accountSettings.RefreshMapTimer = accountSettingsDto.RefreshMapTimer;
+        accountSettings.RefreshMapInterval = accountSettingsDto.RefreshMapInterval;
 
         await context.SaveChangesAsync(cancellationToken);
     }

@@ -7,11 +7,11 @@ public class AccountSettings (Guid accountId)
     public Guid AccountId { get; set; } = accountId;
     public string Maps { get; set; } = "OSM";
     public string? MapsKey { get; set; } = "";
-    public int OnlineTimeLapse { get; set; } = 60;
+    public int OnlineInterval { get; set; } = 60;
     public bool StoreLastPosition { get; set; } = false;
-    public int StoringTimeLapse { get; set; } = 360;
+    public int StoringInterval { get; set; } = 360;
     public bool RefreshMap { get; set; } = false;
-    public int RefreshMapTimer { get; set; } = 60;
+    public int RefreshMapInterval { get; set; } = 60;
 
     public Account Account
     {

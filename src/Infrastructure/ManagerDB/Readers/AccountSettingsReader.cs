@@ -18,11 +18,11 @@ public sealed class AccountSettingsReader(IApplicationDbContext context) : IAcco
                 a.AccountId,
                 a.Maps,
                 a.MapsKey,
-                a.OnlineTimeLapse,
+                a.OnlineInterval,
                 a.StoreLastPosition,
-                a.StoringTimeLapse,
+                a.StoringInterval,
                 a.RefreshMap,
-                a.RefreshMapTimer))
+                a.RefreshMapInterval))
             .FirstAsync(cancellationToken);
 
     /// <summary>
@@ -41,11 +41,11 @@ public sealed class AccountSettingsReader(IApplicationDbContext context) : IAcco
                 a.AccountId,
                 a.Maps,
                 a.MapsKey,
-                a.OnlineTimeLapse,
+                a.OnlineInterval,
                 a.StoreLastPosition,
-                a.StoringTimeLapse,
+                a.StoringInterval,
                 a.RefreshMap,
-                a.RefreshMapTimer))
+                a.RefreshMapInterval))
             .ToListAsync(cancellationToken);
     }
 }

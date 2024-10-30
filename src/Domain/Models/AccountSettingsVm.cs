@@ -4,9 +4,9 @@ public readonly record struct AccountSettingsVm(
     Guid AccountId,
     string Maps,
     string? MapsKey,
-    int OnlineTimeLapse,
+    int OnlineInterval,
     bool StoreLastPosition,
-    int StoringTimeLapse,
+    int StoringInterval,
     bool RefreshMap,
-    int RefreshMapTimer
+    int RefreshMapInterval
     );

@@ -15,11 +15,11 @@ public class AccountSettingsConfiguration : IEntityTypeConfiguration<AccountSett
         builder.Property(x => x.AccountId).HasColumnName("id");
         builder.Property(x => x.Maps).HasColumnName("maps");
         builder.Property(x => x.MapsKey).HasColumnName("mapskey");
-        builder.Property(x => x.OnlineTimeLapse).HasColumnName("onlinetimelapse");
+        builder.Property(x => x.OnlineInterval).HasColumnName("onlineinterval");
         builder.Property(x => x.StoreLastPosition).HasColumnName("storelastposition");
-        builder.Property(x => x.StoringTimeLapse).HasColumnName("storingtimelapse");
+        builder.Property(x => x.StoringInterval).HasColumnName("storinginterval");
         builder.Property(x => x.RefreshMap).HasColumnName("refreshmap");
-        builder.Property(x => x.RefreshMapTimer).HasColumnName("refreshmaptimer");
+        builder.Property(x => x.RefreshMapInterval).HasColumnName("refreshmapinterval");
 
     }
 }
