@@ -1,10 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <RootNamespace>TrackHub.Manager.Application</RootNamespace>
     <AssemblyName>TrackHub.Manager.Application</AssemblyName>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
@@ -13,14 +11,11 @@
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="TransporterPosition\Commands\Update\GetByUser\" />
     <Folder Include="TransporterPosition\Commands\Update\GetByOperator\" />
   </ItemGroup>
-
 </Project>
