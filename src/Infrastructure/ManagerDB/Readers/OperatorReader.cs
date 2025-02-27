@@ -1,4 +1,19 @@
-﻿using Common.Domain.Enums;
+﻿// Copyright (c) 2025 Sergio Hernandez. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License").
+//  You may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+using Common.Domain.Enums;
 using Common.Domain.Helpers;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
@@ -109,5 +124,42 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                     o.Credential.RefreshToken,
                     o.Credential.RefreshTokenExpiration)))
             .ToListAsync(cancellationToken);
+
+    /// <summary>
+    /// Retrieves an operator by transporter ID asynchronously.
+    /// </summary>
+    /// <param name="transporterId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>An OperatorVm instance representing the retrieved operator.</returns>
+    public async Task<OperatorVm> GetOperatorByTransporterAsync(Guid transporterId, CancellationToken cancellationToken)
+        => await context.Transporters
+            .Where(t => t.TransporterId == transporterId)
+            .SelectMany(t => t.Devices)
+            .Select(d => d.Operator)
+            .Select(o => new OperatorVm(
+                o.OperatorId,
+                o.Name,
+                o.Description,
+                o.PhoneNumber,
+                o.EmailAddress,
+                o.Address,
+                o.ContactName,
+                (ProtocolType)o.ProtocolType,
+                o.ProtocolType,
+                o.AccountId,
+                o.LastModified,
+                o.Credential == null ? null : new CredentialTokenVm(
+                    o.Credential.CredentialId,
+                    o.Credential.Uri,
+                    o.Credential.Username,
+                    o.Credential.Password,
+                    o.Credential.Salt,
+                    o.Credential.Key,
+                    o.Credential.Key2,
+                    o.Credential.Token,
+                    o.Credential.TokenExpiration,
+                    o.Credential.RefreshToken,
+                    o.Credential.RefreshTokenExpiration)))
+            .FirstOrDefaultAsync(cancellationToken);
 
 }
