@@ -41,6 +41,7 @@ This API offers:
 - **Device**: A tracking device within the system associated with both a transporter and an operator, supplying real-time location and status data.
 - **TransporterPosition**: Records and timestamps the location of a transporter for route history and monitoring.
 - **Group**: A collection of users and transporters within the system, simplifying permission management and enhancing security protocols.
+- **Report**: Represents the list of available reports for the system account, including report types, formats, and generation details.
 
 ---
 

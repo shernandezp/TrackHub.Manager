@@ -41,6 +41,7 @@ Esta API ofrece:
 - **Device** (Dispositivo): Un dispositivo de seguimiento en el sistema asociado tanto a un transportador como a un operador, proporcionando datos de ubicación y estado en tiempo real.
 - **TransporterPosition** (Posición de Transportador): Registra y marca temporalmente la ubicación de un transportador para el historial de rutas y monitoreo.
 - **Group** (Grupo): Una colección de usuarios y transportadores dentro del sistema, simplificando la gestión de permisos y mejorando los protocolos de seguridad.
+- **Report** (Informe): Representa la lista de informes disponibles para la cuenta del sistema, incluyendo tipos de informes, formatos y detalles de generación.
 
 ---
 
