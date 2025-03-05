@@ -27,6 +27,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Device> Devices { get; set; }
     public DbSet<Group> Groups { get; set; }
     public DbSet<Operator> Operators { get; set; }
+    public DbSet<Report> Reports { get; set; }
     public DbSet<TransporterPosition> TransporterPositions { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<UserGroup> UsersGroup { get; set; }
