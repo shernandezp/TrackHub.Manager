@@ -13,7 +13,9 @@
 //  limitations under the License.
 //
 
-namespace TrackHub.Manager.Infrastructure.ManagerDB.Entities;
+
+namespace TrackHub.Manager.Infrastructure.Entities;
+
 public sealed class TransporterGroup
 {
     private Transporter? _transporter;

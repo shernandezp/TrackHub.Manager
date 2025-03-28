@@ -13,9 +13,10 @@
 //  limitations under the License.
 //
 
-using Common.Domain.Enums;
+using TrackHub.Manager.Infrastructure.Interfaces;
+using TransporterType = Common.Domain.Enums.TransporterType;
 
-namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
+namespace TrackHub.Manager.Infrastructure.Readers;
 
 public sealed class TransporterPositionReader(IApplicationDbContext context) : ITransporterPositionReader
 {

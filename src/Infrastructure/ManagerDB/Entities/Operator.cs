@@ -15,7 +15,8 @@
 
 using Common.Infrastructure;
 
-namespace TrackHub.Manager.Infrastructure.ManagerDB.Entities;
+namespace TrackHub.Manager.Infrastructure.Entities;
+
 public sealed class Operator(string name, string? description, string? phoneNumber, string? emailAddress, string? address, string? contactName, int protocolType, Guid accountId) : BaseAuditableEntity
 {
     private Account? _account;

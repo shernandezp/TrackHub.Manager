@@ -15,7 +15,8 @@
 
 using Common.Infrastructure;
 
-namespace TrackHub.Manager.Infrastructure.ManagerDB.Entities;
+namespace TrackHub.Manager.Infrastructure.Entities;
+
 public sealed class Credential(string uri, string username, string password, string? key, string? key2, string salt, Guid operatorId) : BaseAuditableEntity
 {
     private Operator? _operator;

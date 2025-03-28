@@ -14,6 +14,8 @@
 //
 
 using Common.Domain.Enums;
+using TrackHub.Manager.Infrastructure.Entities;
+using TrackHub.Manager.Infrastructure.Interfaces;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Writers;
 

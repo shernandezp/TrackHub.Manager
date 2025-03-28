@@ -15,7 +15,8 @@
 
 using Common.Infrastructure;
 
-namespace TrackHub.Manager.Infrastructure.ManagerDB.Entities;
+namespace TrackHub.Manager.Infrastructure.Entities;
+
 public sealed class Group(string name, string description, bool active, Guid accountId) : BaseAuditableEntity
 {
     private Account? _account;

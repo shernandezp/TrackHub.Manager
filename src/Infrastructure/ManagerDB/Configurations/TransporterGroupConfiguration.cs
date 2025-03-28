@@ -15,8 +15,10 @@
 
 using Common.Domain.Constants;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using TrackHub.Manager.Infrastructure.Entities;
 
-namespace TrackHub.Manager.Infrastructure.ManagerDB.Configurations;
+namespace TrackHub.Manager.Infrastructure.Configurations;
+
 internal class TransporterGroupConfiguration : IEntityTypeConfiguration<TransporterGroup>
 {
     public void Configure(EntityTypeBuilder<TransporterGroup> builder)

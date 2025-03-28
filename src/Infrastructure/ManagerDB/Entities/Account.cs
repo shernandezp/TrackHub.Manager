@@ -15,7 +15,7 @@
 
 using Common.Infrastructure;
 
-namespace TrackHub.Manager.Infrastructure.ManagerDB.Entities;
+namespace TrackHub.Manager.Infrastructure.Entities;
 
 public class Account(string name, string? description, short type, bool active) : BaseAuditableEntity
 {
