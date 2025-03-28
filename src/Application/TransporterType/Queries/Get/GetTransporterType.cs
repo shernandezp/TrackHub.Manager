@@ -16,11 +16,11 @@
 namespace TrackHub.Manager.Application.TransporterType.Queries.Get;
 
 [Authorize(Resource = Resources.TransporterType, Action = Actions.Read)]
-public readonly record struct GetTransporterTypeQuery(short Id) : IRequest<TransporterTypeVm>;
+public readonly record struct GetTransporterTypeQuery(short TransporterTypeId) : IRequest<TransporterTypeVm>;
 
 public class GetTransporterTypeQueryHandler(ITransporterTypeReader reader) : IRequestHandler<GetTransporterTypeQuery, TransporterTypeVm>
 {
     public async Task<TransporterTypeVm> Handle(GetTransporterTypeQuery request, CancellationToken cancellationToken)
-        => await reader.GetTransporterTypeAsync(request.Id, cancellationToken);
+        => await reader.GetTransporterTypeAsync(request.TransporterTypeId, cancellationToken);
 
 }

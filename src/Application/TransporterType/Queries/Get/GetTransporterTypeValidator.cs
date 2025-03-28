@@ -19,7 +19,7 @@ public class GetTransporterTypeValidator : AbstractValidator<GetTransporterTypeQ
 {
     public GetTransporterTypeValidator()
     {
-        RuleFor(x => x.Id)
+        RuleFor(x => x.TransporterTypeId)
             .NotEmpty();
     }
 }
