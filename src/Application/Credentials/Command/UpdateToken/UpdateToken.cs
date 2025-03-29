@@ -18,7 +18,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace TrackHub.Manager.Application.Credentials.Command.UpdateToken;
 
-[Authorize(Resource = Resources.Credentials, Action = Actions.Edit)]
+[Authorize(Resource = Resources.Credentials, Action = Actions.Custom)]
 public readonly record struct UpdateTokenCommand(UpdateTokenDto Credential) : IRequest;
 
 public class UpdateCommandHandler(ICredentialWriter writer, IConfiguration configuration) : IRequestHandler<UpdateTokenCommand>

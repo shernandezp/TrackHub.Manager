@@ -20,4 +20,5 @@ public record struct TransporterTypeVm(
     bool AccBased,
     double StoppedGap,
     double MaxDistance,
-    double MaxTimeGap);
+    double MaxTimeGap,
+    TransporterType type);

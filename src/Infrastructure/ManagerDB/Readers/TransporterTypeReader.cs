@@ -13,6 +13,7 @@
 //  limitations under the License.
 //
 
+using Common.Domain.Enums;
 using TrackHub.Manager.Infrastructure.Interfaces;
 
 namespace TrackHub.Manager.Infrastructure.Readers;
@@ -32,7 +33,9 @@ public sealed class TransporterTypeReader(IApplicationDbContext context) : ITran
                 tt.AccBased,
                 tt.StoppedGap,
                 tt.MaxDistance,
-                tt.MaxTimeGap))
+                tt.MaxTimeGap,
+                (TransporterType)tt.TransporterTypeId))
+            .OrderBy(tt => tt.TransporterTypeId)
             .ToListAsync(cancellationToken);
 
     /// <summary>
@@ -49,7 +52,8 @@ public sealed class TransporterTypeReader(IApplicationDbContext context) : ITran
                 tt.AccBased,
                 tt.StoppedGap,
                 tt.MaxDistance,
-                tt.MaxTimeGap))
+                tt.MaxTimeGap,
+                (TransporterType)tt.TransporterTypeId))
             .FirstOrDefaultAsync(cancellationToken);
 
 }
