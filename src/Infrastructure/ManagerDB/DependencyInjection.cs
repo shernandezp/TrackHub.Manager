@@ -18,7 +18,10 @@ using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
-using TrackHub.Manager.Infrastructure.ManagerDB;
+using TrackHub.Manager.Infrastructure;
+using TrackHub.Manager.Infrastructure.Interfaces;
+using TrackHub.Manager.Infrastructure.Readers;
+using TrackHub.Manager.Infrastructure.Writers;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -63,6 +66,8 @@ public static class DependencyInjection
         services.AddScoped<IDeviceTransporterReader, DeviceTransporterReader>();
         services.AddScoped<ITransporterReader, TransporterReader>();
         services.AddScoped<ITransporterPositionReader, TransporterPositionReader>();
+        services.AddScoped<ITransporterTypeWriter, TransporterTypeWriter>();
+        services.AddScoped<ITransporterTypeReader, TransporterTypeReader>();
         services.AddScoped<IGroupWriter, GroupWriter>();
         services.AddScoped<IGroupReader, GroupReader>();
         services.AddScoped<IOperatorWriter, OperatorWriter>();

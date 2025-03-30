@@ -15,7 +15,8 @@
 
 using Common.Infrastructure;
 
-namespace TrackHub.Manager.Infrastructure.ManagerDB.Entities;
+namespace TrackHub.Manager.Infrastructure.Entities;
+
 public sealed class Transporter(string name, short transporterTypeId) : BaseAuditableEntity
 {
     public Guid TransporterId { get; private set; } = Guid.NewGuid();
@@ -25,4 +26,5 @@ public sealed class Transporter(string name, short transporterTypeId) : BaseAudi
     public ICollection<Group> Groups { get; set; } = [];
     public ICollection<Device> Devices { get; set; } = [];
     public TransporterPosition? Position { get; set; }
+    public TransporterType? TransporterType { get; set; }
 }

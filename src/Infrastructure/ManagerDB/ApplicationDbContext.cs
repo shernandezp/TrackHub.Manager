@@ -14,8 +14,10 @@
 //
 
 using System.Reflection;
+using TrackHub.Manager.Infrastructure.Entities;
+using TrackHub.Manager.Infrastructure.Interfaces;
 
-namespace TrackHub.Manager.Infrastructure.ManagerDB;
+namespace TrackHub.Manager.Infrastructure;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IApplicationDbContext
 {
@@ -29,6 +31,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Operator> Operators { get; set; }
     public DbSet<Report> Reports { get; set; }
     public DbSet<TransporterPosition> TransporterPositions { get; set; }
+    public DbSet<TransporterType> TransporterTypes { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<UserGroup> UsersGroup { get; set; }
     public DbSet<UserSettings> UserSettings { get; set; }

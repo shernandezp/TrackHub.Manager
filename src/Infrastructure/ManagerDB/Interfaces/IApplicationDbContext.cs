@@ -13,7 +13,9 @@
 //  limitations under the License.
 //
 
-namespace TrackHub.Manager.Infrastructure.ManagerDB.Interfaces;
+using TrackHub.Manager.Infrastructure.Entities;
+
+namespace TrackHub.Manager.Infrastructure.Interfaces;
 
 public interface IApplicationDbContext
 {
@@ -27,6 +29,7 @@ public interface IApplicationDbContext
     DbSet<Operator> Operators { get; set; }
     DbSet<Report> Reports { get; set; }
     DbSet<TransporterPosition> TransporterPositions { get; set; }
+    DbSet<TransporterType> TransporterTypes { get; set; }
     DbSet<User> Users { get; set; }
     DbSet<UserGroup> UsersGroup { get; set; }
     DbSet<UserSettings> UserSettings { get; set; }

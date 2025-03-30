@@ -14,6 +14,9 @@
 //
 
 using Common.Domain.Enums;
+using TrackHub.Manager.Infrastructure.Entities;
+using TrackHub.Manager.Infrastructure.Interfaces;
+using TransporterType = Common.Domain.Enums.TransporterType;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Writers;
 // This class represents a writer for the Transporter entity

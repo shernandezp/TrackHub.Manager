@@ -14,6 +14,7 @@
 //
 
 using Common.Domain.Extensions;
+using TrackHub.Manager.Infrastructure.Interfaces;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 

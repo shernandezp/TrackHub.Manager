@@ -13,6 +13,8 @@
 //  limitations under the License.
 //
 
+using TrackHub.Manager.Infrastructure.Interfaces;
+
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
 // UserSettingsReader class for reading user settings data

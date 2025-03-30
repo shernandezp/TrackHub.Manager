@@ -13,6 +13,8 @@
 //  limitations under the License.
 //
 
+using TrackHub.Manager.Infrastructure.Interfaces;
+
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
 // This class represents a reader for retrieving group information from the database.

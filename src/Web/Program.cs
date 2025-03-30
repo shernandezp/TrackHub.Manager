@@ -15,7 +15,7 @@
 
 using Ardalis.GuardClauses;
 using Common.Application;
-using TrackHub.Manager.Infrastructure.ManagerDB;
+using TrackHub.Manager.Infrastructure;
 using TrackHub.Manager.Web.GraphQL.Mutation;
 using TrackHub.Manager.Web.GraphQL.Query;
 

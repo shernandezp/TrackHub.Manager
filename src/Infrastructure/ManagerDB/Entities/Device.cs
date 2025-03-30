@@ -13,7 +13,7 @@
 //  limitations under the License.
 //
 
-namespace TrackHub.Manager.Infrastructure.ManagerDB.Entities;
+namespace TrackHub.Manager.Infrastructure.Entities;
 
 public sealed class Device (string name, int identifier, string serial, short deviceTypeId, string? description, Guid? transporterId, Guid operatorId)
 {

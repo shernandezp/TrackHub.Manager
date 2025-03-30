@@ -15,8 +15,9 @@
 
 using Common.Domain.Constants;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using TrackHub.Manager.Infrastructure.Entities;
 
-namespace TrackHub.Manager.Infrastructure.ManagerDB.Configurations;
+namespace TrackHub.Manager.Infrastructure.Configurations;
 public class AccountConfiguration : IEntityTypeConfiguration<Account>
 {
     public void Configure(EntityTypeBuilder<Account> builder)

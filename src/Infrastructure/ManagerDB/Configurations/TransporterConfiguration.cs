@@ -15,8 +15,9 @@
 
 using Common.Domain.Constants;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using TrackHub.Manager.Infrastructure.Entities;
 
-namespace TrackHub.Manager.Infrastructure.ManagerDB.Configurations;
+namespace TrackHub.Manager.Infrastructure.Configurations;
 public sealed class TransporterConfiguration : IEntityTypeConfiguration<Transporter>
 {
     public void Configure(EntityTypeBuilder<Transporter> builder)
@@ -44,5 +45,12 @@ public sealed class TransporterConfiguration : IEntityTypeConfiguration<Transpor
             .WithOne(d => d.Transporter)
             .HasForeignKey<TransporterPosition>(d => d.TransporterId)
             .IsRequired(false);
+
+        builder
+            .HasOne(d => d.TransporterType)
+            .WithMany()
+            .HasForeignKey(d => d.TransporterTypeId)
+            .IsRequired(false);
+
     }
 }

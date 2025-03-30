@@ -15,8 +15,10 @@
 
 using Common.Domain.Constants;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using TrackHub.Manager.Infrastructure.Entities;
 
-namespace TrackHub.Manager.Infrastructure.ManagerDB.Configurations;
+namespace TrackHub.Manager.Infrastructure.Configurations;
+
 public sealed class OperatorConfiguration : IEntityTypeConfiguration<Operator>
 {
     public void Configure(EntityTypeBuilder<Operator> builder)
@@ -40,24 +42,19 @@ public sealed class OperatorConfiguration : IEntityTypeConfiguration<Operator>
             .IsRequired();
 
         builder.Property(t => t.Description)
-            .HasMaxLength(ColumnMetadata.DefaultDescriptionLength)
-            .IsRequired();
+            .HasMaxLength(ColumnMetadata.DefaultDescriptionLength);
 
         builder.Property(t => t.PhoneNumber)
-            .HasMaxLength(ColumnMetadata.DefaultPhoneNumberLength)
-            .IsRequired();
+            .HasMaxLength(ColumnMetadata.DefaultPhoneNumberLength);
 
         builder.Property(t => t.EmailAddress)
-            .HasMaxLength(ColumnMetadata.DefaultEmailLength)
-            .IsRequired();
+            .HasMaxLength(ColumnMetadata.DefaultEmailLength);
 
         builder.Property(t => t.Address)
-            .HasMaxLength(ColumnMetadata.DefaultAddressLength)
-            .IsRequired();
+            .HasMaxLength(ColumnMetadata.DefaultAddressLength);
 
         builder.Property(t => t.ContactName)
-            .HasMaxLength(ColumnMetadata.DefaultFieldLength)
-            .IsRequired();
+            .HasMaxLength(ColumnMetadata.DefaultFieldLength);
 
         builder
             .HasOne(d => d.Credential)

@@ -13,6 +13,9 @@
 //  limitations under the License.
 //
 
+using TrackHub.Manager.Infrastructure.Entities;
+using TrackHub.Manager.Infrastructure.Interfaces;
+
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Writers;
 
 // This class represents a writer for UserGroup entities in the infrastructure layer.
