@@ -28,6 +28,7 @@ public sealed class TransporterTypeReader(IApplicationDbContext context) : ITran
     /// <returns></returns>
     public async Task<IReadOnlyCollection<TransporterTypeVm>> GetTransporterTypesAsync(CancellationToken cancellationToken)
         => await context.TransporterTypes
+            .OrderBy(tt => tt.TransporterTypeId)
             .Select(tt => new TransporterTypeVm(
                 tt.TransporterTypeId,
                 tt.AccBased,
@@ -35,7 +36,6 @@ public sealed class TransporterTypeReader(IApplicationDbContext context) : ITran
                 tt.MaxDistance,
                 tt.MaxTimeGap,
                 (TransporterType)tt.TransporterTypeId))
-            .OrderBy(tt => tt.TransporterTypeId)
             .ToListAsync(cancellationToken);
 
     /// <summary>
