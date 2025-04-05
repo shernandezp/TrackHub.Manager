@@ -15,7 +15,7 @@
 
 namespace TrackHub.Manager.Application.TransporterPosition.Commands.Create;
 
-[Authorize(Resource = Resources.Positions, Action = Actions.Write)]
+[Authorize(Resource = Resources.Positions, Action = Actions.Custom)]
 public readonly record struct BulkTransporterPositionCommand(IEnumerable<TransporterPositionDto> Positions) : IRequest;
 
 public class CreateTransporterCommandHandler(ITransporterPositionWriter writer) : IRequestHandler<BulkTransporterPositionCommand>

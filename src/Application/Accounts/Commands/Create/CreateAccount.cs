@@ -30,7 +30,7 @@ public class CreateAccountCommandHandler(IAccountWriter writer, ISecurityWriter 
         await securityWriter.CreateUserAsync(new CreateUserDto
         (
             account.AccountId,
-            "Manager",
+            Roles.Manager,
             request.Account.Password,
             request.Account.EmailAddress,
             request.Account.FirstName,
