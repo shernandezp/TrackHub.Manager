@@ -19,7 +19,7 @@ public readonly record struct AttributesVm(
     bool? Ignition,
     int? Satellites,
     double? Mileage,
-    double? HobbsMeter,
+    double? Hourmeter,
     double? Temperature
     );
 

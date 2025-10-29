@@ -51,7 +51,7 @@ public sealed class TransporterPositionWriter(IApplicationDbContext context) : I
                         positionDto.Attributes?.Ignition,
                         positionDto.Attributes?.Satellites,
                         positionDto.Attributes?.Mileage,
-                        positionDto.Attributes?.HobbsMeter,
+                        positionDto.Attributes?.Hourmeter,
                         positionDto.Attributes?.Temperature
                     )
             )).ToList();
@@ -95,7 +95,7 @@ public sealed class TransporterPositionWriter(IApplicationDbContext context) : I
             positionDto.Attributes?.Ignition,
             positionDto.Attributes?.Satellites,
             positionDto.Attributes?.Mileage,
-            positionDto.Attributes?.HobbsMeter,
+            positionDto.Attributes?.Hourmeter,
             positionDto.Attributes?.Temperature
         );
 

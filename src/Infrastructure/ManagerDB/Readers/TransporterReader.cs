@@ -63,12 +63,19 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
         => await context.Groups
             .Where(g => g.GroupId == groupId)
             .SelectMany(g => g.Transporters)
+            .Select(d => new
+            {
+                d.TransporterId,
+                d.Name,
+                d.TransporterTypeId
+            })
+            .Distinct()
+            .OrderBy(d => d.Name)
             .Select(d => new TransporterVm(
                 d.TransporterId,
                 d.Name,
                 (TransporterType)d.TransporterTypeId,
                 d.TransporterTypeId))
-            .Distinct()
             .ToListAsync(cancellationToken);
 
     /// <summary>
@@ -102,7 +109,14 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
             .SelectMany(a => a.Operators)
             .SelectMany(o => o.Devices)
             .Select(d => d.Transporter)
+            .Select(t => new
+            {
+                t.TransporterId,
+                t.Name,
+                t.TransporterTypeId
+            })
             .Distinct()
+            .OrderBy(t => t.Name)
             .Select(t => new TransporterVm(
                 t.TransporterId,
                 t.Name,
