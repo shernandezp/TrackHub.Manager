@@ -19,6 +19,6 @@ public readonly record struct AttributesDto(
     bool? Ignition,
     int? Satellites,
     double? Mileage,
-    double? HobbsMeter,
+    double? Hourmeter,
     double? Temperature
     );
