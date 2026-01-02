@@ -1,12 +1,73 @@
-﻿## Components and Resources
+﻿# TrackHub Management API
+
+## Key Features
+
+- **Account & Organization Management**: Multi-tenant support with account-based resource isolation
+- **Transporter & Device Management**: Complete CRUD for vehicles, personnel, pets, and GPS devices
+- **Operator Integration**: Manage credentials and connections to external GPS service providers
+- **Group-Based Access Control**: Organize transporters and users into logical groups for permission management
+- **User & Role Administration**: Comprehensive user management with customizable roles and permissions
+- **Settings Personalization**: Account-level and user-level configuration options
+- **GraphQL API**: Efficient, flexible queries using Hot Chocolate server
+- **Clean Architecture**: Maintainable, testable codebase following SOLID principles
+
+---
+
+## Quick Start
+
+### Prerequisites
+
+- .NET 10.0 SDK
+- PostgreSQL 14+
+- TrackHub Authority Server running (for authentication)
+
+### Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/shernandezp/TrackHub.Manager.git
+   cd TrackHub.Manager
+   ```
+
+2. **Configure the database connection** in `appsettings.json`:
+   ```json
+   {
+     "ConnectionStrings": {
+       "ManagerConnection": "Host=localhost;Database=trackhub_manager;Username=postgres;Password=yourpassword"
+     }
+   }
+   ```
+
+3. **Run database migrations**:
+   ```bash
+   dotnet ef database update
+   ```
+
+4. **Seed initial data** (optional):
+   ```bash
+   dotnet run --project src/DBInitializer
+   ```
+
+5. **Start the application**:
+   ```bash
+   dotnet run --project src/Web
+   ```
+
+6. **Access GraphQL Playground** at `https://localhost:5001/graphql`
+
+---
+
+## Components and Resources
 
 | Component                | Description                                           | Documentation                                                                 |
 |--------------------------|-------------------------------------------------------|-------------------------------------------------------------------------------|
 | Hot Chocolate            | GraphQL server for .NET                               | [Hot Chocolate Documentation](https://chillicream.com/docs/hotchocolate/v13)  |
 | .NET Core                | Development platform for modern applications          | [.NET Core Documentation](https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-9/overview) |
-| Postgres                 | Relational database management system                 | [Documentación Postgres](https://www.postgresql.org/)                         |
+| Postgres                 | Relational database management system                 | [Postgres Documentation](https://www.postgresql.org/)                         |
 
-# TrackHub Management API
+---
+
+## Overview
 
 The **TrackHub Management API** provides a robust, modular service for managing core tracking and resource data in TrackHub's ecosystem. Built on **Clean Architecture** principles, this **GraphQL**-based API is designed for flexibility, maintainability, and scalability, ensuring seamless integration and easy adaptability as your business evolves.
 

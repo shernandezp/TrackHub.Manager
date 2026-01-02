@@ -65,7 +65,7 @@ public sealed class DeviceWriter(IApplicationDbContext context) : IDeviceWriter
     /// <exception cref="NotFoundException">If the Device with the specified IDs is not found</exception>
     public async Task UpdateDeviceAsync(UpdateDeviceDto deviceDto, CancellationToken cancellationToken)
     {
-        var device = await context.Devices.FindAsync(deviceDto.DeviceId, cancellationToken)
+        var device = await context.Devices.FindAsync([deviceDto.DeviceId], cancellationToken)
             ?? throw new NotFoundException(nameof(Transporter), $"{deviceDto.DeviceId}");
 
         context.Devices.Attach(device);
