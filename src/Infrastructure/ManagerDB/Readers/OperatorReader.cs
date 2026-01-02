@@ -94,11 +94,17 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
     /// <param name="cancellationToken">A cancellation token to cancel the operation if needed.</param>
     /// <returns>A collection of OperatorVm instances representing the retrieved operators.</returns>
     public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsByUserAsync(Guid userId, CancellationToken cancellationToken)
-        => await context.UsersGroup
-            .Where(ug => ug.UserId == userId)
-            .SelectMany(ug => ug.Group.Transporters)
-            .SelectMany(d => d.Devices)
-            .Select(d => d.Operator)
+    {
+        // Resolve user's account to filter operators by account ownership
+        var accountId = await context.Users
+            .Where(u => u.UserId == userId)
+            .Select(u => u.AccountId)
+            .FirstAsync(cancellationToken);
+
+        return await context.Operators
+            .Where(o => o.AccountId == accountId 
+                && o.Devices.Any(d => d.Transporter != null 
+                    && d.Transporter.Groups.Any(g => g.Users.Any(u => u.UserId == userId))))
             .Distinct()
             .Select(o => new OperatorVm(
                 o.OperatorId,
@@ -125,6 +131,7 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                     o.Credential.RefreshToken,
                     o.Credential.RefreshTokenExpiration)))
             .ToListAsync(cancellationToken);
+    }
 
     /// <summary>
     /// Retrieves an operator by transporter ID asynchronously.

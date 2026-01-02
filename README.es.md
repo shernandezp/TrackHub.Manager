@@ -1,4 +1,63 @@
-﻿﻿## Componentes y Recursos Utilizados
+﻿﻿# API de Administración de TrackHub
+
+## Características Principales
+
+- **Gestión de Cuentas y Organizaciones**: Soporte multi-inquilino con aislamiento de recursos por cuenta
+- **Gestión de Transportadores y Dispositivos**: CRUD completo para vehículos, personal, mascotas y dispositivos GPS
+- **Integración de Operadores**: Gestionar credenciales y conexiones a proveedores externos de servicios GPS
+- **Control de Acceso Basado en Grupos**: Organizar transportadores y usuarios en grupos lógicos para gestión de permisos
+- **Administración de Usuarios y Roles**: Gestión integral de usuarios con roles y permisos personalizables
+- **Personalización de Configuraciones**: Opciones de configuración a nivel de cuenta y de usuario
+- **API GraphQL**: Consultas eficientes y flexibles usando servidor Hot Chocolate
+- **Arquitectura Limpia**: Código mantenible y testeable siguiendo principios SOLID
+
+---
+
+## Inicio Rápido
+
+### Requisitos Previos
+
+- .NET 10.0 SDK
+- PostgreSQL 14+
+- TrackHub Authority Server ejecutándose (para autenticación)
+
+### Instalación
+
+1. **Clonar el repositorio**:
+   ```bash
+   git clone https://github.com/shernandezp/TrackHub.Manager.git
+   cd TrackHub.Manager
+   ```
+
+2. **Configurar la conexión a la base de datos** en `appsettings.json`:
+   ```json
+   {
+     "ConnectionStrings": {
+       "ManagerConnection": "Host=localhost;Database=trackhub_manager;Username=postgres;Password=yourpassword"
+     }
+   }
+   ```
+
+3. **Ejecutar las migraciones de la base de datos**:
+   ```bash
+   dotnet ef database update
+   ```
+
+4. **Sembrar datos iniciales** (opcional):
+   ```bash
+   dotnet run --project src/DBInitializer
+   ```
+
+5. **Iniciar la aplicación**:
+   ```bash
+   dotnet run --project src/Web
+   ```
+
+6. **Acceder al Playground GraphQL** en `https://localhost:5001/graphql`
+
+---
+
+## Componentes y Recursos Utilizados
 
 | Componente                | Descripción                                             | Documentación                                                                 |
 |---------------------------|---------------------------------------------------------|-------------------------------------------------------------------------------|
@@ -6,7 +65,9 @@
 | .NET Core                 | Plataforma de desarrollo para aplicaciones modernas     | [Documentación .NET Core](https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-9/overview) |
 | Postgres                  | Sistema de gestión de bases de datos relacional         | [Documentación Postgres](https://www.postgresql.org/)                         |
 
-# API de Administración de TrackHub
+---
+
+## Descripción General
 
 La **API de Administración de TrackHub** proporciona un servicio modular y robusto para gestionar los datos de seguimiento y recursos principales en el ecosistema de TrackHub. Construida sobre principios de **Arquitectura Limpia**, esta API basada en **GraphQL** está diseñada para ofrecer flexibilidad, mantenibilidad y escalabilidad, asegurando una integración sin complicaciones y una fácil adaptabilidad a medida que evoluciona su negocio.
 
