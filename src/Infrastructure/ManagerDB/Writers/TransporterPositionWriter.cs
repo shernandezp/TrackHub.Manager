@@ -56,10 +56,7 @@ public sealed class TransporterPositionWriter(IApplicationDbContext context) : I
                     )
             )).ToList();
 
-        foreach (var position in positions)
-        {
-            await context.TransporterPositions.AddOrUpdateAsync(position, p => p.TransporterId, ["TransporterPositionId"], cancellationToken);
-        }
+        await context.TransporterPositions.BulkAddOrUpdateAsync(positions, p => p.TransporterId, ["TransporterPositionId"], cancellationToken);
 
         await context.SaveChangesAsync(cancellationToken);
     }

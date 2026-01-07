@@ -200,6 +200,11 @@ public class OperatorReaderTests
         var transporter = new Transporter("t", 1);
         var @operator = new Operator("opT", null, null, null, null, null, 1, accountId);
 
+        // Create a group and associate it with the transporter (required for accountId lookup)
+        var group = new Group("testGroup", "desc", true, accountId);
+        transporter.Groups.Add(group);
+        group.Transporters.Add(transporter);
+
         var device = new Device("d", 1, "s", 1, null, transporter.TransporterId, @operator.OperatorId)
         {
             Transporter = transporter,
@@ -210,6 +215,7 @@ public class OperatorReaderTests
 
         await context.Transporters.AddAsync(transporter);
         await context.Operators.AddAsync(@operator);
+        await context.Groups.AddAsync(group);
         await context.Devices.AddAsync(device);
         await context.SaveChangesAsync(CancellationToken.None);
 
