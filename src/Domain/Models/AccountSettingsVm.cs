@@ -23,5 +23,7 @@ public readonly record struct AccountSettingsVm(
     bool StoreLastPosition,
     int StoringInterval,
     bool RefreshMap,
-    int RefreshMapInterval
+    int RefreshMapInterval,
+    bool EnableGeofencing,
+    bool EnableTripManagement
     );

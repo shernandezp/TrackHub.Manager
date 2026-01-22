@@ -38,7 +38,9 @@ public sealed class AccountSettingsReader(IApplicationDbContext context) : IAcco
                 a.StoreLastPosition,
                 a.StoringInterval,
                 a.RefreshMap,
-                a.RefreshMapInterval))
+                a.RefreshMapInterval,
+                a.EnableGeofencing,
+                a.EnableTripManagement))
             .FirstAsync(cancellationToken);
 
     /// <summary>
@@ -61,7 +63,9 @@ public sealed class AccountSettingsReader(IApplicationDbContext context) : IAcco
                 a.StoreLastPosition,
                 a.StoringInterval,
                 a.RefreshMap,
-                a.RefreshMapInterval))
+                a.RefreshMapInterval,
+                a.EnableGeofencing,
+                a.EnableTripManagement))
             .ToListAsync(cancellationToken);
     }
 }

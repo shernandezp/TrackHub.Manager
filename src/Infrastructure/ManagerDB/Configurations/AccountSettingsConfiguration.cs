@@ -36,6 +36,8 @@ public class AccountSettingsConfiguration : IEntityTypeConfiguration<AccountSett
         builder.Property(x => x.StoringInterval).HasColumnName("storinginterval");
         builder.Property(x => x.RefreshMap).HasColumnName("refreshmap");
         builder.Property(x => x.RefreshMapInterval).HasColumnName("refreshmapinterval");
+        builder.Property(x => x.EnableGeofencing).HasColumnName("geofencing");
+        builder.Property(x => x.EnableTripManagement).HasColumnName("tripmanagement");
 
     }
 }
