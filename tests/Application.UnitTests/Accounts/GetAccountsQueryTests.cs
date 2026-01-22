@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Sergio Hernandez. All rights reserved.
+// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
 
 using TrackHub.Manager.Application.Accounts.Queries.GetAll;
 using TrackHub.Manager.Domain.Interfaces;

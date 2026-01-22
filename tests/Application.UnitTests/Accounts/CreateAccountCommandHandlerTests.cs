@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Sergio Hernandez. All rights reserved.
+// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
 
 using TrackHub.Manager.Application.Accounts.Commands.Create;
 using TrackHub.Manager.Application.Accounts.Events;
