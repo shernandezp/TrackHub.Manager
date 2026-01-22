@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2025 Sergio Hernandez. All rights reserved.
+﻿// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License").
 //  You may not use this file except in compliance with the License.
@@ -19,81 +19,118 @@ namespace TrackHub.Manager.Infrastructure;
 
 public static class DbSetExtensions
 {
+
     /// <summary>
-    /// Adds or updates an entity in the DbSet. If the entity exists, it updates the entity while excluding specified properties.
-    /// It might worth considering different approaches for bulk operations.
+    /// Bulk adds or updates entities in the DbSet. Optimized for scenarios where most entities already exist.
+    /// Fetches all existing entities in a single query and uses dictionary lookups for O(1) matching.
+    /// When multiple entities share the same key, only the last occurrence is processed.
     /// </summary>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <typeparam name="TKey">The type of the key.</typeparam>
-    /// <param name="dbSet">The DbSet to add or update the entity in.</param>
-    /// <param name="entity">The entity to add or update.</param>
+    /// <param name="dbSet">The DbSet to add or update the entities in.</param>
+    /// <param name="entities">The entities to add or update.</param>
     /// <param name="keySelector">An expression to select the key of the entity.</param>
     /// <param name="excludeProperties">A collection of property names to exclude from the update.</param>
     /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public static async Task AddOrUpdateAsync<TEntity, TKey>(
+    public static async Task BulkAddOrUpdateAsync<TEntity, TKey>(
         this DbSet<TEntity> dbSet,
-        TEntity entity,
+        IEnumerable<TEntity> entities,
         Expression<Func<TEntity, TKey>> keySelector,
         IEnumerable<string> excludeProperties,
         CancellationToken cancellationToken = default)
         where TEntity : class
+        where TKey : notnull
     {
-        // Get the key value
-        var keyValue = keySelector.Compile().Invoke(entity);
+        var entityList = entities.ToList();
+        if (entityList.Count == 0)
+            return;
 
-        // Ensure the key value is not null to avoid null comparison issues
-        if (keyValue == null)
-        {
-            throw new ArgumentNullException(nameof(keyValue), "Key value cannot be null.");
-        }
+        // Compile the key selector once for reuse
+        var compiledKeySelector = keySelector.Compile();
 
-        // Create a comparison expression for the query
+        // Deduplicate incoming entities by key, keeping the last occurrence
+        var deduplicatedEntities = entityList
+            .Select((entity, index) => (entity, index, key: compiledKeySelector(entity)))
+            .Where(x => x.key != null)
+            .GroupBy(x => x.key)
+            .Select(g => g.OrderByDescending(x => x.index).First().entity)
+            .ToList();
+
+        // Extract all unique keys from the deduplicated entities
+        var incomingKeys = deduplicatedEntities
+            .Select(compiledKeySelector)
+            .ToList();
+
+        // Build a predicate to fetch all existing entities in a single query
         var parameter = Expression.Parameter(typeof(TEntity), "e");
         var keySelectorBody = Expression.Invoke(keySelector, parameter);
-        var keyComparison = Expression.Equal(keySelectorBody, Expression.Constant(keyValue));
 
-        // Build the final lambda expression
-        var predicate = Expression.Lambda<Func<TEntity, bool>>(keyComparison, parameter);
+        // Create: e => incomingKeys.Contains(keySelector(e))
+        var containsMethod = typeof(Enumerable)
+            .GetMethods()
+            .First(m => m.Name == nameof(Enumerable.Contains) && m.GetParameters().Length == 2)
+            .MakeGenericMethod(typeof(TKey));
 
-        // Check if the entity exists using the provided key selector
-        var existingEntity = await dbSet.FirstOrDefaultAsync(predicate, cancellationToken);
+        var containsCall = Expression.Call(
+            containsMethod,
+            Expression.Constant(incomingKeys),
+            keySelectorBody);
 
-        if (existingEntity != null)
+        var predicate = Expression.Lambda<Func<TEntity, bool>>(containsCall, parameter);
+
+        // Fetch all existing entities in a single query
+        var existingEntities = await dbSet
+            .Where(predicate)
+            .ToListAsync(cancellationToken);
+
+        // Build a dictionary for O(1) lookups
+        var existingDict = existingEntities.ToDictionary(compiledKeySelector);
+
+        // Cache exclude properties as a HashSet for faster lookup
+        var excludeSet = excludeProperties.ToHashSet();
+
+        // Cache property infos for the entity type
+        var propertyInfoCache = typeof(TEntity)
+            .GetProperties()
+            .Where(p => p.CanRead && p.CanWrite)
+            .ToDictionary(p => p.Name);
+
+        foreach (var entity in deduplicatedEntities)
         {
-            // Attach the existing entity to the context
-            dbSet.Attach(existingEntity);
+            var key = compiledKeySelector(entity);
 
-            // Update the existing entity, excluding specified properties
-            var entry = dbSet.Entry(existingEntity);
-
-            // Get all properties of the entity
-            var properties = entry.Properties.Select(p => p.Metadata.Name).ToList();
-
-            // Determine properties to include in the update
-            var propertiesToInclude = properties.Except(excludeProperties);
-
-            // Manually update each property
-            foreach (var property in propertiesToInclude)
+            if (existingDict.TryGetValue(key, out var existingEntity))
             {
-                var propertyInfo = typeof(TEntity).GetProperty(property);
-                if (propertyInfo != null)
-                {
-                    var oldValue = propertyInfo.GetValue(existingEntity);
-                    var newValue = propertyInfo.GetValue(entity);
+                // Update existing entity
+                var entry = dbSet.Entry(existingEntity);
 
-                    // Compare old and new values
-                    if (!Equals(oldValue, newValue))
+                // Get all tracked properties
+                var properties = entry.Properties.Select(p => p.Metadata.Name);
+
+                foreach (var property in properties)
+                {
+                    if (excludeSet.Contains(property))
+                        continue;
+
+                    if (propertyInfoCache.TryGetValue(property, out var propertyInfo))
                     {
-                        entry.Property(property).CurrentValue = newValue;
-                        entry.Property(property).IsModified = true;
+                        var oldValue = propertyInfo.GetValue(existingEntity);
+                        var newValue = propertyInfo.GetValue(entity);
+
+                        if (!Equals(oldValue, newValue))
+                        {
+                            entry.Property(property).CurrentValue = newValue;
+                            entry.Property(property).IsModified = true;
+                        }
                     }
                 }
             }
-        }
-        else
-        {
-            await dbSet.AddAsync(entity, cancellationToken);
+            else
+            {
+                // Add new entity
+                await dbSet.AddAsync(entity, cancellationToken);
+            }
         }
     }
 }

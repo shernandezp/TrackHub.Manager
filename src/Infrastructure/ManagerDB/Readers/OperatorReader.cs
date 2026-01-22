@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2025 Sergio Hernandez. All rights reserved.
+﻿// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License").
 //  You may not use this file except in compliance with the License.
@@ -140,10 +140,20 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
     /// <param name="cancellationToken"></param>
     /// <returns>An OperatorVm instance representing the retrieved operator.</returns>
     public async Task<OperatorVm> GetOperatorByTransporterAsync(Guid transporterId, CancellationToken cancellationToken)
-        => await context.Transporters
+    {
+        // First, get the account ID from the transporter's group
+        var accountId = await context.Transporters
+            .Where(t => t.TransporterId == transporterId)
+            .SelectMany(t => t.Groups)
+            .Select(g => g.AccountId)
+            .FirstAsync(cancellationToken);
+
+        // Then, get the operator that belongs to the same account
+        return await context.Transporters
             .Where(t => t.TransporterId == transporterId)
             .SelectMany(t => t.Devices)
             .Select(d => d.Operator)
+            .Where(o => o.AccountId == accountId)
             .Select(o => new OperatorVm(
                 o.OperatorId,
                 o.Name,
@@ -169,5 +179,6 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                     o.Credential.RefreshToken,
                     o.Credential.RefreshTokenExpiration)))
             .FirstOrDefaultAsync(cancellationToken);
+    }
 
 }

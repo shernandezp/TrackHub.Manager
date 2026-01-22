@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2025 Sergio Hernandez. All rights reserved.
+﻿// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License").
 //  You may not use this file except in compliance with the License.
@@ -36,6 +36,8 @@ public class AccountSettingsConfiguration : IEntityTypeConfiguration<AccountSett
         builder.Property(x => x.StoringInterval).HasColumnName("storinginterval");
         builder.Property(x => x.RefreshMap).HasColumnName("refreshmap");
         builder.Property(x => x.RefreshMapInterval).HasColumnName("refreshmapinterval");
+        builder.Property(x => x.EnableGeofencing).HasColumnName("geofencing");
+        builder.Property(x => x.EnableTripManagement).HasColumnName("tripmanagement");
 
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2025 Sergio Hernandez. All rights reserved.
+﻿// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License").
 //  You may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@ namespace TrackHub.Manager.Infrastructure.Entities;
 
 public class AccountSettings (Guid accountId)
 {
-    private Account? _account;
-
     public Guid AccountId { get; set; } = accountId;
     public string Maps { get; set; } = "OSM";
     public string? MapsKey { get; set; } = "";
@@ -27,10 +25,12 @@ public class AccountSettings (Guid accountId)
     public int StoringInterval { get; set; } = 360;
     public bool RefreshMap { get; set; } = false;
     public int RefreshMapInterval { get; set; } = 60;
+    public bool EnableGeofencing { get; set; } = false;
+    public bool EnableTripManagement { get; set; } = false;
 
     public Account Account
     {
-        get => _account ?? throw new InvalidOperationException("Account is not loaded");
-        set => _account = value;
+        get => field ?? throw new InvalidOperationException("Account is not loaded");
+        set;
     }
 }

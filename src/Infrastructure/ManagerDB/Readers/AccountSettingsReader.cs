@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2025 Sergio Hernandez. All rights reserved.
+﻿// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License").
 //  You may not use this file except in compliance with the License.
@@ -38,7 +38,9 @@ public sealed class AccountSettingsReader(IApplicationDbContext context) : IAcco
                 a.StoreLastPosition,
                 a.StoringInterval,
                 a.RefreshMap,
-                a.RefreshMapInterval))
+                a.RefreshMapInterval,
+                a.EnableGeofencing,
+                a.EnableTripManagement))
             .FirstAsync(cancellationToken);
 
     /// <summary>
@@ -61,7 +63,9 @@ public sealed class AccountSettingsReader(IApplicationDbContext context) : IAcco
                 a.StoreLastPosition,
                 a.StoringInterval,
                 a.RefreshMap,
-                a.RefreshMapInterval))
+                a.RefreshMapInterval,
+                a.EnableGeofencing,
+                a.EnableTripManagement))
             .ToListAsync(cancellationToken);
     }
 }
