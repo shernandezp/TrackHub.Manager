@@ -104,18 +104,8 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
     /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a collection of TransporterVm objects.</returns>
     public async Task<IReadOnlyCollection<TransporterVm>> GetTransportersByAccountAsync(Guid accountId, CancellationToken cancellationToken)
-        => await context.Accounts
-            .Where(a => a.AccountId == accountId)
-            .SelectMany(a => a.Operators)
-            .SelectMany(o => o.Devices)
-            .Select(d => d.Transporter)
-            .Select(t => new
-            {
-                t.TransporterId,
-                t.Name,
-                t.TransporterTypeId
-            })
-            .Distinct()
+        => await context.Transporters
+            .Where(t => t.AccountId == accountId)
             .OrderBy(t => t.Name)
             .Select(t => new TransporterVm(
                 t.TransporterId,

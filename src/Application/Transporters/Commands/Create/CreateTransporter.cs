@@ -13,13 +13,21 @@
 //  limitations under the License.
 //
 
+using Common.Application.Interfaces;
+
 namespace TrackHub.Manager.Application.Transporters.Commands.Create;
 
 [Authorize(Resource = Resources.Transporters, Action = Actions.Write)]
 public readonly record struct CreateTransporterCommand(TransporterDto Transporter) : IRequest<TransporterVm>;
 
-public class CreateTransporterCommandHandler(ITransporterWriter writer) : IRequestHandler<CreateTransporterCommand, TransporterVm>
+public class CreateTransporterCommandHandler(ITransporterWriter writer, IUserReader userReader, IUser user) : IRequestHandler<CreateTransporterCommand, TransporterVm>
 {
+    private Guid UserId { get; } = user.Id is null ? throw new UnauthorizedAccessException() : new Guid(user.Id);
+
     public async Task<TransporterVm> Handle(CreateTransporterCommand request, CancellationToken cancellationToken)
-        => await writer.CreateTransporterAsync(request.Transporter, cancellationToken);
+    {
+        var userVm = await userReader.GetUserAsync(UserId, cancellationToken);
+        var dto = request.Transporter with { AccountId = userVm.AccountId };
+        return await writer.CreateTransporterAsync(dto, cancellationToken);
+    }
 }

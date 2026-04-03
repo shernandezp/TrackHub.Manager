@@ -32,6 +32,8 @@ public class Account(string name, string? description, short type, bool active) 
     public IEnumerable<User> Users { get; } = [];
     public IEnumerable<Group> Groups { get; } = [];
     public IEnumerable<Operator> Operators { get; } = [];
+    public IEnumerable<Transporter> Transporters { get; } = [];
+    public IEnumerable<Device> Devices { get; } = [];
     public AccountSettings? AccountSettings { get; set; }
 
 }

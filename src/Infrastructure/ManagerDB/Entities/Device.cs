@@ -15,10 +15,11 @@
 
 namespace TrackHub.Manager.Infrastructure.Entities;
 
-public sealed class Device (string name, int identifier, string serial, short deviceTypeId, string? description, Guid? transporterId, Guid operatorId)
+public sealed class Device (string name, int identifier, string serial, short deviceTypeId, string? description, Guid? transporterId, Guid operatorId, Guid accountId)
 {
     private Transporter? _transporter;
     private Operator? _operator;
+    private Account? _account;
     public Guid DeviceId { get; private set; }
     public string Name { get; set; } = name;
     public int Identifier { get; set; } = identifier;
@@ -27,6 +28,7 @@ public sealed class Device (string name, int identifier, string serial, short de
     public string? Description { get; set; } = description;
     public Guid? TransporterId { get; set; } = transporterId;
     public Guid OperatorId { get; set; } = operatorId;
+    public Guid AccountId { get; set; } = accountId;
 
     public Transporter Transporter
     {
@@ -37,6 +39,11 @@ public sealed class Device (string name, int identifier, string serial, short de
     {
         get => _operator ?? throw new InvalidOperationException("Operator is not loaded");
         set => _operator = value;
+    }
+    public Account Account
+    {
+        get => _account ?? throw new InvalidOperationException("Account is not loaded");
+        set => _account = value;
     }
 
 }

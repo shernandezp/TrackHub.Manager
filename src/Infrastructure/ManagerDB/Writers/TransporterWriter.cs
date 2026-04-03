@@ -32,7 +32,8 @@ public sealed class TransporterWriter(IApplicationDbContext context) : ITranspor
     {
         var transporter = new Transporter(
             transporterDto.Name,
-            transporterDto.TransporterTypeId);
+            transporterDto.TransporterTypeId,
+            transporterDto.AccountId);
 
         await context.Transporters.AddAsync(transporter, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);

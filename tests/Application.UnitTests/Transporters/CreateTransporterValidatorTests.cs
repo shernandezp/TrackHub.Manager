@@ -33,7 +33,7 @@ public class CreateTransporterValidatorTests
     [Test]
     public void Should_Have_Error_When_Name_Is_Empty()
     {
-        var command = new CreateTransporterCommand(new TransporterDto("", 1));
+        var command = new CreateTransporterCommand(new TransporterDto("", 1, Guid.NewGuid()));
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(v => v.Transporter.Name);
     }
@@ -41,7 +41,7 @@ public class CreateTransporterValidatorTests
     [Test]
     public void Should_Have_Error_When_TransporterTypeId_Is_Zero()
     {
-        var command = new CreateTransporterCommand(new TransporterDto("Name", 0));
+        var command = new CreateTransporterCommand(new TransporterDto("Name", 0, Guid.NewGuid()));
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(v => v.Transporter.TransporterTypeId);
     }
@@ -57,7 +57,7 @@ public class CreateTransporterValidatorTests
     [Test]
     public void Should_Not_Have_Errors_When_Valid()
     {
-        var command = new CreateTransporterCommand(new TransporterDto("Truck-001", 1));
+        var command = new CreateTransporterCommand(new TransporterDto("Truck-001", 1, Guid.NewGuid()));
         var result = _validator.TestValidate(command);
         result.ShouldNotHaveAnyValidationErrors();
     }

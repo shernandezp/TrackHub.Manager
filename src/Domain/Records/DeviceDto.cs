@@ -21,5 +21,6 @@ public record struct DeviceDto(
     short DeviceTypeId,
     string? Description,
     Guid TransporterId,
-    Guid OperatorId
+    Guid OperatorId,
+    Guid AccountId
     );

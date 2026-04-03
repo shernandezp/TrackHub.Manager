@@ -71,10 +71,8 @@ public sealed class DeviceReader(IApplicationDbContext context) : IDeviceReader
     /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
     /// <returns>Task<IReadOnlyCollection<DeviceVm>>: A task that represents the asynchronous operation. The task result contains a collection of DeviceVm objects.</returns>
     public async Task<IReadOnlyCollection<DeviceVm>> GetDevicesByAccountAsync(Guid accountId, CancellationToken cancellationToken)
-        => await context.Accounts
-            .Where(a => a.AccountId == accountId)
-            .SelectMany(a => a.Operators)
-            .SelectMany(d => d.Devices)
+        => await context.Devices
+            .Where(d => d.AccountId == accountId)
             .Select(d => new DeviceVm(
                 d.DeviceId,
                 d.Name,

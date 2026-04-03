@@ -17,14 +17,23 @@ using Common.Infrastructure;
 
 namespace TrackHub.Manager.Infrastructure.Entities;
 
-public sealed class Transporter(string name, short transporterTypeId) : BaseAuditableEntity
+public sealed class Transporter(string name, short transporterTypeId, Guid accountId) : BaseAuditableEntity
 {
+    private Account? _account;
+
     public Guid TransporterId { get; private set; } = Guid.NewGuid();
     public string Name { get; set; } = name;
     public short TransporterTypeId { get; set; } = transporterTypeId;
+    public Guid AccountId { get; set; } = accountId;
 
     public ICollection<Group> Groups { get; set; } = [];
     public ICollection<Device> Devices { get; set; } = [];
     public TransporterPosition? Position { get; set; }
     public TransporterType? TransporterType { get; set; }
+
+    public Account Account
+    {
+        get => _account ?? throw new InvalidOperationException("Account is not loaded");
+        set => _account = value;
+    }
 }

@@ -13,9 +13,7 @@
 //  limitations under the License.
 //
 
-using Common.Domain.Enums;
 using Common.Domain.Helpers;
-using TrackHub.Manager.Infrastructure.Entities;
 using TrackHub.Manager.Infrastructure.Interfaces;
 using TransporterType = Common.Domain.Enums.TransporterType;
 
