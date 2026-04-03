@@ -25,7 +25,7 @@ public class OperatorReaderTests
 
         var user = new User(userId, "alice", true, accountId);
         var group = new Group("group1", "desc", true, accountId);
-        var transporter = new Transporter("transp", 1);
+        var transporter = new Transporter("transp", 1, accountId);
 
         // Link relations
         group.Users.Add(user);
@@ -33,7 +33,7 @@ public class OperatorReaderTests
         group.Transporters.Add(transporter);
 
         var operatorIncluded = new Operator("op1", null, null, null, null, null, 1, accountId);
-        var device1 = new Device("dev1", 1, "s1", 1, null, transporter.TransporterId, operatorIncluded.OperatorId)
+        var device1 = new Device("dev1", 1, "s1", 1, null, transporter.TransporterId, operatorIncluded.OperatorId, accountId)
         {
             Transporter = transporter,
             Operator = operatorIncluded
@@ -42,7 +42,7 @@ public class OperatorReaderTests
         operatorIncluded.Devices.Add(device1);
 
         var operatorExcluded = new Operator("op2", null, null, null, null, null, 1, otherAccountId);
-        var device2 = new Device("dev2", 2, "s2", 1, null, transporter.TransporterId, operatorExcluded.OperatorId)
+        var device2 = new Device("dev2", 2, "s2", 1, null, transporter.TransporterId, operatorExcluded.OperatorId, otherAccountId)
         {
             Transporter = transporter,
             Operator = operatorExcluded
@@ -85,8 +85,8 @@ public class OperatorReaderTests
 
         var user = new User(userId, "bob", true, accountId);
         var group = new Group("groupA", "desc", true, accountId);
-        var transporter1 = new Transporter("t1", 1);
-        var transporter2 = new Transporter("t2", 1);
+        var transporter1 = new Transporter("t1", 1, accountId);
+        var transporter2 = new Transporter("t2", 1, accountId);
 
         group.Users.Add(user);
         transporter1.Groups.Add(group);
@@ -96,7 +96,7 @@ public class OperatorReaderTests
 
         var operatorSingle = new Operator("opX", null, null, null, null, null, 1, accountId);
 
-        var deviceA = new Device("dA", 1, "sa", 1, null, transporter1.TransporterId, operatorSingle.OperatorId)
+        var deviceA = new Device("dA", 1, "sa", 1, null, transporter1.TransporterId, operatorSingle.OperatorId, accountId)
         {
             Transporter = transporter1,
             Operator = operatorSingle
@@ -104,7 +104,7 @@ public class OperatorReaderTests
         transporter1.Devices.Add(deviceA);
         operatorSingle.Devices.Add(deviceA);
 
-        var deviceB = new Device("dB", 2, "sb", 1, null, transporter2.TransporterId, operatorSingle.OperatorId)
+        var deviceB = new Device("dB", 2, "sb", 1, null, transporter2.TransporterId, operatorSingle.OperatorId, accountId)
         {
             Transporter = transporter2,
             Operator = operatorSingle
@@ -197,7 +197,7 @@ public class OperatorReaderTests
         await using var context = new ApplicationDbContext(options);
 
         var accountId = Guid.NewGuid();
-        var transporter = new Transporter("t", 1);
+        var transporter = new Transporter("t", 1, accountId);
         var @operator = new Operator("opT", null, null, null, null, null, 1, accountId);
 
         // Create a group and associate it with the transporter (required for accountId lookup)
@@ -205,7 +205,7 @@ public class OperatorReaderTests
         transporter.Groups.Add(group);
         group.Transporters.Add(transporter);
 
-        var device = new Device("d", 1, "s", 1, null, transporter.TransporterId, @operator.OperatorId)
+        var device = new Device("d", 1, "s", 1, null, transporter.TransporterId, @operator.OperatorId, accountId)
         {
             Transporter = transporter,
             Operator = @operator

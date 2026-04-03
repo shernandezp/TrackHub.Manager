@@ -38,7 +38,8 @@ public sealed class DeviceWriter(IApplicationDbContext context) : IDeviceWriter
             deviceDto.DeviceTypeId,
             deviceDto.Description,
             deviceDto.TransporterId,
-            deviceDto.OperatorId
+            deviceDto.OperatorId,
+            deviceDto.AccountId
         );
 
         await context.Devices.AddAsync(device, cancellationToken);

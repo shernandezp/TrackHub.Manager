@@ -13,9 +13,11 @@
 //  limitations under the License.
 //
 
+using Common.Application.Interfaces;
 using Common.Domain.Enums;
 using TrackHub.Manager.Application.Transporters.Commands.Create;
 using TrackHub.Manager.Domain.Interfaces;
+using TrackHub.Manager.Domain.Models;
 using TrackHub.Manager.Domain.Records;
 
 namespace Application.UnitTests.Transporters;
@@ -24,42 +26,58 @@ namespace Application.UnitTests.Transporters;
 public class CreateTransporterCommandHandlerTests
 {
     private Mock<ITransporterWriter> _writerMock;
+    private Mock<IUserReader> _userReaderMock;
+    private Mock<IUser> _userMock;
+    private Guid _userId;
+    private Guid _accountId;
 
     [SetUp]
     public void SetUp()
     {
         _writerMock = new Mock<ITransporterWriter>();
+        _userReaderMock = new Mock<IUserReader>();
+        _userMock = new Mock<IUser>();
+        _userId = Guid.NewGuid();
+        _accountId = Guid.NewGuid();
+
+        _userMock.Setup(u => u.Id).Returns(_userId.ToString());
+        _userReaderMock.Setup(r => r.GetUserAsync(_userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserVm(_userId, "testuser", true, _accountId));
     }
 
     [Test]
-    public async Task Handle_ValidCommand_DelegatesToWriter()
+    public async Task Handle_ValidCommand_DelegatesToWriterWithAccountId()
     {
         // Arrange
-        var dto = new TransporterDto("Truck-001", 1);
+        var dto = new TransporterDto("Truck-001", 1, Guid.Empty);
         var expectedVm = new TransporterVm(Guid.NewGuid(), "Truck-001", TransporterType.Truck, 1);
-        _writerMock.Setup(w => w.CreateTransporterAsync(dto, It.IsAny<CancellationToken>()))
+        _writerMock.Setup(w => w.CreateTransporterAsync(
+                It.Is<TransporterDto>(d => d.AccountId == _accountId && d.Name == "Truck-001"),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedVm);
 
-        var handler = new CreateTransporterCommandHandler(_writerMock.Object);
+        var handler = new CreateTransporterCommandHandler(_writerMock.Object, _userReaderMock.Object, _userMock.Object);
 
         // Act
         var result = await handler.Handle(new CreateTransporterCommand(dto), CancellationToken.None);
 
         // Assert
         Assert.That(result, Is.EqualTo(expectedVm));
-        _writerMock.Verify(w => w.CreateTransporterAsync(dto, It.IsAny<CancellationToken>()), Times.Once);
+        _writerMock.Verify(w => w.CreateTransporterAsync(
+            It.Is<TransporterDto>(d => d.AccountId == _accountId),
+            It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Test]
-    public async Task Handle_ReturnsTransporterVm_WithCorrectTypeId()
+    public async Task Handle_OverridesAccountIdFromUserContext()
     {
-        // Arrange
-        var dto = new TransporterDto("Asset-X", 3);
+        // Arrange — DTO has Guid.Empty for AccountId (from GraphQL input)
+        var dto = new TransporterDto("Asset-X", 3, Guid.Empty);
         var expectedVm = new TransporterVm(Guid.NewGuid(), "Asset-X", TransporterType.Bicycle, 3);
-        _writerMock.Setup(w => w.CreateTransporterAsync(dto, It.IsAny<CancellationToken>()))
+        _writerMock.Setup(w => w.CreateTransporterAsync(It.IsAny<TransporterDto>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedVm);
 
-        var handler = new CreateTransporterCommandHandler(_writerMock.Object);
+        var handler = new CreateTransporterCommandHandler(_writerMock.Object, _userReaderMock.Object, _userMock.Object);
 
         // Act
         var result = await handler.Handle(new CreateTransporterCommand(dto), CancellationToken.None);
@@ -67,5 +85,20 @@ public class CreateTransporterCommandHandlerTests
         // Assert
         Assert.That(result.TransporterTypeId, Is.EqualTo(3));
         Assert.That(result.Name, Is.EqualTo("Asset-X"));
+        _writerMock.Verify(w => w.CreateTransporterAsync(
+            It.Is<TransporterDto>(d => d.AccountId == _accountId && d.Name == "Asset-X" && d.TransporterTypeId == 3),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
+    public void Handle_NullUserId_ThrowsUnauthorizedAccessException()
+    {
+        // Arrange
+        var nullUserMock = new Mock<IUser>();
+        nullUserMock.Setup(u => u.Id).Returns((string?)null);
+
+        // Act & Assert
+        Assert.Throws<UnauthorizedAccessException>(() =>
+            new CreateTransporterCommandHandler(_writerMock.Object, _userReaderMock.Object, nullUserMock.Object));
     }
 }

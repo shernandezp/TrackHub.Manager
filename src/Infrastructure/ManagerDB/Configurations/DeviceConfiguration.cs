@@ -35,6 +35,7 @@ internal class DeviceConfiguration : IEntityTypeConfiguration<Device>
         builder.Property(x => x.Description).HasColumnName("description");
         builder.Property(x => x.TransporterId).HasColumnName("transporterid");
         builder.Property(x => x.OperatorId).HasColumnName("operatorid");
+        builder.Property(x => x.AccountId).HasColumnName("accountid");
 
         builder.Property(t => t.Serial)
             .HasMaxLength(ColumnMetadata.DefaultFieldLength)
@@ -49,5 +50,12 @@ internal class DeviceConfiguration : IEntityTypeConfiguration<Device>
             .WithMany(e => e.Devices)
             .HasForeignKey(e => e.OperatorId);
 
+        builder
+            .HasOne(e => e.Account)
+            .WithMany(a => a.Devices)
+            .HasForeignKey(e => e.AccountId)
+            .IsRequired();
+
+        builder.HasIndex(e => e.AccountId);
     }
 }

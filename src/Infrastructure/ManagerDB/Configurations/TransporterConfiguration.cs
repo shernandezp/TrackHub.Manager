@@ -29,6 +29,7 @@ public sealed class TransporterConfiguration : IEntityTypeConfiguration<Transpor
         builder.Property(x => x.TransporterId).HasColumnName("id");
         builder.Property(x => x.Name).HasColumnName("name");
         builder.Property(x => x.TransporterTypeId).HasColumnName("transportertypeid");
+        builder.Property(x => x.AccountId).HasColumnName("accountid");
 
         builder.Property(t => t.Name)
             .HasMaxLength(ColumnMetadata.DefaultNameLength)
@@ -52,5 +53,12 @@ public sealed class TransporterConfiguration : IEntityTypeConfiguration<Transpor
             .HasForeignKey(d => d.TransporterTypeId)
             .IsRequired(false);
 
+        builder
+            .HasOne(d => d.Account)
+            .WithMany(a => a.Transporters)
+            .HasForeignKey(d => d.AccountId)
+            .IsRequired();
+
+        builder.HasIndex(t => t.AccountId);
     }
 }
