@@ -13,14 +13,24 @@
 //  limitations under the License.
 //
 
+using Common.Application.Interfaces;
+
 namespace TrackHub.Manager.Application.Groups.Queries.Get;
 
 [Authorize(Resource = Resources.Groups, Action = Actions.Read)]
 public readonly record struct GetGroupQuery(long Id) : IRequest<GroupVm>;
 
-public class GetGroupsQueryHandler(IGroupReader reader) : IRequestHandler<GetGroupQuery, GroupVm>
+public class GetGroupsQueryHandler(IGroupReader reader, IUserReader userReader, IUser user) : IRequestHandler<GetGroupQuery, GroupVm>
 {
+    private Guid UserId { get; } = user.Id is null ? throw new UnauthorizedAccessException() : new Guid(user.Id);
+
     public async Task<GroupVm> Handle(GetGroupQuery request, CancellationToken cancellationToken)
-        => await reader.GetGroupAsync(request.Id, cancellationToken);
+    {
+        var result = await reader.GetGroupAsync(request.Id, cancellationToken);
+        var currentUser = await userReader.GetUserAsync(UserId, cancellationToken);
+        if (result.AccountId != currentUser.AccountId)
+            throw new ForbiddenAccessException();
+        return result;
+    }
 
 }
