@@ -61,6 +61,7 @@ internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextIniti
             context.Reports.Add(new Report(Reports.TransportersInGeofence, "Transporters In Geofence", reportType, true));
             context.Reports.Add(new Report(Reports.PositionRecord, "Position Record", reportType, true));
             context.Reports.Add(new Report(Reports.LiveReport, "Live Report", reportType, true));
+            context.Reports.Add(new Report(Reports.GeofenceEvents, "Geofence Events", reportType, true));
             await context.SaveChangesAsync();
         }
         if (!context.TransporterTypes.Any())

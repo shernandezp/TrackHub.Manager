@@ -41,5 +41,10 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .WithOne(d => d.User)
             .HasForeignKey<UserSettings>(d => d.UserId)
             .IsRequired(false);
+
+        builder
+            .HasIndex(u => new { u.AccountId, u.Username })
+            .HasDatabaseName("ix_users_accountid_username")
+            .IsUnique();
     }
 }

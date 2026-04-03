@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
+// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License").
 //  You may not use this file except in compliance with the License.
@@ -13,11 +13,13 @@
 //  limitations under the License.
 //
 
-global using Common.Application.Attributes;
-global using Common.Application.Exceptions;
-global using Common.Domain.Constants;
-global using TrackHub.Manager.Domain.Interfaces;
-global using TrackHub.Manager.Domain.Models;
-global using TrackHub.Manager.Domain.Records;
-global using FluentValidation;
-global using Common.Mediator;
+namespace TrackHub.Manager.Application.Device.Commands.Wipe;
+
+public sealed class WipeDevicesCommandValidator : AbstractValidator<WipeDevicesCommand>
+{
+    public WipeDevicesCommandValidator()
+    {
+        RuleFor(x => x.OperatorId)
+            .NotEmpty();
+    }
+}
