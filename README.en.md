@@ -97,9 +97,9 @@ This API offers:
 
 ### Tracking and Grouping Entities
 
-- **Transporter**: Represents an entity (e.g., vehicle, person, or pet) equipped with a GPS device, linked to groups and devices, and trackable in real-time.
+- **Transporter**: Represents an entity (e.g., vehicle, person, or pet) equipped with a GPS device, linked to groups and devices, and trackable in real-time. Each transporter has a direct `AccountId` foreign key for tenant-level isolation.
 - **TransporterGroup**: Establishes a relationship between transporters and groups, enabling structured management and permission control.
-- **Device**: A tracking device within the system associated with both a transporter and an operator, supplying real-time location and status data.
+- **Device**: A tracking device within the system associated with both a transporter and an operator, supplying real-time location and status data. Each device has a direct `AccountId` foreign key for tenant-level isolation.
 - **TransporterPosition**: Records and timestamps the location of a transporter for route history and monitoring.
 - **Group**: A collection of users and transporters within the system, simplifying permission management and enhancing security protocols.
 - **Report**: Represents the list of available reports for the system account, including report types, formats, and generation details.
