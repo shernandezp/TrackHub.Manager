@@ -97,9 +97,9 @@ Esta API ofrece:
 
 ### Entidades de Seguimiento y Agrupamiento
 
-- **Transporter** (Transportador): Representa una entidad (como un vehículo, persona o mascota) equipada con un dispositivo GPS, vinculada a grupos y dispositivos, y rastreable en tiempo real.
+- **Transporter** (Transportador): Representa una entidad (como un vehículo, persona o mascota) equipada con un dispositivo GPS, vinculada a grupos y dispositivos, y rastreable en tiempo real. Cada transportador tiene una clave foránea directa `AccountId` para aislamiento a nivel de inquilino.
 - **TransporterGroup** (Grupo de Transportador): Establece una relación entre transportadores y grupos, permitiendo una gestión estructurada y el control de permisos.
-- **Device** (Dispositivo): Un dispositivo de seguimiento en el sistema asociado tanto a un transportador como a un operador, proporcionando datos de ubicación y estado en tiempo real.
+- **Device** (Dispositivo): Un dispositivo de seguimiento en el sistema asociado tanto a un transportador como a un operador, proporcionando datos de ubicación y estado en tiempo real. Cada dispositivo tiene una clave foránea directa `AccountId` para aislamiento a nivel de inquilino.
 - **TransporterPosition** (Posición de Transportador): Registra y marca temporalmente la ubicación de un transportador para el historial de rutas y monitoreo.
 - **Group** (Grupo): Una colección de usuarios y transportadores dentro del sistema, simplificando la gestión de permisos y mejorando los protocolos de seguridad.
 - **Report** (Informe): Representa la lista de informes disponibles para la cuenta del sistema, incluyendo tipos de informes, formatos y detalles de generación.
