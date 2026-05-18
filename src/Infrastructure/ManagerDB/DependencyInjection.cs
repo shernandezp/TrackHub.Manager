@@ -74,6 +74,8 @@ public static class DependencyInjection
         services.AddScoped<IOperatorReader, OperatorReader>();
         services.AddScoped<IReportWriter, ReportWriter>();
         services.AddScoped<IReportReader, ReportReader>();
+        services.AddScoped<IPlatformFoundationReader, PlatformFoundationReader>();
+        services.AddScoped<IPlatformFoundationWriter, PlatformFoundationWriter>();
         services.AddScoped<IUserWriter, UserWriter>();
         services.AddScoped<IUserReader, UserReader>();
         services.AddScoped<IUserSettingsWriter, UserSettingsWriter>();

@@ -27,5 +27,14 @@ public sealed class AccountCreated
             public async Task Handle(Notification notification, CancellationToken cancellationToken)
                 => await writer.CreateAccountSettingsAsync(notification.AccountId, cancellationToken);
         }
+
+        public class AccountFeatureEventHandler(IPlatformFoundationWriter writer) : INotificationHandler<Notification>
+        {
+            public async Task Handle(Notification notification, CancellationToken cancellationToken)
+            {
+                await writer.SetAccountFeatureAsync(new AccountFeatureDto(notification.AccountId, FeatureKeys.Geofencing, false, "default", "account-settings-migration", null, null, null), cancellationToken);
+                await writer.SetAccountFeatureAsync(new AccountFeatureDto(notification.AccountId, FeatureKeys.TripManagement, false, "default", "account-settings-migration", null, null, null), cancellationToken);
+            }
+        }
     }
 }

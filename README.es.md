@@ -1,4 +1,4 @@
-﻿﻿# API de Administración de TrackHub
+# API de Administración de TrackHub
 
 ## Características Principales
 
@@ -10,6 +10,15 @@
 - **Personalización de Configuraciones**: Opciones de configuración a nivel de cuenta y de usuario
 - **API GraphQL**: Consultas eficientes y flexibles usando servidor Hot Chocolate
 - **Arquitectura Limpia**: Código mantenible y testeable siguiendo principios SOLID
+
+---
+
+
+## Mejoras de Plataforma Base
+
+- Agrega consultas y mutaciones GraphQL base por cuenta para conductores, caracteristicas de cuenta, auditoria, documentos, notificaciones, alertas, trabajos en segundo plano, enlaces publicos y permisos de soporte.
+- Aplica acceso por cuenta mediante el principal actual, el alcance del cliente de servicio y validaciones de permisos de soporte aprobados.
+- Mantiene compatibilidad con configuraciones de cuenta existentes mientras usa `AccountFeature` como fuente de feature flags para modulos como geocercas y reportes.
 
 ---
 
@@ -113,3 +122,4 @@ El uso de **GraphQL** permite consultas eficientes y personalizables, permitiend
 ## Licencia
 
 Este proyecto está bajo la Licencia Apache 2.0. Consulta el archivo [LICENSE](https://www.apache.org/licenses/LICENSE-2.0) para más información.
+

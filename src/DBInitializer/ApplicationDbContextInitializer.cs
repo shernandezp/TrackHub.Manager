@@ -116,5 +116,26 @@ internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextIniti
             context.UserSettings.Add(new UserSettings(user.UserId));
             await context.SaveChangesAsync();
         }
+        await SeedAccountFeaturesAsync();
+    }
+
+    private async Task SeedAccountFeaturesAsync()
+    {
+        var settings = await context.AccountSettings.ToListAsync();
+        foreach (var accountSettings in settings)
+        {
+            await EnsureAccountFeatureAsync(accountSettings.AccountId, FeatureKeys.Geofencing, accountSettings.EnableGeofencing);
+            await EnsureAccountFeatureAsync(accountSettings.AccountId, FeatureKeys.TripManagement, accountSettings.EnableTripManagement);
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    private async Task EnsureAccountFeatureAsync(Guid accountId, string featureKey, bool enabled)
+    {
+        if (!await context.AccountFeatures.AnyAsync(x => x.AccountId == accountId && x.FeatureKey == featureKey))
+        {
+            await context.AccountFeatures.AddAsync(new AccountFeature(accountId, featureKey, enabled, "default", "account-settings-migration", null, null, null));
+        }
     }
 }

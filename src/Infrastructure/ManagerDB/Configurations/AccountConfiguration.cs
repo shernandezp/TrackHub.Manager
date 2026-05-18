@@ -59,6 +59,18 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             .IsRequired();
 
         builder
+            .HasMany(e => e.Drivers)
+            .WithOne()
+            .HasForeignKey(e => e.AccountId)
+            .IsRequired();
+
+        builder
+            .HasMany(e => e.AccountFeatures)
+            .WithOne()
+            .HasForeignKey(e => e.AccountId)
+            .IsRequired();
+
+        builder
             .HasOne(d => d.AccountSettings)
             .WithOne(d => d.Account)
             .HasForeignKey<AccountSettings>(d => d.AccountId)

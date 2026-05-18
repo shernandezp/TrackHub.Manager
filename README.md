@@ -1,4 +1,4 @@
-﻿# TrackHub Management API
+# TrackHub Management API
 
 [English](README.en.md) | [Español](README.es.md)
 
@@ -9,6 +9,15 @@ Currently in development, our project aims to foster collaboration among diverse
 We believe in the strength of community collaboration to create effective and accessible tools for everyone. Contribute to TrackHub to help shape the future of monitoring solutions!
 
 ![Image](https://github.com/shernandezp/TrackHub.AuthorityServer/blob/master/src/Web/wwwroot/images/logo.png)
+
+
+## Platform Foundation Enhancements
+
+- Adds account-scoped foundation GraphQL queries and mutations for drivers, account features, audit trail, documents, notifications, alerts, background jobs, public links, and support grants.
+- Enforces account access through the current principal, service-client scope, and approved support-grant checks.
+- Keeps legacy account settings compatible while using `AccountFeature` as the feature-flag source for modules such as geofencing and reports.
+
+---
 
 ## Project Repositories
 
@@ -23,3 +32,5 @@ We believe in the strength of community collaboration to create effective and ac
 | **Reporting API**           | [https://github.com/shernandezp/TrackHub.Reporting](https://github.com/shernandezp/TrackHub.Reporting)    |
 | **TrackHub Web**            | [https://github.com/shernandezp/TrackHub](https://github.com/shernandezp/TrackHub)          |
 | **TrackHub Mobile**         | [https://github.com/shernandezp/TrackHubMobile](https://github.com/shernandezp/TrackHubMobile)      |
+
+

@@ -13,7 +13,9 @@
 //  limitations under the License.
 //
 
+using Common.Domain.Constants;
 using Common.Domain.Helpers;
+using TrackHub.Manager.Infrastructure.Entities;
 using TrackHub.Manager.Infrastructure.Interfaces;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
@@ -28,20 +30,13 @@ public sealed class AccountSettingsReader(IApplicationDbContext context) : IAcco
     /// <param name="cancellationToken"></param>
     /// <returns>Returns an AccountSettingsVm object</returns>
     public async Task<AccountSettingsVm> GetAccountSettingsAsync(Guid id, CancellationToken cancellationToken)
-        => await context.AccountSettings
+    {
+        var accountSettings = await context.AccountSettings
             .Where(a => a.AccountId.Equals(id))
-            .Select(a => new AccountSettingsVm(
-                a.AccountId,
-                a.Maps,
-                a.MapsKey,
-                a.OnlineInterval,
-                a.StoreLastPosition,
-                a.StoringInterval,
-                a.RefreshMap,
-                a.RefreshMapInterval,
-                a.EnableGeofencing,
-                a.EnableTripManagement))
             .FirstAsync(cancellationToken);
+
+        return await ToVmAsync(accountSettings, cancellationToken);
+    }
 
     /// <summary>
     /// Retrieves a collection of account settings
@@ -54,18 +49,34 @@ public sealed class AccountSettingsReader(IApplicationDbContext context) : IAcco
         var query = context.AccountSettings.AsQueryable();
         query = filters.Apply(query);
 
-        return await query
-            .Select(a => new AccountSettingsVm(
-                a.AccountId,
-                a.Maps,
-                a.MapsKey,
-                a.OnlineInterval,
-                a.StoreLastPosition,
-                a.StoringInterval,
-                a.RefreshMap,
-                a.RefreshMapInterval,
-                a.EnableGeofencing,
-                a.EnableTripManagement))
-            .ToListAsync(cancellationToken);
+        var settings = await query.ToListAsync(cancellationToken);
+        var result = new List<AccountSettingsVm>();
+
+        foreach (var accountSettings in settings)
+        {
+            result.Add(await ToVmAsync(accountSettings, cancellationToken));
+        }
+
+        return result;
+    }
+
+    private async Task<AccountSettingsVm> ToVmAsync(AccountSettings accountSettings, CancellationToken cancellationToken)
+    {
+        var featureStates = await context.AccountFeatures
+            .Where(x => x.AccountId == accountSettings.AccountId
+                && (x.FeatureKey == FeatureKeys.Geofencing || x.FeatureKey == FeatureKeys.TripManagement))
+            .ToDictionaryAsync(x => x.FeatureKey, x => x.Enabled, cancellationToken);
+
+        return new AccountSettingsVm(
+            accountSettings.AccountId,
+            accountSettings.Maps,
+            accountSettings.MapsKey,
+            accountSettings.OnlineInterval,
+            accountSettings.StoreLastPosition,
+            accountSettings.StoringInterval,
+            accountSettings.RefreshMap,
+            accountSettings.RefreshMapInterval,
+            featureStates.TryGetValue(FeatureKeys.Geofencing, out var geofencingEnabled) ? geofencingEnabled : accountSettings.EnableGeofencing,
+            featureStates.TryGetValue(FeatureKeys.TripManagement, out var tripManagementEnabled) ? tripManagementEnabled : accountSettings.EnableTripManagement);
     }
 }

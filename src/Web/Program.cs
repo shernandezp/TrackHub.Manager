@@ -15,7 +15,11 @@
 
 using Ardalis.GuardClauses;
 using Common.Application;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 using TrackHub.Manager.Infrastructure;
+using TrackHub.Manager.Infrastructure.Entities;
 using TrackHub.Manager.Web.GraphQL.Mutation;
 using TrackHub.Manager.Web.GraphQL.Query;
 
@@ -78,6 +82,85 @@ app.UseStaticFiles();
 
 app.UseExceptionHandler(options => { });
 
+app.MapGet("~/public-links/{publicLinkGrantId:guid}", async (
+    Guid publicLinkGrantId,
+    Guid accountId,
+    string resourceType,
+    string resourceId,
+    string scope,
+    string token,
+    ApplicationDbContext context,
+    CancellationToken cancellationToken) =>
+{
+    if (accountId == Guid.Empty
+        || string.IsNullOrWhiteSpace(resourceType)
+        || string.IsNullOrWhiteSpace(resourceId)
+        || string.IsNullOrWhiteSpace(scope)
+        || string.IsNullOrWhiteSpace(token))
+    {
+        return Results.BadRequest();
+    }
+
+    var tokenHash = HashPublicLinkToken(token);
+    var grant = await context.PublicLinkGrants
+        .FirstOrDefaultAsync(x =>
+            x.PublicLinkGrantId == publicLinkGrantId
+            && x.AccountId == accountId
+            && x.ResourceType == resourceType
+            && x.ResourceId == resourceId
+            && x.SubjectTokenIdHash == tokenHash,
+            cancellationToken);
+
+    if (grant == null || grant.RevokedAt.HasValue || !HasScope(grant.Scopes, scope))
+    {
+        return Results.NotFound();
+    }
+
+    if (grant.ExpiresAt <= DateTimeOffset.UtcNow)
+    {
+        return Results.StatusCode(StatusCodes.Status410Gone);
+    }
+
+    grant.AccessCount++;
+    grant.LastAccessedAt = DateTimeOffset.UtcNow;
+    context.AuditEvents.Add(new AuditEvent(
+        grant.AccountId,
+        "PublicLink",
+        grant.PublicLinkGrantId.ToString(),
+        "PublicLinkAccessed",
+        "PublicLinkGrant",
+        grant.PublicLinkGrantId.ToString(),
+        "Succeeded",
+        null,
+        $$"""{"resourceType":"{{grant.ResourceType}}","resourceId":"{{grant.ResourceId}}","scope":"{{scope}}","accessCount":{{grant.AccessCount}}}""",
+        null,
+        null,
+        null,
+        null));
+    await context.SaveChangesAsync(cancellationToken);
+
+    return Results.Ok(new
+    {
+        grant.PublicLinkGrantId,
+        grant.AccountId,
+        grant.ResourceType,
+        grant.ResourceId,
+        grant.Scopes,
+        grant.Purpose,
+        grant.ExpiresAt,
+        grant.AccessCount,
+        grant.LastAccessedAt
+    });
+});
+
 app.MapGraphQL();
 
 app.Run();
+
+static string HashPublicLinkToken(string token)
+    => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
+
+static bool HasScope(string scopes, string requestedScope)
+    => scopes
+        .Split([' ', ','], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Any(scope => string.Equals(scope, requestedScope, StringComparison.OrdinalIgnoreCase));

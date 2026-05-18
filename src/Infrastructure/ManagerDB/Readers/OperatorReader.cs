@@ -118,18 +118,7 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                 o.ProtocolType,
                 o.AccountId,
                 o.LastModified,
-                o.Credential == null ? null : new CredentialTokenVm(
-                    o.Credential.CredentialId,
-                    o.Credential.Uri,
-                    o.Credential.Username,
-                    o.Credential.Password,
-                    o.Credential.Salt,
-                    o.Credential.Key,
-                    o.Credential.Key2,
-                    o.Credential.Token,
-                    o.Credential.TokenExpiration,
-                    o.Credential.RefreshToken,
-                    o.Credential.RefreshTokenExpiration)))
+                null))
             .ToListAsync(cancellationToken);
     }
 
@@ -166,18 +155,7 @@ public sealed class OperatorReader(IApplicationDbContext context) : IOperatorRea
                 o.ProtocolType,
                 o.AccountId,
                 o.LastModified,
-                o.Credential == null ? null : new CredentialTokenVm(
-                    o.Credential.CredentialId,
-                    o.Credential.Uri,
-                    o.Credential.Username,
-                    o.Credential.Password,
-                    o.Credential.Salt,
-                    o.Credential.Key,
-                    o.Credential.Key2,
-                    o.Credential.Token,
-                    o.Credential.TokenExpiration,
-                    o.Credential.RefreshToken,
-                    o.Credential.RefreshTokenExpiration)))
+                null))
             .FirstOrDefaultAsync(cancellationToken);
     }
 
