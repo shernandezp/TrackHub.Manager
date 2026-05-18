@@ -18,5 +18,6 @@ global using TrackHub.Manager.Domain.Records;
 global using Ardalis.GuardClauses;
 global using Microsoft.EntityFrameworkCore;
 global using TrackHub.Manager.Domain.Models;
+global using TrackHub.Manager.Infrastructure.ManagerDB;
 global using TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 global using TrackHub.Manager.Infrastructure.ManagerDB.Writers;

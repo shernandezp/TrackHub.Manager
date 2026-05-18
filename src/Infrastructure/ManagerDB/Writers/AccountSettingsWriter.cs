@@ -42,9 +42,7 @@ public sealed class AccountSettingsWriter(IApplicationDbContext context) : IAcco
             accountSettings.StoreLastPosition,
             accountSettings.StoringInterval,
             accountSettings.RefreshMap,
-            accountSettings.RefreshMapInterval,
-            accountSettings.EnableGeofencing,
-            accountSettings.EnableTripManagement);
+            accountSettings.RefreshMapInterval);
     }
 
     /// <summary>
@@ -68,8 +66,6 @@ public sealed class AccountSettingsWriter(IApplicationDbContext context) : IAcco
         accountSettings.StoringInterval = accountSettingsDto.StoringInterval;
         accountSettings.RefreshMap = accountSettingsDto.RefreshMap;
         accountSettings.RefreshMapInterval = accountSettingsDto.RefreshMapInterval;
-        accountSettings.EnableGeofencing = accountSettingsDto.EnableGeofencing;
-        accountSettings.EnableTripManagement = accountSettingsDto.EnableTripManagement;
 
         await context.SaveChangesAsync(cancellationToken);
     }

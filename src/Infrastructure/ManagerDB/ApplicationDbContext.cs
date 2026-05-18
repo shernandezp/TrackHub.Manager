@@ -22,13 +22,23 @@ namespace TrackHub.Manager.Infrastructure;
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IApplicationDbContext
 {
     public DbSet<Account> Accounts { get; set; }
+    public DbSet<AccountFeature> AccountFeatures { get; set; }
     public DbSet<AccountSettings> AccountSettings { get; set; }
+    public DbSet<AccountSupportGrant> AccountSupportGrants { get; set; }
+    public DbSet<AlertEvent> AlertEvents { get; set; }
+    public DbSet<AuditEvent> AuditEvents { get; set; }
+    public DbSet<BackgroundJobRun> BackgroundJobRuns { get; set; }
     public DbSet<Credential> Credentials { get; set; }
+    public DbSet<Document> Documents { get; set; }
+    public DbSet<Driver> Drivers { get; set; }
     public DbSet<Transporter> Transporters { get; set; }
     public DbSet<TransporterGroup> TransportersGroup { get; set; }
     public DbSet<Device> Devices { get; set; }
     public DbSet<Group> Groups { get; set; }
+    public DbSet<NotificationDelivery> NotificationDeliveries { get; set; }
+    public DbSet<NotificationRule> NotificationRules { get; set; }
     public DbSet<Operator> Operators { get; set; }
+    public DbSet<PublicLinkGrant> PublicLinkGrants { get; set; }
     public DbSet<Report> Reports { get; set; }
     public DbSet<TransporterPosition> TransporterPositions { get; set; }
     public DbSet<TransporterType> TransporterTypes { get; set; }

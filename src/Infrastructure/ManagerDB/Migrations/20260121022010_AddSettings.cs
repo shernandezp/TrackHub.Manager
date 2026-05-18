@@ -89,9 +89,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     storelastposition = table.Column<bool>(type: "boolean", nullable: false),
                     storinginterval = table.Column<int>(type: "integer", nullable: false),
                     refreshmap = table.Column<bool>(type: "boolean", nullable: false),
-                    refreshmapinterval = table.Column<int>(type: "integer", nullable: false),
-                    geofencing = table.Column<bool>(type: "boolean", nullable: false),
-                    tripmanagement = table.Column<bool>(type: "boolean", nullable: false)
+                    refreshmapinterval = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {

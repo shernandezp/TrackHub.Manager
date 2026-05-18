@@ -14,6 +14,7 @@
 //
 
 using Common.Domain.Helpers;
+using TrackHub.Manager.Infrastructure.Entities;
 using TrackHub.Manager.Infrastructure.Interfaces;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
@@ -28,20 +29,13 @@ public sealed class AccountSettingsReader(IApplicationDbContext context) : IAcco
     /// <param name="cancellationToken"></param>
     /// <returns>Returns an AccountSettingsVm object</returns>
     public async Task<AccountSettingsVm> GetAccountSettingsAsync(Guid id, CancellationToken cancellationToken)
-        => await context.AccountSettings
+    {
+        var accountSettings = await context.AccountSettings
             .Where(a => a.AccountId.Equals(id))
-            .Select(a => new AccountSettingsVm(
-                a.AccountId,
-                a.Maps,
-                a.MapsKey,
-                a.OnlineInterval,
-                a.StoreLastPosition,
-                a.StoringInterval,
-                a.RefreshMap,
-                a.RefreshMapInterval,
-                a.EnableGeofencing,
-                a.EnableTripManagement))
             .FirstAsync(cancellationToken);
+
+        return ToVm(accountSettings);
+    }
 
     /// <summary>
     /// Retrieves a collection of account settings
@@ -54,18 +48,25 @@ public sealed class AccountSettingsReader(IApplicationDbContext context) : IAcco
         var query = context.AccountSettings.AsQueryable();
         query = filters.Apply(query);
 
-        return await query
-            .Select(a => new AccountSettingsVm(
-                a.AccountId,
-                a.Maps,
-                a.MapsKey,
-                a.OnlineInterval,
-                a.StoreLastPosition,
-                a.StoringInterval,
-                a.RefreshMap,
-                a.RefreshMapInterval,
-                a.EnableGeofencing,
-                a.EnableTripManagement))
-            .ToListAsync(cancellationToken);
+        var settings = await query.ToListAsync(cancellationToken);
+        var result = new List<AccountSettingsVm>();
+
+        foreach (var accountSettings in settings)
+        {
+            result.Add(ToVm(accountSettings));
+        }
+
+        return result;
     }
+
+    private static AccountSettingsVm ToVm(AccountSettings accountSettings)
+        => new(
+            accountSettings.AccountId,
+            accountSettings.Maps,
+            accountSettings.MapsKey,
+            accountSettings.OnlineInterval,
+            accountSettings.StoreLastPosition,
+            accountSettings.StoringInterval,
+            accountSettings.RefreshMap,
+            accountSettings.RefreshMapInterval);
 }

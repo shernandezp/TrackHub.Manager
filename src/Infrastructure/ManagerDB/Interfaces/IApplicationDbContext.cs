@@ -20,13 +20,23 @@ namespace TrackHub.Manager.Infrastructure.Interfaces;
 public interface IApplicationDbContext
 {
     DbSet<Account> Accounts { get; set; }
+    DbSet<AccountFeature> AccountFeatures { get; set; }
     DbSet<AccountSettings> AccountSettings { get; set; }
+    DbSet<AccountSupportGrant> AccountSupportGrants { get; set; }
+    DbSet<AlertEvent> AlertEvents { get; set; }
+    DbSet<AuditEvent> AuditEvents { get; set; }
+    DbSet<BackgroundJobRun> BackgroundJobRuns { get; set; }
     DbSet<Credential> Credentials { get; set; }
+    DbSet<Document> Documents { get; set; }
+    DbSet<Driver> Drivers { get; set; }
     DbSet<Transporter> Transporters { get; set; }
     DbSet<TransporterGroup> TransportersGroup { get; set; }
     DbSet<Device> Devices { get; set; }
     DbSet<Group> Groups { get; set; }
+    DbSet<NotificationDelivery> NotificationDeliveries { get; set; }
+    DbSet<NotificationRule> NotificationRules { get; set; }
     DbSet<Operator> Operators { get; set; }
+    DbSet<PublicLinkGrant> PublicLinkGrants { get; set; }
     DbSet<Report> Reports { get; set; }
     DbSet<TransporterPosition> TransporterPositions { get; set; }
     DbSet<TransporterType> TransporterTypes { get; set; }

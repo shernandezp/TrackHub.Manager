@@ -76,14 +76,6 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<bool>("EnableGeofencing")
-                        .HasColumnType("boolean")
-                        .HasColumnName("geofencing");
-
-                    b.Property<bool>("EnableTripManagement")
-                        .HasColumnType("boolean")
-                        .HasColumnName("tripmanagement");
-
                     b.Property<string>("Maps")
                         .IsRequired()
                         .HasColumnType("text")
