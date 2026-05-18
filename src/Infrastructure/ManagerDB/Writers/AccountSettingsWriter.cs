@@ -13,7 +13,6 @@
 //  limitations under the License.
 //
 
-using Common.Domain.Constants;
 using TrackHub.Manager.Infrastructure.Entities;
 using TrackHub.Manager.Infrastructure.Interfaces;
 
@@ -43,9 +42,7 @@ public sealed class AccountSettingsWriter(IApplicationDbContext context) : IAcco
             accountSettings.StoreLastPosition,
             accountSettings.StoringInterval,
             accountSettings.RefreshMap,
-            accountSettings.RefreshMapInterval,
-            accountSettings.EnableGeofencing,
-            accountSettings.EnableTripManagement);
+            accountSettings.RefreshMapInterval);
     }
 
     /// <summary>
@@ -69,26 +66,7 @@ public sealed class AccountSettingsWriter(IApplicationDbContext context) : IAcco
         accountSettings.StoringInterval = accountSettingsDto.StoringInterval;
         accountSettings.RefreshMap = accountSettingsDto.RefreshMap;
         accountSettings.RefreshMapInterval = accountSettingsDto.RefreshMapInterval;
-        accountSettings.EnableGeofencing = accountSettingsDto.EnableGeofencing;
-        accountSettings.EnableTripManagement = accountSettingsDto.EnableTripManagement;
-
-        await SetAccountFeatureAsync(accountSettings.AccountId, FeatureKeys.Geofencing, accountSettingsDto.EnableGeofencing, cancellationToken);
-        await SetAccountFeatureAsync(accountSettings.AccountId, FeatureKeys.TripManagement, accountSettingsDto.EnableTripManagement, cancellationToken);
 
         await context.SaveChangesAsync(cancellationToken);
-    }
-
-    private async Task SetAccountFeatureAsync(Guid accountId, string featureKey, bool enabled, CancellationToken cancellationToken)
-    {
-        var feature = await context.AccountFeatures.FirstOrDefaultAsync(x => x.AccountId == accountId && x.FeatureKey == featureKey, cancellationToken);
-        if (feature == null)
-        {
-            await context.AccountFeatures.AddAsync(new AccountFeature(accountId, featureKey, enabled, "default", "account-settings", null, null, null), cancellationToken);
-            return;
-        }
-
-        context.AccountFeatures.Attach(feature);
-        feature.Enabled = enabled;
-        feature.Source = "account-settings";
     }
 }

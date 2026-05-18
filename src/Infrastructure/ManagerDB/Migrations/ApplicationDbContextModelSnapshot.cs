@@ -18,7 +18,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -137,14 +137,6 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     b.Property<Guid>("AccountId")
                         .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    b.Property<bool>("EnableGeofencing")
-                        .HasColumnType("boolean")
-                        .HasColumnName("geofencing");
-
-                    b.Property<bool>("EnableTripManagement")
-                        .HasColumnType("boolean")
-                        .HasColumnName("tripmanagement");
 
                     b.Property<string>("Maps")
                         .IsRequired()

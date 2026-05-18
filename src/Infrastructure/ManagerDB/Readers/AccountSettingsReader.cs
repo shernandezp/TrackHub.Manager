@@ -13,7 +13,6 @@
 //  limitations under the License.
 //
 
-using Common.Domain.Constants;
 using Common.Domain.Helpers;
 using TrackHub.Manager.Infrastructure.Entities;
 using TrackHub.Manager.Infrastructure.Interfaces;
@@ -35,7 +34,7 @@ public sealed class AccountSettingsReader(IApplicationDbContext context) : IAcco
             .Where(a => a.AccountId.Equals(id))
             .FirstAsync(cancellationToken);
 
-        return await ToVmAsync(accountSettings, cancellationToken);
+        return ToVm(accountSettings);
     }
 
     /// <summary>
@@ -54,20 +53,14 @@ public sealed class AccountSettingsReader(IApplicationDbContext context) : IAcco
 
         foreach (var accountSettings in settings)
         {
-            result.Add(await ToVmAsync(accountSettings, cancellationToken));
+            result.Add(ToVm(accountSettings));
         }
 
         return result;
     }
 
-    private async Task<AccountSettingsVm> ToVmAsync(AccountSettings accountSettings, CancellationToken cancellationToken)
-    {
-        var featureStates = await context.AccountFeatures
-            .Where(x => x.AccountId == accountSettings.AccountId
-                && (x.FeatureKey == FeatureKeys.Geofencing || x.FeatureKey == FeatureKeys.TripManagement))
-            .ToDictionaryAsync(x => x.FeatureKey, x => x.Enabled, cancellationToken);
-
-        return new AccountSettingsVm(
+    private static AccountSettingsVm ToVm(AccountSettings accountSettings)
+        => new(
             accountSettings.AccountId,
             accountSettings.Maps,
             accountSettings.MapsKey,
@@ -75,8 +68,5 @@ public sealed class AccountSettingsReader(IApplicationDbContext context) : IAcco
             accountSettings.StoreLastPosition,
             accountSettings.StoringInterval,
             accountSettings.RefreshMap,
-            accountSettings.RefreshMapInterval,
-            featureStates.TryGetValue(FeatureKeys.Geofencing, out var geofencingEnabled) ? geofencingEnabled : accountSettings.EnableGeofencing,
-            featureStates.TryGetValue(FeatureKeys.TripManagement, out var tripManagementEnabled) ? tripManagementEnabled : accountSettings.EnableTripManagement);
-    }
+            accountSettings.RefreshMapInterval);
 }

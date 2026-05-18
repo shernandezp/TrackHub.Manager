@@ -13,15 +13,6 @@
 
 ---
 
-
-## Platform Foundation Enhancements
-
-- Adds account-scoped foundation GraphQL queries and mutations for drivers, account features, audit trail, documents, notifications, alerts, background jobs, public links, and support grants.
-- Enforces account access through the current principal, service-client scope, and approved support-grant checks.
-- Keeps legacy account settings compatible while using `AccountFeature` as the feature-flag source for modules such as geofencing and reports.
-
----
-
 ## Quick Start
 
 ### Prerequisites
@@ -122,4 +113,5 @@ The use of **GraphQL** enables efficient, customizable queries, letting clients 
 ## License
 
 This project is licensed under the Apache 2.0 License. See the [LICENSE file](https://www.apache.org/licenses/LICENSE-2.0) for more information.
+
 

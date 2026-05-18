@@ -14,14 +14,6 @@
 ---
 
 
-## Mejoras de Plataforma Base
-
-- Agrega consultas y mutaciones GraphQL base por cuenta para conductores, caracteristicas de cuenta, auditoria, documentos, notificaciones, alertas, trabajos en segundo plano, enlaces publicos y permisos de soporte.
-- Aplica acceso por cuenta mediante el principal actual, el alcance del cliente de servicio y validaciones de permisos de soporte aprobados.
-- Mantiene compatibilidad con configuraciones de cuenta existentes mientras usa `AccountFeature` como fuente de feature flags para modulos como geocercas y reportes.
-
----
-
 ## Inicio Rápido
 
 ### Requisitos Previos

@@ -25,8 +25,6 @@ public class AccountSettings (Guid accountId)
     public int StoringInterval { get; set; } = 360;
     public bool RefreshMap { get; set; } = false;
     public int RefreshMapInterval { get; set; } = 60;
-    public bool EnableGeofencing { get; set; } = false;
-    public bool EnableTripManagement { get; set; } = false;
 
     public Account Account
     {
