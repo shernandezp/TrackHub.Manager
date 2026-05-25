@@ -1,100 +1,151 @@
-﻿// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
-//
-//  Licensed under the Apache License, Version 2.0 (the "License").
-//  You may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
-//
-
+using Common.Application.Exceptions;
+using Common.Application.Interfaces;
 using Common.Domain.Enums;
-using TrackHub.Manager.Infrastructure.Entities;
 using TrackHub.Manager.Infrastructure.Interfaces;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Writers;
 
-// This class represents a writer for Device entities
-public sealed class DeviceWriter(IApplicationDbContext context) : IDeviceWriter
+public sealed class DeviceWriter(IApplicationDbContext context, ICurrentPrincipal principal)
+    : AccountScopedDataAccess(context, principal), IDeviceWriter
 {
-    /// <summary>
-    /// Creates a new Device asynchronously
-    /// </summary>
-    /// <param name="deviceDto">The DTO object containing the device data</param>
-    /// <param name="cancellationToken">A token to cancel the operation if needed</param>
-    /// <returns>A Task representing the asynchronous operation. The task result contains the created DeviceVm</returns>
-    public async Task<DeviceVm> CreateDeviceAsync(DeviceDto deviceDto, CancellationToken cancellationToken)
+    public async Task<DeviceVm> UpsertSynchronizedDeviceAsync(DeviceDto deviceDto, CancellationToken cancellationToken)
     {
-        var device = new Device
-        (
-            deviceDto.Name,
-            deviceDto.Identifier,
-            deviceDto.Serial,
-            deviceDto.DeviceTypeId,
-            deviceDto.Description,
-            deviceDto.TransporterId,
-            deviceDto.OperatorId,
-            deviceDto.AccountId
-        );
+        var accountId = RequireAccountAccess(deviceDto.AccountId);
+        var operatorAccountId = await Context.Operators
+            .Where(o => o.OperatorId == deviceDto.OperatorId)
+            .Select(o => (Guid?)o.AccountId)
+            .FirstOrDefaultAsync(cancellationToken)
+            ?? throw new NotFoundException(nameof(Entities.Operator), deviceDto.OperatorId.ToString());
+        if (operatorAccountId != accountId)
+        {
+            throw new ForbiddenAccessException();
+        }
 
-        await context.Devices.AddAsync(device, cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
+        var now = DateTimeOffset.UtcNow;
+
+        var existing = await Context.Devices
+            .FirstOrDefaultAsync(d => d.AccountId == accountId
+                && d.OperatorId == deviceDto.OperatorId
+                && d.Identifier == deviceDto.Identifier,
+                cancellationToken);
+
+        Entities.Device device;
+        bool created;
+        if (existing == null)
+        {
+            device = new Entities.Device(
+                deviceDto.Name,
+                deviceDto.Identifier,
+                deviceDto.Serial,
+                deviceDto.DeviceTypeId,
+                deviceDto.Description,
+                deviceDto.ProviderDisplayName,
+                deviceDto.ProviderMetadataHash,
+                deviceDto.ProviderStatus,
+                (int)DetectedStatus.New,
+                deviceDto.OperatorId,
+                accountId)
+            {
+                FirstSeenAt = now,
+                LastSeenAt = now,
+                LastSyncedAt = now
+            };
+            await Context.Devices.AddAsync(device, cancellationToken);
+            created = true;
+        }
+        else
+        {
+            existing.Name = deviceDto.Name;
+            existing.Identifier = deviceDto.Identifier;
+            existing.Serial = deviceDto.Serial;
+            existing.DeviceTypeId = deviceDto.DeviceTypeId;
+            existing.Description = deviceDto.Description;
+            existing.ProviderDisplayName = deviceDto.ProviderDisplayName;
+            existing.ProviderMetadataHash = deviceDto.ProviderMetadataHash;
+            existing.ProviderStatus = deviceDto.ProviderStatus;
+            existing.LastSeenAt = now;
+            existing.LastSyncedAt = now;
+            if (existing.DetectedStatus == (int)DetectedStatus.New)
+            {
+                existing.DetectedStatus = (int)DetectedStatus.Available;
+            }
+            device = existing;
+            created = false;
+        }
+
+        AddAuditEvent(accountId, created ? "SynchronizedDevice.Created" : "SynchronizedDevice.Updated",
+            "SynchronizedDevice", device.DeviceId.ToString(), null, null);
+        await Context.SaveChangesAsync(cancellationToken);
 
         return new DeviceVm(
             device.DeviceId,
+            device.AccountId,
+            device.OperatorId,
+            device.Serial,
             device.Name,
             device.Identifier,
-            device.Serial,
+            device.ProviderDisplayName,
             (DeviceType)device.DeviceTypeId,
             device.DeviceTypeId,
             device.Description,
-            device.TransporterId,
-            device.OperatorId);
+            device.ProviderMetadataHash,
+            device.ProviderStatus,
+            (DetectedStatus)device.DetectedStatus,
+            device.FirstSeenAt,
+            device.LastSeenAt,
+            device.LastSyncedAt,
+            device.LastAssignedAt,
+            device.IgnoredAt);
     }
 
-    /// <summary>
-    /// Updates a Device asynchronously
-    /// </summary>
-    /// <param name="deviceDto">The DTO object containing the updated device data</param>
-    /// <param name="cancellationToken">A token to cancel the operation if needed</param>
-    /// <returns></returns>
-    /// <exception cref="NotFoundException">If the Device with the specified IDs is not found</exception>
-    public async Task UpdateDeviceAsync(UpdateDeviceDto deviceDto, CancellationToken cancellationToken)
+    public async Task SetDetectedStatusAsync(Guid deviceId, DetectedStatus status, CancellationToken cancellationToken)
     {
-        var device = await context.Devices.FindAsync([deviceDto.DeviceId], cancellationToken)
-            ?? throw new NotFoundException(nameof(Transporter), $"{deviceDto.DeviceId}");
+        var device = await Context.Devices.FindAsync([deviceId], cancellationToken)
+            ?? throw new NotFoundException(nameof(Entities.Device), deviceId.ToString());
 
-        context.Devices.Attach(device);
-
-        device.Name = deviceDto.Name;
-        device.Identifier = deviceDto.Identifier;
-        device.DeviceTypeId = deviceDto.DeviceTypeId;
-        device.Description = deviceDto.Description;
-        device.TransporterId = deviceDto.TransporterId;
-
-        await context.SaveChangesAsync(cancellationToken);
+        RequireAccountAccess(device.AccountId);
+        device.DetectedStatus = (int)status;
+        if (status == DetectedStatus.Ignored)
+        {
+            device.IgnoredAt = DateTimeOffset.UtcNow;
+        }
+        else if (device.IgnoredAt.HasValue && status != DetectedStatus.Ignored)
+        {
+            device.IgnoredAt = null;
+        }
+        AddAuditEvent(device.AccountId, "SynchronizedDevice.StatusChanged",
+            "SynchronizedDevice", deviceId.ToString(), null, $"{{\"status\":\"{status}\"}}");
+        await Context.SaveChangesAsync(cancellationToken);
     }
 
-    /// <summary>
-    /// Deletes a Device asynchronously
-    /// </summary>
-    /// <param name="deviceId">The ID of the device associated with the Device</param>
-    /// <param name="cancellationToken">A token to cancel the operation if needed</param>
-    /// <returns></returns>
-    /// <exception cref="NotFoundException">If the Device with the specified IDs is not found</exception>
     public async Task DeleteDeviceAsync(Guid deviceId, CancellationToken cancellationToken)
     {
-        var device = await context.Devices.FindAsync([deviceId], cancellationToken)
-            ?? throw new NotFoundException(nameof(Device), $"{deviceId}");
+        var device = await Context.Devices.FindAsync([deviceId], cancellationToken)
+            ?? throw new NotFoundException(nameof(Entities.Device), deviceId.ToString());
 
-        context.Devices.Attach(device);
+        RequireAccountAccess(device.AccountId);
+        Context.Devices.Remove(device);
+        AddAuditEvent(device.AccountId, "SynchronizedDevice.Deleted",
+            "SynchronizedDevice", deviceId.ToString(), null, null);
+        await Context.SaveChangesAsync(cancellationToken);
+    }
 
-        context.Devices.Remove(device);
-        await context.SaveChangesAsync(cancellationToken);
+    public async Task<int> DeleteDevicesByOperatorAsync(Guid operatorId, CancellationToken cancellationToken)
+    {
+        var devices = await Context.Devices
+            .Where(d => d.OperatorId == operatorId
+                && (CanAccessAllAccounts || d.AccountId == Principal.AccountId))
+            .ToListAsync(cancellationToken);
+
+        if (devices.Count == 0) return 0;
+
+        foreach (var d in devices)
+        {
+            Context.Devices.Remove(d);
+            AddAuditEvent(d.AccountId, "SynchronizedDevice.Wiped",
+                "SynchronizedDevice", d.DeviceId.ToString(), null, null);
+        }
+        await Context.SaveChangesAsync(cancellationToken);
+        return devices.Count;
     }
 }

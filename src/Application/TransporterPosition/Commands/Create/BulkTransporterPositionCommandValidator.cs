@@ -23,5 +23,13 @@ public sealed class BulkTransporterPositionCommandValidator : AbstractValidator<
             .NotEmpty()
             .Must(p => p.Count() <= 10000)
             .WithMessage("Batch size cannot exceed 10000.");
+
+        RuleForEach(x => x.Positions).ChildRules(position =>
+        {
+            position.RuleFor(x => x.TransporterId).NotEmpty();
+            position.RuleFor(x => x.DeviceDateTime).Must(x => x != default).WithMessage("Position timestamp is required.");
+            position.RuleFor(x => x.Latitude).InclusiveBetween(-90d, 90d);
+            position.RuleFor(x => x.Longitude).InclusiveBetween(-180d, 180d);
+        });
     }
 }

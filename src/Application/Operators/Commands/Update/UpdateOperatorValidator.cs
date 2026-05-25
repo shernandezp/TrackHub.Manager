@@ -30,5 +30,9 @@ public sealed class UpdateOperatorValidator : AbstractValidator<UpdateOperatorCo
 
         RuleFor(v => v.Operator.ProtocolTypeId)
             .NotEmpty();
+
+        RuleFor(v => v.Operator.SyncIntervalMinutes)
+            .InclusiveBetween(15, 1440)
+            .WithMessage("SyncIntervalMinutes must be between 15 minutes and 24 hours.");
     }
 }

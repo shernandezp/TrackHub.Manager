@@ -21,4 +21,8 @@ public interface IOperatorWriter
     Task<OperatorVm> CreateOperatorAsync(OperatorDto operatorDto, Guid accountId, CancellationToken cancellationToken);
     Task DeleteOperatorAsync(Guid operatorId, CancellationToken cancellationToken);
     Task UpdateOperatorAsync(UpdateOperatorDto operatorDto, CancellationToken cancellationToken);
+    Task SetEnabledAsync(Guid operatorId, bool enabled, CancellationToken cancellationToken);
+    Task UpdateHealthSummaryAsync(Guid operatorId, TrackHub.Manager.Domain.Enums.OperatorHealthStatus status, DateTimeOffset checkAt, int? latencyMs, string? errorCode, string? errorMessage, CancellationToken cancellationToken);
+    Task UpdateSyncSummaryAsync(Guid operatorId, bool success, DateTimeOffset finishedAt, TrackHub.Manager.Domain.Enums.SyncTriggerType trigger, bool deviceSync, bool positionSync, string? errorCode, string? errorMessage, CancellationToken cancellationToken);
+    Task MarkManualSyncTriggeredAsync(Guid operatorId, DateTimeOffset triggeredAt, CancellationToken cancellationToken);
 }

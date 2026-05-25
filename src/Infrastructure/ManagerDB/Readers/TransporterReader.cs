@@ -114,5 +114,13 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
                 t.TransporterTypeId))
             .ToListAsync(cancellationToken);
 
-
+    /// <summary>
+    /// Returns the owning <c>AccountId</c> for the given transporter, or <c>null</c> when not found.
+    /// Used by handlers that need account scope without leaking the EF context to Application.
+    /// </summary>
+    public async Task<Guid?> GetAccountIdAsync(Guid transporterId, CancellationToken cancellationToken)
+        => await context.Transporters
+            .Where(t => t.TransporterId == transporterId)
+            .Select(t => (Guid?)t.AccountId)
+            .FirstOrDefaultAsync(cancellationToken);
 }

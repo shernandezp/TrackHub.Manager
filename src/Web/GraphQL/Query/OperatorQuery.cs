@@ -17,7 +17,6 @@ using TrackHub.Manager.Application.Operators.Queries.Get;
 using TrackHub.Manager.Application.Operators.Queries.GetByAccount;
 using TrackHub.Manager.Application.Operators.Queries.GetMaster;
 using TrackHub.Manager.Application.Operators.Queries.GetByUser;
-using TrackHub.Manager.Application.Operators.Queries.GetByTransporter;
 
 namespace TrackHub.Manager.Web.GraphQL.Query;
 
@@ -34,8 +33,4 @@ public partial class Query
 
     public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsByUser([Service] ISender sender)
         => await sender.Send(new GetOperatorByUserQuery());
-
-    public async Task<OperatorVm> GetOperatorByTransporter([Service] ISender sender, [AsParameters] GetOperatorByTransporterQuery query)
-        => await sender.Send(query);
-
 }

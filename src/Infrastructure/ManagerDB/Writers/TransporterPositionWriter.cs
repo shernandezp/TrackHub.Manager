@@ -29,8 +29,31 @@ public sealed class TransporterPositionWriter(IApplicationDbContext context) : I
     /// <returns></returns>
     public async Task BulkTransporterPositionAsync(IEnumerable<TransporterPositionDto> positionsDto, CancellationToken cancellationToken)
     {
-        var positions = positionsDto.Select(positionDto => new TransporterPosition
-            (
+        var incoming = positionsDto.ToList();
+        if (incoming.Count == 0)
+        {
+            return;
+        }
+
+        var transporterIds = incoming.Select(p => p.TransporterId).Distinct().ToArray();
+        var existingByTransporter = await context.TransporterPositions
+            .Where(p => transporterIds.Contains(p.TransporterId))
+            .ToDictionaryAsync(p => p.TransporterId, cancellationToken);
+
+        foreach (var positionDto in incoming)
+        {
+            if (existingByTransporter.TryGetValue(positionDto.TransporterId, out var existing))
+            {
+                if (existing.DateTime >= positionDto.DeviceDateTime.UtcDateTime)
+                {
+                    continue;
+                }
+
+                Apply(existing, positionDto);
+                continue;
+            }
+
+            var created = new TransporterPosition(
                 positionDto.TransporterId,
                 positionDto.GeometryId,
                 positionDto.Latitude,
@@ -45,18 +68,11 @@ public sealed class TransporterPositionWriter(IApplicationDbContext context) : I
                 positionDto.City,
                 positionDto.State,
                 positionDto.Country,
-                positionDto.Attributes == null ? null :
-                    new AttributesVm
-                    (
-                        positionDto.Attributes?.Ignition,
-                        positionDto.Attributes?.Satellites,
-                        positionDto.Attributes?.Mileage,
-                        positionDto.Attributes?.Hourmeter,
-                        positionDto.Attributes?.Temperature
-                    )
-            )).ToList();
+                MapAttributes(positionDto.Attributes));
 
-        await context.TransporterPositions.BulkAddOrUpdateAsync(positions, p => p.TransporterId, ["TransporterPositionId"], cancellationToken);
+            await context.TransporterPositions.AddAsync(created, cancellationToken);
+            existingByTransporter[positionDto.TransporterId] = created;
+        }
 
         await context.SaveChangesAsync(cancellationToken);
     }
@@ -98,6 +114,32 @@ public sealed class TransporterPositionWriter(IApplicationDbContext context) : I
 
         await context.SaveChangesAsync(cancellationToken);
     }
+
+    private static void Apply(TransporterPosition position, TransporterPositionDto positionDto)
+    {
+        position.GeometryId = positionDto.GeometryId;
+        position.Latitude = positionDto.Latitude;
+        position.Longitude = positionDto.Longitude;
+        position.Altitude = positionDto.Altitude;
+        position.DateTime = positionDto.DeviceDateTime.UtcDateTime;
+        position.Offset = positionDto.DeviceDateTime.Offset;
+        position.Speed = positionDto.Speed;
+        position.Course = positionDto.Course;
+        position.EventId = positionDto.EventId;
+        position.Address = positionDto.Address;
+        position.City = positionDto.City;
+        position.State = positionDto.State;
+        position.Country = positionDto.Country;
+        position.Attributes = MapAttributes(positionDto.Attributes);
+    }
+
+    private static AttributesVm? MapAttributes(AttributesDto? attributes)
+        => attributes == null ? null : new AttributesVm(
+            attributes.Value.Ignition,
+            attributes.Value.Satellites,
+            attributes.Value.Mileage,
+            attributes.Value.Hourmeter,
+            attributes.Value.Temperature);
 
     /// <summary>
     /// This method will delete an existing TransporterPosition in the database

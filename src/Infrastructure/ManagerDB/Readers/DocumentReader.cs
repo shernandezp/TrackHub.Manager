@@ -9,10 +9,13 @@ public sealed class DocumentReader(IApplicationDbContext context, ICurrentPrinci
     private static int Offset(int skip) => Math.Max(0, skip);
 
     public async Task<IReadOnlyCollection<DocumentVm>> GetDocumentsForOwnerAsync(Guid accountId, string ownerEntityType, string ownerEntityId, DateTimeOffset? from, DateTimeOffset? to, int skip, int take, CancellationToken cancellationToken)
-        => await Context.Documents
-            .Where(x => x.AccountId == RequireAccountAccess(accountId) && x.OwnerEntityType == ownerEntityType && x.OwnerEntityId == ownerEntityId && (!from.HasValue || x.LastModified >= from) && (!to.HasValue || x.LastModified <= to))
+    {
+        var scopedAccountId = RequireAccountAccess(accountId);
+        return await Context.Documents
+            .Where(x => x.AccountId == scopedAccountId && x.OwnerEntityType == ownerEntityType && x.OwnerEntityId == ownerEntityId && (!from.HasValue || x.LastModified >= from) && (!to.HasValue || x.LastModified <= to))
             .OrderByDescending(x => x.LastModified).ThenBy(x => x.DocumentId)
             .Skip(Offset(skip)).Take(PageSize(take))
             .Select(x => new DocumentVm(x.DocumentId, x.AccountId, x.OwnerEntityType, x.OwnerEntityId, x.UploadedByPrincipalType, x.UploadedByPrincipalId, x.StorageProvider, x.ContentType, x.SizeBytes, x.Sha256Hash, x.Classification, x.Status, x.ExpiresAt, x.VisibilityScope, x.ScanStatus, x.LastModified))
             .ToListAsync(cancellationToken);
+    }
 }

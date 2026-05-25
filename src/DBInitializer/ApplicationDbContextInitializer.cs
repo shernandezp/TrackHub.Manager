@@ -62,6 +62,16 @@ internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextIniti
             context.Reports.Add(new Report(Reports.PositionRecord, "Position Record", reportType, true));
             context.Reports.Add(new Report(Reports.LiveReport, "Live Report", reportType, true));
             context.Reports.Add(new Report(Reports.GeofenceEvents, "Geofence Events", reportType, true));
+            context.Reports.Add(new Report(Reports.GpsProviderHealthSummary, "GPS Provider Health Summary", reportType, true));
+            context.Reports.Add(new Report(Reports.GpsProviderSyncHistory, "GPS Provider Sync History", reportType, true));
+            context.Reports.Add(new Report(Reports.GpsSyncStatistics, "GPS Sync Statistics", reportType, true));
+            context.Reports.Add(new Report(Reports.GpsSynchronizedDeviceInventory, "GPS Synchronized Device Inventory", reportType, true));
+            context.Reports.Add(new Report(Reports.GpsRecentlyAddedDevices, "GPS Recently Added Devices", reportType, true));
+            context.Reports.Add(new Report(Reports.GpsUnassignedDevices, "GPS Unassigned Devices", reportType, true));
+            context.Reports.Add(new Report(Reports.GpsIgnoredDevices, "GPS Ignored Devices", reportType, true));
+            context.Reports.Add(new Report(Reports.GpsAssignmentHistory, "GPS Assignment History", reportType, true));
+            context.Reports.Add(new Report(Reports.GpsLatestPositionFreshness, "GPS Latest Position Freshness", reportType, true));
+            context.Reports.Add(new Report(Reports.GpsPositionHistory, "GPS Position History", reportType, true));
             await context.SaveChangesAsync();
         }
         if (!context.TransporterTypes.Any())

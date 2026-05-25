@@ -34,7 +34,7 @@ public class UpdateOperatorCommandHandlerTests
     public async Task Handle_ValidCommand_DelegatesToWriter()
     {
         // Arrange
-        var dto = new UpdateOperatorDto(Guid.NewGuid(), "Updated", "Desc", "+1", "e@e.com", "Addr", "Contact", 2);
+        var dto = new UpdateOperatorDto(Guid.NewGuid(), "Updated", "Desc", "+1", "e@e.com", "Addr", "Contact", 2, 60);
         var command = new UpdateOperatorCommand(dto);
         var handler = new UpdateOperatorCommandHandler(_writerMock.Object);
 
@@ -50,7 +50,7 @@ public class UpdateOperatorCommandHandlerTests
     {
         // Arrange — ensure the exact DTO reference is passed through
         var operatorId = Guid.NewGuid();
-        var dto = new UpdateOperatorDto(operatorId, "Name", null, null, null, null, null, 1);
+        var dto = new UpdateOperatorDto(operatorId, "Name", null, null, null, null, null, 1, 60);
         var handler = new UpdateOperatorCommandHandler(_writerMock.Object);
 
         // Act

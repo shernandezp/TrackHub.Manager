@@ -98,6 +98,19 @@ public static class DependencyInjection
         services.AddScoped<IUserSettingsWriter, UserSettingsWriter>();
         services.AddScoped<IUserSettingsReader, UserSettingsReader>();
         services.AddScoped<IUserGroupWriter, UserGroupWriter>();
+        services.AddScoped<ITransporterDeviceAssignmentReader, TransporterDeviceAssignmentReader>();
+        services.AddScoped<ITransporterDeviceAssignmentWriter, TransporterDeviceAssignmentWriter>();
+        services.AddScoped<IOperatorHealthCheckReader, OperatorHealthCheckReader>();
+        services.AddScoped<IOperatorHealthCheckWriter, OperatorHealthCheckWriter>();
+        services.AddScoped<IOperatorSyncRunReader, OperatorSyncRunReader>();
+        services.AddScoped<IOperatorSyncRunWriter, OperatorSyncRunWriter>();
+        services.AddScoped<ITransporterPositionHistoryReader, TransporterPositionHistoryReader>();
+        services.AddScoped<ITransporterPositionHistoryWriter, TransporterPositionHistoryWriter>();
+        services.AddScoped<IGpsIntegrationDashboardReader, GpsIntegrationDashboardReader>();
+        services.AddScoped<IPositionRetentionPolicyReader, PositionRetentionPolicyReader>();
+        services.AddScoped<IPositionRetentionPolicyWriter, PositionRetentionPolicyWriter>();
+        services.AddMemoryCache();
+        services.AddScoped<Common.Application.Interfaces.IFeatureFlagService, TrackHub.Manager.Infrastructure.ManagerDB.Services.FeatureFlagService>();
 
         return services;
     }

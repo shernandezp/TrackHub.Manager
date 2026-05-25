@@ -18,7 +18,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace TrackHub.Manager.Application.Credentials.Queries.GetByOperator;
 
-[Authorize(Resource = Resources.Credentials, Action = Actions.Read)]
+[Authorize(Resource = Resources.Credentials, Action = Actions.Write)]
 public readonly record struct GetCredentialByOperatorQuery(Guid OperatorId) : IRequest<CredentialVm>;
 
 public class GetCredentialsByOperatorQueryHandler(ICredentialReader reader, IConfiguration configuration) : IRequestHandler<GetCredentialByOperatorQuery, CredentialVm>

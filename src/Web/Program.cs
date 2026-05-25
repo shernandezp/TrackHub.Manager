@@ -15,6 +15,7 @@
 
 using Ardalis.GuardClauses;
 using Common.Application;
+using Common.Web.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
@@ -35,6 +36,7 @@ builder.Services.AddApplicationServices();
 builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddAppSecurityContext();
+builder.Services.AddAppRouterContext(builder.Configuration);
 builder.Services.AddWebServices();
 
 // Add HealthChecks
@@ -45,6 +47,7 @@ builder.Services
     .AddGraphQLServer()
     .AddAuthorization()
     .AddMaxExecutionDepthRule(15)
+    .AddErrorFilter<TrackHubGraphQLErrorFilter>()
     .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = builder.Environment.IsDevelopment())
     .AddQueryType<Query>()
     .AddMutationType<Mutation>();

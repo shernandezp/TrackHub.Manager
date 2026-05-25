@@ -9,10 +9,13 @@ public sealed class AuditEventReader(IApplicationDbContext context, ICurrentPrin
     private static int Offset(int skip) => Math.Max(0, skip);
 
     public async Task<IReadOnlyCollection<AuditEventVm>> GetAuditTrailAsync(Guid accountId, DateTimeOffset? from, DateTimeOffset? to, int skip, int take, CancellationToken cancellationToken)
-        => await Context.AuditEvents
-            .Where(x => x.AccountId == RequireAccountAccess(accountId) && (!from.HasValue || x.OccurredAt >= from) && (!to.HasValue || x.OccurredAt <= to))
+    {
+        var scopedAccountId = RequireAccountAccess(accountId);
+        return await Context.AuditEvents
+            .Where(x => x.AccountId == scopedAccountId && (!from.HasValue || x.OccurredAt >= from) && (!to.HasValue || x.OccurredAt <= to))
             .OrderByDescending(x => x.OccurredAt).ThenBy(x => x.AuditEventId)
             .Skip(Offset(skip)).Take(PageSize(take))
             .Select(x => new AuditEventVm(x.AuditEventId, x.AccountId, x.ActorType, x.ActorId, x.Action, x.ResourceType, x.ResourceId, x.Result, x.Reason, x.IpAddress, x.UserAgent, x.CorrelationId, x.OccurredAt))
             .ToListAsync(cancellationToken);
+    }
 }

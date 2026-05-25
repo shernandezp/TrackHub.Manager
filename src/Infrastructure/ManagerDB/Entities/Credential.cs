@@ -32,6 +32,10 @@ public sealed class Credential(string uri, string username, string password, str
     public DateTimeOffset? TokenExpiration { get; set; }
     public string? RefreshToken { get; set; }
     public DateTimeOffset? RefreshTokenExpiration { get; set; }
+    public int CredentialVersion { get; set; } = 1;
+    public DateTimeOffset? RotatedAt { get; set; }
+    public string? RotatedByPrincipalType { get; set; }
+    public string? RotatedByPrincipalId { get; set; }
     public Guid OperatorId { get; set; } = operatorId;
 
     public Operator Operator

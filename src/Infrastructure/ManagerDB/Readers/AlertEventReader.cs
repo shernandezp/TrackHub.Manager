@@ -9,10 +9,13 @@ public sealed class AlertEventReader(IApplicationDbContext context, ICurrentPrin
     private static int Offset(int skip) => Math.Max(0, skip);
 
     public async Task<IReadOnlyCollection<AlertEventVm>> GetAlertEventsAsync(Guid accountId, DateTimeOffset? from, DateTimeOffset? to, int skip, int take, CancellationToken cancellationToken)
-        => await Context.AlertEvents
-            .Where(x => x.AccountId == RequireAccountAccess(accountId) && (!from.HasValue || x.LastSeenAt >= from) && (!to.HasValue || x.LastSeenAt <= to))
+    {
+        var scopedAccountId = RequireAccountAccess(accountId);
+        return await Context.AlertEvents
+            .Where(x => x.AccountId == scopedAccountId && (!from.HasValue || x.LastSeenAt >= from) && (!to.HasValue || x.LastSeenAt <= to))
             .OrderByDescending(x => x.LastSeenAt).ThenBy(x => x.AlertEventId)
             .Skip(Offset(skip)).Take(PageSize(take))
             .Select(x => new AlertEventVm(x.AlertEventId, x.AccountId, x.EventType, x.Severity, x.SourceModule, x.ResourceType, x.ResourceId, x.Status, x.FirstSeenAt, x.LastSeenAt, x.PayloadJson, x.DeduplicationKey, x.LastModified))
             .ToListAsync(cancellationToken);
+    }
 }

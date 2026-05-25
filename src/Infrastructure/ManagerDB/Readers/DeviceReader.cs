@@ -1,120 +1,102 @@
-﻿// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
-//
-//  Licensed under the Apache License, Version 2.0 (the "License").
-//  You may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
-//
-
+using Common.Application.Exceptions;
+using Common.Application.Interfaces;
 using Common.Domain.Enums;
+using Common.Domain.Helpers;
 using TrackHub.Manager.Infrastructure.Interfaces;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
-public sealed class DeviceReader(IApplicationDbContext context) : IDeviceReader
+public sealed class DeviceReader(IApplicationDbContext context, ICurrentPrincipal principal)
+    : AccountScopedDataAccess(context, principal), IDeviceReader
 {
+    private static readonly System.Linq.Expressions.Expression<Func<Entities.Device, DeviceVm>> Projection = d => new DeviceVm(
+        d.DeviceId,
+        d.AccountId,
+        d.OperatorId,
+        d.Serial,
+        d.Name,
+        d.Identifier,
+        d.ProviderDisplayName,
+        (DeviceType)d.DeviceTypeId,
+        d.DeviceTypeId,
+        d.Description,
+        d.ProviderMetadataHash,
+        d.ProviderStatus,
+        (DetectedStatus)d.DetectedStatus,
+        d.FirstSeenAt,
+        d.LastSeenAt,
+        d.LastSyncedAt,
+        d.LastAssignedAt,
+        d.IgnoredAt);
 
-    /// <summary>
-    /// Retrieves a device by its ID
-    /// </summary>
-    /// <param name="id">The ID of the device</param>
-    /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
-    /// <returns>Task<DeviceVm>: A task that represents the asynchronous operation. The task result contains the DeviceVm object.</returns>
     public async Task<DeviceVm> GetDeviceAsync(Guid id, CancellationToken cancellationToken)
-        => await context.Devices
-            .Where(d => d.DeviceId.Equals(id))
-            .Select(d => new DeviceVm(
-                d.DeviceId,
-                d.Name,
-                d.Identifier,
-                d.Serial,
-                (DeviceType)d.DeviceTypeId,
-                d.DeviceTypeId,
-                d.Description,
-                d.TransporterId,
-                d.OperatorId))
-            .FirstAsync(cancellationToken);
+    {
+        var device = await Context.Devices
+            .Where(d => d.DeviceId == id)
+            .Select(Projection)
+            .Cast<DeviceVm?>()
+            .FirstOrDefaultAsync(cancellationToken)
+            ?? throw new NotFoundException(nameof(Entities.Device), id.ToString());
 
-    /// <summary>
-    /// Retrieves a device by its serial number and operator ID 
-    /// </summary>
-    /// <param name="serial">The serial number of the device</param>
-    /// <param name="operatorId">The ID of the operator</param>
-    /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
-    /// <returns>Task<DeviceVm>: A task that represents the asynchronous operation. The task result contains the DeviceVm object.</returns>
-    public async Task<DeviceVm> GetDeviceAsync(string serial, Guid operatorId, CancellationToken cancellationToken)
-        => await context.Devices
-            .Where(d => d.Serial.ToLower() == serial.ToLower() && d.OperatorId.Equals(operatorId))
-            .Select(d => new DeviceVm(
-                d.DeviceId,
-                d.Name,
-                d.Identifier,
-                d.Serial,
-                (DeviceType)d.DeviceTypeId,
-                d.DeviceTypeId,
-                d.Description,
-                d.TransporterId,
-                d.OperatorId))
-            .FirstOrDefaultAsync(cancellationToken);
+        RequireAccountAccess(device.AccountId);
+        return device;
+    }
 
-    /// <summary>
-    /// Retrieves a collection of devices by account ID
-    /// </summary>
-    /// <param name="accountId">The ID of the account</param>
-    /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
-    /// <returns>Task<IReadOnlyCollection<DeviceVm>>: A task that represents the asynchronous operation. The task result contains a collection of DeviceVm objects.</returns>
     public async Task<IReadOnlyCollection<DeviceVm>> GetDevicesByAccountAsync(Guid accountId, CancellationToken cancellationToken)
-        => await context.Devices
-            .Where(d => d.AccountId == accountId)
-            .Select(d => new DeviceVm(
-                d.DeviceId,
-                d.Name,
-                d.Identifier,
-                d.Serial,
-                (DeviceType)d.DeviceTypeId,
-                d.DeviceTypeId,
-                d.Description,
-                d.TransporterId,
-                d.OperatorId))
+    {
+        var scoped = RequireAccountAccess(accountId);
+        return await Context.Devices
+            .Where(d => d.AccountId == scoped)
+            .Select(Projection)
             .ToListAsync(cancellationToken);
+    }
 
-    /// <summary>
-    /// Retrieves a collection of devices by operator ID
-    /// </summary>
-    /// <param name="operatorId">The ID of the operator</param>
-    /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
-    /// <returns>Task<IReadOnlyCollection<DeviceVm>>: A task that represents the asynchronous operation. The task result contains a collection of DeviceVm objects.</returns>
     public async Task<IReadOnlyCollection<DeviceVm>> GetDevicesByOperatorAsync(Guid operatorId, CancellationToken cancellationToken)
-        => await context.Devices
-            .Where(d => d.OperatorId.Equals(operatorId))
-            .Select(d => new DeviceVm(
-                d.DeviceId,
-                d.Name,
-                d.Identifier,
-                d.Serial,
-                (DeviceType)d.DeviceTypeId,
-                d.DeviceTypeId,
-                d.Description,
-                d.TransporterId,
-                d.OperatorId))
+    {
+        return await Context.Devices
+            .Where(d => d.OperatorId == operatorId
+                && (CanAccessAllAccounts || d.AccountId == Principal.AccountId))
+            .Select(Projection)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<DeviceVm>> GetUnassignedDevicesAsync(Guid accountId, CancellationToken cancellationToken)
+    {
+        var scoped = RequireAccountAccess(accountId);
+        return await Context.Devices
+            .Where(d => d.AccountId == scoped
+                && d.IgnoredAt == null
+                && !d.Assignments.Any(a => a.Status == (int)AssignmentStatus.Active))
+            .Select(Projection)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<DeviceVm>> SearchDevicesAsync(Guid accountId, Filters filters, CancellationToken cancellationToken)
+    {
+        var scoped = RequireAccountAccess(accountId);
+        var query = Context.Devices.Where(d => d.AccountId == scoped);
+        query = filters.Apply(query);
+        return await query.Select(Projection).ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<(string Serial, Guid OperatorId)>> FindDuplicateSerialsAsync(
+        Guid accountId, Guid excludeOperatorId, IReadOnlyCollection<string> serials, CancellationToken cancellationToken)
+    {
+        if (serials is null || serials.Count == 0)
+            return [];
+
+        var scoped = RequireAccountAccess(accountId);
+        var serialSet = serials.Where(s => !string.IsNullOrWhiteSpace(s)).ToHashSet(StringComparer.Ordinal);
+        if (serialSet.Count == 0)
+            return [];
+
+        var rows = await Context.Devices
+            .Where(d => d.AccountId == scoped
+                && d.OperatorId != excludeOperatorId
+                && serialSet.Contains(d.Serial))
+            .Select(d => new { d.Serial, d.OperatorId })
             .ToListAsync(cancellationToken);
 
-    /// <summary>
-    /// Validates whether a device exists by its serial transporter ID and device ID
-    /// </summary>
-    /// <param name="transporterId"></param>
-    /// <param name="deviceId"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>returns true if the device exists, otherwise false</returns>
-    public async Task<bool> ExistDeviceAsync(Guid transporterId, Guid deviceId, CancellationToken cancellationToken)
-        => await context.Devices
-            .Where(d => d.TransporterId.Equals(transporterId) && !d.DeviceId.Equals(deviceId))
-            .AnyAsync(cancellationToken);
+        return rows.Select(r => (r.Serial, r.OperatorId)).ToList();
+    }
 }

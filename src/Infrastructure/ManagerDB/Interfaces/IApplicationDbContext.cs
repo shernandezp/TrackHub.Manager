@@ -39,6 +39,10 @@ public interface IApplicationDbContext
     DbSet<PublicLinkGrant> PublicLinkGrants { get; set; }
     DbSet<Report> Reports { get; set; }
     DbSet<TransporterPosition> TransporterPositions { get; set; }
+    DbSet<TransporterPositionHistory> TransporterPositionHistory { get; set; }
+    DbSet<TransporterDeviceAssignment> TransporterDeviceAssignments { get; set; }
+    DbSet<OperatorHealthCheck> OperatorHealthChecks { get; set; }
+    DbSet<OperatorSyncRun> OperatorSyncRuns { get; set; }
     DbSet<TransporterType> TransporterTypes { get; set; }
     DbSet<User> Users { get; set; }
     DbSet<UserGroup> UsersGroup { get; set; }

@@ -22,4 +22,5 @@ public interface ICredentialWriter
     Task DeleteCredentialAsync(Guid credentialId, CancellationToken cancellationToken);
     Task UpdateCredentialAsync(UpdateCredentialDto credentialDto, byte[] salt, string key, CancellationToken cancellationToken);
     Task UpdateTokenAsync(UpdateTokenDto credentialDto, string key, CancellationToken cancellationToken);
+    Task RotateCredentialAsync(RotateCredentialDto dto, byte[] salt, string key, string principalType, string principalId, CancellationToken cancellationToken);
 }

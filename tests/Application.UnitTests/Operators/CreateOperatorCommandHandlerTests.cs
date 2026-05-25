@@ -44,7 +44,8 @@ public class CreateOperatorCommandHandlerTests
         var accountId = Guid.NewGuid();
         var operatorDto = new OperatorDto("TestOperator", "Desc", "+1234", "test@test.com", "Addr", "Contact", 1);
         var expectedVm = new OperatorVm(Guid.NewGuid(), "TestOperator", "Desc", "+1234", "test@test.com", "Addr", "Contact",
-            ProtocolType.CommandTrack, 1, accountId, DateTimeOffset.UtcNow, null);
+            ProtocolType.CommandTrack, 1, accountId, DateTimeOffset.UtcNow, null,
+            true, 60, OperatorHealthStatus.Unknown, null, null, null, null, null, null, null, null);
 
         _userMock.Setup(u => u.Id).Returns(userId.ToString());
         _userReaderMock.Setup(r => r.GetUserAsync(userId, It.IsAny<CancellationToken>()))
@@ -77,7 +78,7 @@ public class CreateOperatorCommandHandlerTests
         _userReaderMock.Setup(r => r.GetUserAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new UserVm(userId, "user", true, accountId));
         _writerMock.Setup(w => w.CreateOperatorAsync(operatorDto, accountId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new OperatorVm(Guid.NewGuid(), "Op", null, null, null, null, null, ProtocolType.Traccar, 2, accountId, DateTimeOffset.UtcNow, null));
+            .ReturnsAsync(new OperatorVm(Guid.NewGuid(), "Op", null, null, null, null, null, ProtocolType.Traccar, 2, accountId, DateTimeOffset.UtcNow, null, true, 60, OperatorHealthStatus.Unknown, null, null, null, null, null, null, null, null));
 
         var handler = new CreateOperatorCommandHandler(_writerMock.Object, _userReaderMock.Object, _userMock.Object);
 
