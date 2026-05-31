@@ -39,6 +39,10 @@ public sealed class AccountSupportGrantWriter(IApplicationDbContext context, ICu
         await Context.SaveChangesAsync(cancellationToken);
     }
 
-    private static AccountSupportGrantVm ToVm(AccountSupportGrant x) => new(x.AccountSupportGrantId, x.AccountId, x.SupportUserId, x.Reason, x.TicketReference, x.ApprovedBy, x.ApprovedAt, x.AccessLevel, x.StartsAt, x.EndsAt, x.RevokedAt, x.RevokedBy, x.LastModified);
-    private static string AuditValues(AccountSupportGrant grant) => $$"""{"supportUserId":"{{grant.SupportUserId}}","reason":"{{grant.Reason}}","ticketReference":"{{grant.TicketReference}}","approvedBy":{{Quote(grant.ApprovedBy)}},"approvedAt":{{Quote(grant.ApprovedAt)}},"accessLevel":"{{grant.AccessLevel}}","startsAt":{{Quote(grant.StartsAt)}},"endsAt":{{Quote(grant.EndsAt)}},"revokedAt":{{Quote(grant.RevokedAt)}},"revokedBy":{{Quote(grant.RevokedBy)}}}""";
+    private static AccountSupportGrantVm ToVm(AccountSupportGrant x) 
+        => new(x.AccountSupportGrantId, x.AccountId, x.SupportUserId, x.Reason, x.TicketReference, x.ApprovedBy, x.ApprovedAt, x.AccessLevel, x.StartsAt, x.EndsAt, x.RevokedAt, x.RevokedBy, x.LastModified);
+
+    private static string AuditValues(AccountSupportGrant grant) 
+        => $$"""{"supportUserId":"{{grant.SupportUserId}}","reason":"{{grant.Reason}}","ticketReference":"{{grant.TicketReference}}","approvedBy":{{Quote(grant.ApprovedBy)}},"approvedAt":{{Quote(grant.ApprovedAt)}},"accessLevel":"{{grant.AccessLevel}}","startsAt":{{Quote(grant.StartsAt)}},"endsAt":{{Quote(grant.EndsAt)}},"revokedAt":{{Quote(grant.RevokedAt)}},"revokedBy":{{Quote(grant.RevokedBy)}}}""";
+
 }

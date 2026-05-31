@@ -27,7 +27,7 @@ public sealed class Transporter(string name, short transporterTypeId, Guid accou
     public Guid AccountId { get; set; } = accountId;
 
     public ICollection<Group> Groups { get; set; } = [];
-    public ICollection<Device> Devices { get; set; } = [];
+    public ICollection<TransporterDeviceAssignment> Assignments { get; set; } = [];
     public TransporterPosition? Position { get; set; }
     public TransporterType? TransporterType { get; set; }
 

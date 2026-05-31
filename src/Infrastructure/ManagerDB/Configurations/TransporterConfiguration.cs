@@ -36,12 +36,6 @@ public sealed class TransporterConfiguration : IEntityTypeConfiguration<Transpor
             .IsRequired();
 
         builder
-            .HasMany(d => d.Devices)
-            .WithOne(d => d.Transporter)
-            .HasForeignKey(d => d.TransporterId)
-            .IsRequired(false);
-
-        builder
             .HasOne(d => d.Position)
             .WithOne(d => d.Transporter)
             .HasForeignKey<TransporterPosition>(d => d.TransporterId)

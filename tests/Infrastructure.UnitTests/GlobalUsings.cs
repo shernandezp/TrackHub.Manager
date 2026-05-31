@@ -15,3 +15,5 @@
 
 global using Microsoft.EntityFrameworkCore;
 global using TrackHub.Manager.Infrastructure.Entities;
+global using Common.Application.Exceptions;
+global using Ardalis.GuardClauses;

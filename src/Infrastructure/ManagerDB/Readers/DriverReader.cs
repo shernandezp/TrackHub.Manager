@@ -18,12 +18,15 @@ public sealed class DriverReader(IApplicationDbContext context, ICurrentPrincipa
     }
 
     public async Task<IReadOnlyCollection<DriverVm>> GetDriversByAccountAsync(Guid accountId, int skip, int take, CancellationToken cancellationToken)
-        => await Context.Drivers
-            .Where(x => x.AccountId == RequireAccountAccess(accountId))
+    {
+        var scopedAccountId = RequireAccountAccess(accountId);
+        return await Context.Drivers
+            .Where(x => x.AccountId == scopedAccountId)
             .OrderBy(x => x.Name).ThenBy(x => x.DriverId)
             .Skip(Offset(skip)).Take(PageSize(take))
             .Select(x => new DriverVm(x.DriverId, x.AccountId, x.Name, x.Phone, x.DocumentType, x.DocumentNumber, x.Active, x.EmployeeCode, x.LicenseNumber, x.LicenseExpiresAt, x.DefaultTransporterId, x.LastModified))
             .ToListAsync(cancellationToken);
+    }
 
     public async Task<IReadOnlyCollection<DriverAssignmentVm>> GetDriverAssignmentsAsync(Guid driverId, CancellationToken cancellationToken)
     {

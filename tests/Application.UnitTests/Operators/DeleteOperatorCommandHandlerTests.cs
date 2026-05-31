@@ -42,7 +42,8 @@ public class DeleteOperatorCommandHandlerTests
         var credentialId = Guid.NewGuid();
         var credential = new CredentialTokenVm(credentialId, "https://api.com", "user", "pass", "salt", null, null, null, null, null, null);
         var operatorVm = new OperatorVm(operatorId, "Op", null, null, null, null, null,
-            ProtocolType.CommandTrack, 1, Guid.NewGuid(), DateTimeOffset.UtcNow, credential);
+            ProtocolType.CommandTrack, 1, Guid.NewGuid(), DateTimeOffset.UtcNow, credential,
+            true, 60, OperatorHealthStatus.Unknown, null, null, null, null, null, null, null, null);
 
         _readerMock.Setup(r => r.GetOperatorAsync(operatorId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(operatorVm);
@@ -64,7 +65,8 @@ public class DeleteOperatorCommandHandlerTests
         // Arrange
         var operatorId = Guid.NewGuid();
         var operatorVm = new OperatorVm(operatorId, "Op", null, null, null, null, null,
-            ProtocolType.CommandTrack, 1, Guid.NewGuid(), DateTimeOffset.UtcNow, null);
+            ProtocolType.CommandTrack, 1, Guid.NewGuid(), DateTimeOffset.UtcNow, null,
+            true, 60, OperatorHealthStatus.Unknown, null, null, null, null, null, null, null, null);
 
         _readerMock.Setup(r => r.GetOperatorAsync(operatorId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(operatorVm);
@@ -85,7 +87,8 @@ public class DeleteOperatorCommandHandlerTests
         // Arrange — credential is default(CredentialTokenVm), not null
         var operatorId = Guid.NewGuid();
         var operatorVm = new OperatorVm(operatorId, "Op", null, null, null, null, null,
-            ProtocolType.CommandTrack, 1, Guid.NewGuid(), DateTimeOffset.UtcNow, default(CredentialTokenVm));
+            ProtocolType.CommandTrack, 1, Guid.NewGuid(), DateTimeOffset.UtcNow, default(CredentialTokenVm),
+            true, 60, OperatorHealthStatus.Unknown, null, null, null, null, null, null, null, null);
 
         _readerMock.Setup(r => r.GetOperatorAsync(operatorId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(operatorVm);

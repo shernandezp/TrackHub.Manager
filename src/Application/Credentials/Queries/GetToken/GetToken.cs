@@ -18,7 +18,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace TrackHub.Manager.Application.CredentialToken.Queries.GetToken;
 
-[Authorize(Resource = Resources.Credentials, Action = Actions.Read)]
+[Authorize(Resource = Resources.Credentials, Action = Actions.Write, PrincipalTypes = "ServiceClient")]
 public readonly record struct GetTokenQuery(Guid Id) : IRequest<TokenVm>;
 
 // Handles the GetTokenQuery and returns a TokenVm

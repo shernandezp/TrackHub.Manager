@@ -33,7 +33,7 @@ public class UpdateOperatorValidatorTests
     [Test]
     public void Should_Have_Error_When_OperatorId_Is_Empty()
     {
-        var command = new UpdateOperatorCommand(new UpdateOperatorDto(Guid.Empty, "Name", null, null, null, null, null, 1));
+        var command = new UpdateOperatorCommand(new UpdateOperatorDto(Guid.Empty, "Name", null, null, null, null, null, 1, 60));
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(v => v.Operator.OperatorId);
     }
@@ -41,7 +41,7 @@ public class UpdateOperatorValidatorTests
     [Test]
     public void Should_Have_Error_When_Name_Is_Empty()
     {
-        var command = new UpdateOperatorCommand(new UpdateOperatorDto(Guid.NewGuid(), "", null, null, null, null, null, 1));
+        var command = new UpdateOperatorCommand(new UpdateOperatorDto(Guid.NewGuid(), "", null, null, null, null, null, 1, 60));
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(v => v.Operator.Name);
     }
@@ -49,7 +49,7 @@ public class UpdateOperatorValidatorTests
     [Test]
     public void Should_Have_Error_When_ProtocolTypeId_Is_Zero()
     {
-        var command = new UpdateOperatorCommand(new UpdateOperatorDto(Guid.NewGuid(), "Name", null, null, null, null, null, 0));
+        var command = new UpdateOperatorCommand(new UpdateOperatorDto(Guid.NewGuid(), "Name", null, null, null, null, null, 0, 60));
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(v => v.Operator.ProtocolTypeId);
     }
@@ -65,7 +65,7 @@ public class UpdateOperatorValidatorTests
     [Test]
     public void Should_Not_Have_Errors_When_Valid()
     {
-        var command = new UpdateOperatorCommand(new UpdateOperatorDto(Guid.NewGuid(), "ValidName", "Desc", "+1", "e@e.com", "Addr", "Contact", 2));
+        var command = new UpdateOperatorCommand(new UpdateOperatorDto(Guid.NewGuid(), "ValidName", "Desc", "+1", "e@e.com", "Addr", "Contact", 2, 60));
         var result = _validator.TestValidate(command);
         result.ShouldNotHaveAnyValidationErrors();
     }

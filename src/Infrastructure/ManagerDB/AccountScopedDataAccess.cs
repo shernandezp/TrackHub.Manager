@@ -17,15 +17,18 @@ public abstract class AccountScopedDataAccess(IApplicationDbContext context, ICu
     {
         if (accountId == Guid.Empty)
         {
-            throw new ForbiddenAccessException();
+            throw new ForbiddenAccessException("Insufficient permissions. Required account access: a non-empty account id.");
         }
 
-        if (CanAccessAllAccounts || Principal.AccountId == accountId || HasActiveSupportGrant(accountId))
+        if (CanAccessAllAccounts
+            || Principal.AccountId == accountId
+            || UserBelongsToAccount(accountId)
+            || HasActiveSupportGrant(accountId))
         {
             return accountId;
         }
 
-        throw new ForbiddenAccessException();
+        throw new ForbiddenAccessException($"Insufficient permissions. Required account access: {accountId}.");
     }
 
     protected Guid? ResolveAccountScope(Guid? requestedAccountId)
@@ -37,12 +40,30 @@ public abstract class AccountScopedDataAccess(IApplicationDbContext context, ICu
 
         if (!Principal.AccountId.HasValue)
         {
-            throw new ForbiddenAccessException();
+            if (Principal.UserId.HasValue)
+            {
+                var userAccountId = Context.Users
+                    .Where(x => x.UserId == Principal.UserId.Value)
+                    .Select(x => (Guid?)x.AccountId)
+                    .FirstOrDefault();
+
+                if (userAccountId.HasValue)
+                {
+                    if (requestedAccountId.HasValue && requestedAccountId.Value != userAccountId.Value)
+                    {
+                        throw new ForbiddenAccessException($"Insufficient permissions. Required account access: {requestedAccountId.Value}.");
+                    }
+
+                    return userAccountId.Value;
+                }
+            }
+
+            throw new ForbiddenAccessException("Insufficient permissions. Required account access: current principal must include or resolve an account id.");
         }
 
         if (requestedAccountId.HasValue && requestedAccountId.Value != Principal.AccountId.Value)
         {
-            throw new ForbiddenAccessException();
+            throw new ForbiddenAccessException($"Insufficient permissions. Required account access: {requestedAccountId.Value}.");
         }
 
         return Principal.AccountId.Value;
@@ -88,6 +109,11 @@ public abstract class AccountScopedDataAccess(IApplicationDbContext context, ICu
             && x.EndsAt >= now
             && !x.RevokedAt.HasValue);
     }
+
+    private bool UserBelongsToAccount(Guid accountId)
+        => Principal.PrincipalType == PrincipalType.User
+           && Principal.UserId.HasValue
+           && Context.Users.Any(x => x.UserId == Principal.UserId.Value && x.AccountId == accountId);
 
     protected static string Quote(DateTimeOffset? value) => value.HasValue ? Quote(value.Value.ToString("O")) : "null";
     protected static string Quote(string? value) => value == null ? "null" : $"\"{value.Replace("\\", "\\\\").Replace("\"", "\\\"")}\"";

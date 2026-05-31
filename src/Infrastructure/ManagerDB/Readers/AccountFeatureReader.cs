@@ -6,11 +6,14 @@ namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 public sealed class AccountFeatureReader(IApplicationDbContext context, ICurrentPrincipal principal) : AccountScopedDataAccess(context, principal), IAccountFeatureReader
 {
     public async Task<IReadOnlyCollection<AccountFeatureVm>> GetAccountFeaturesAsync(Guid accountId, CancellationToken cancellationToken)
-        => await Context.AccountFeatures
-            .Where(x => x.AccountId == RequireAccountAccess(accountId))
+    {
+        var scopedAccountId = RequireAccountAccess(accountId);
+        return await Context.AccountFeatures
+            .Where(x => x.AccountId == scopedAccountId)
             .OrderBy(x => x.FeatureKey)
             .Select(x => new AccountFeatureVm(x.AccountFeatureId, x.AccountId, x.FeatureKey, x.Enabled, x.Tier, x.Source, x.EffectiveFrom, x.EffectiveTo, x.ConfigurationJson, x.LastModified))
             .ToListAsync(cancellationToken);
+    }
 
     public async Task<bool> ValidateFeatureEnabledAsync(Guid accountId, string featureKey, CancellationToken cancellationToken)
     {

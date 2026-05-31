@@ -33,7 +33,10 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
             operatorDto.Address,
             operatorDto.ContactName,
             operatorDto.ProtocolTypeId,
-            accountId);
+            accountId)
+        {
+            SyncIntervalMinutes = operatorDto.SyncIntervalMinutes
+        };
 
         await context.Operators.AddAsync(@operator, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
@@ -50,7 +53,18 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
             @operator.ProtocolType,
             @operator.AccountId,
             @operator.LastModified,
-            null);
+            null,
+            @operator.Enabled,
+            @operator.SyncIntervalMinutes,
+            (OperatorHealthStatus)@operator.HealthStatus,
+            @operator.LastSuccessfulSyncAt,
+            @operator.LastFailedSyncAt,
+            @operator.LastManualSyncAt,
+            @operator.LastDeviceSyncAt,
+            @operator.LastPositionSyncAt,
+            @operator.LastFailureCode,
+            @operator.LastFailureMessage,
+            @operator.LastLatencyMs);
     }
 
     // UpdateOperatorAsync method updates an existing operator
@@ -68,6 +82,7 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
         @operator.Address = operatorDto.Address;
         @operator.ContactName = operatorDto.ContactName;
         @operator.ProtocolType = operatorDto.ProtocolTypeId;
+        @operator.SyncIntervalMinutes = operatorDto.SyncIntervalMinutes;
 
         await context.SaveChangesAsync(cancellationToken);
     }
@@ -81,6 +96,88 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
         context.Operators.Attach(@operator);
 
         context.Operators.Remove(@operator);
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task SetEnabledAsync(Guid operatorId, bool enabled, CancellationToken cancellationToken)
+    {
+        var @operator = await context.Operators.FindAsync([operatorId], cancellationToken)
+            ?? throw new NotFoundException(nameof(Operator), $"{operatorId}");
+
+        context.Operators.Attach(@operator);
+        @operator.Enabled = enabled;
+        if (!enabled)
+        {
+            @operator.HealthStatus = (int)OperatorHealthStatus.Disabled;
+        }
+        else if (@operator.HealthStatus == (int)OperatorHealthStatus.Disabled)
+        {
+            @operator.HealthStatus = (int)OperatorHealthStatus.Unknown;
+        }
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task MarkManualSyncTriggeredAsync(Guid operatorId, DateTimeOffset triggeredAt, CancellationToken cancellationToken)
+    {
+        var @operator = await context.Operators.FindAsync([operatorId], cancellationToken)
+            ?? throw new NotFoundException(nameof(Operator), $"{operatorId}");
+        context.Operators.Attach(@operator);
+        @operator.LastManualSyncAt = triggeredAt;
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UpdateHealthSummaryAsync(Guid operatorId, OperatorHealthStatus status, DateTimeOffset checkAt, int? latencyMs, string? errorCode, string? errorMessage, CancellationToken cancellationToken)
+    {
+        var @operator = await context.Operators.FindAsync([operatorId], cancellationToken)
+            ?? throw new NotFoundException(nameof(Operator), $"{operatorId}");
+        context.Operators.Attach(@operator);
+        @operator.HealthStatus = (int)status;
+        @operator.LastLatencyMs = latencyMs;
+        if (status is OperatorHealthStatus.Degraded or OperatorHealthStatus.Offline)
+        {
+            @operator.LastFailedSyncAt = checkAt;
+            @operator.LastFailureCode = errorCode;
+            @operator.LastFailureMessage = errorMessage;
+        }
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UpdateSyncSummaryAsync(Guid operatorId, bool success, DateTimeOffset finishedAt, SyncTriggerType trigger, bool deviceSync, bool positionSync, string? errorCode, string? errorMessage, CancellationToken cancellationToken)
+    {
+        var @operator = await context.Operators.FindAsync([operatorId], cancellationToken)
+            ?? throw new NotFoundException(nameof(Operator), $"{operatorId}");
+        context.Operators.Attach(@operator);
+
+        if (success)
+        {
+            @operator.LastSuccessfulSyncAt = finishedAt;
+            @operator.LastFailureCode = null;
+            @operator.LastFailureMessage = null;
+            if (@operator.HealthStatus is (int)OperatorHealthStatus.Offline or (int)OperatorHealthStatus.Degraded or (int)OperatorHealthStatus.Unknown)
+            {
+                @operator.HealthStatus = (int)OperatorHealthStatus.Healthy;
+            }
+        }
+        else
+        {
+            @operator.LastFailedSyncAt = finishedAt;
+            @operator.LastFailureCode = errorCode;
+            @operator.LastFailureMessage = errorMessage;
+        }
+
+        if (trigger == SyncTriggerType.Manual)
+        {
+            @operator.LastManualSyncAt = finishedAt;
+        }
+        if (deviceSync)
+        {
+            @operator.LastDeviceSyncAt = finishedAt;
+        }
+        if (positionSync)
+        {
+            @operator.LastPositionSyncAt = finishedAt;
+        }
+
         await context.SaveChangesAsync(cancellationToken);
     }
 }

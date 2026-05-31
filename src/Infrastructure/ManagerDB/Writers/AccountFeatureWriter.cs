@@ -55,6 +55,10 @@ public sealed class AccountFeatureWriter(IApplicationDbContext context, ICurrent
         await Context.SaveChangesAsync(cancellationToken);
     }
 
-    private static AccountFeatureVm ToVm(AccountFeature x) => new(x.AccountFeatureId, x.AccountId, x.FeatureKey, x.Enabled, x.Tier, x.Source, x.EffectiveFrom, x.EffectiveTo, x.ConfigurationJson, x.LastModified);
-    private static string AuditValues(AccountFeature feature) => $$"""{"featureKey":"{{feature.FeatureKey}}","enabled":{{feature.Enabled.ToString().ToLowerInvariant()}},"tier":"{{feature.Tier}}","source":"{{feature.Source}}","effectiveFrom":{{Quote(feature.EffectiveFrom)}},"effectiveTo":{{Quote(feature.EffectiveTo)}},"configurationJson":{{Quote(feature.ConfigurationJson)}}}""";
+    private static AccountFeatureVm ToVm(AccountFeature x) 
+        => new(x.AccountFeatureId, x.AccountId, x.FeatureKey, x.Enabled, x.Tier, x.Source, x.EffectiveFrom, x.EffectiveTo, x.ConfigurationJson, x.LastModified);
+
+    private static string AuditValues(AccountFeature feature) 
+        => $$"""{"featureKey":"{{feature.FeatureKey}}","enabled":{{feature.Enabled.ToString().ToLowerInvariant()}},"tier":"{{feature.Tier}}","source":"{{feature.Source}}","effectiveFrom":{{Quote(feature.EffectiveFrom)}},"effectiveTo":{{Quote(feature.EffectiveTo)}},"configurationJson":{{Quote(feature.ConfigurationJson)}}}""";
+
 }

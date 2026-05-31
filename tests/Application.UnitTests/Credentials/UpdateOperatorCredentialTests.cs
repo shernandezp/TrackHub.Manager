@@ -30,7 +30,7 @@ public class UpdateOperatorCredentialTests
         var operatorId = Guid.NewGuid();
         var dto = new UpdateOperatorCredentialDto(operatorId, "https://example.com/", "u", "p", "k1", "k2");
         var credentialToken = new CredentialTokenVm(Guid.NewGuid(), "https://example.com/", "u", "p", "salt", null, null, null, null, null, null);
-        var opVm = new OperatorVm(operatorId, "op", null, null, null, null, null, default, 0, Guid.NewGuid(), DateTimeOffset.UtcNow, credentialToken);
+        var opVm = new OperatorVm(operatorId, "op", null, null, null, null, null, default, 0, Guid.NewGuid(), DateTimeOffset.UtcNow, credentialToken, true, 60, OperatorHealthStatus.Unknown, null, null, null, null, null, null, null, null);
         _operatorReaderMock.Setup(r => r.GetOperatorAsync(operatorId, CancellationToken.None)).ReturnsAsync(opVm);
         _configurationMock.Setup(c => c["AppSettings:EncryptionKey"]).Returns("key");
         _writerMock.Setup(w => w.UpdateCredentialAsync(It.IsAny<UpdateCredentialDto>(), It.IsAny<byte[]>(), "key", CancellationToken.None)).Returns(Task.CompletedTask);

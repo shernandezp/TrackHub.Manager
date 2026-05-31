@@ -95,10 +95,10 @@ public class TransporterPositionWriterTests
     }
 
     [Test]
-    public async Task BulkTransporterPositionAsync_HandlesDuplicateTransporters_KeepsLast()
+    public async Task BulkTransporterPositionAsync_HandlesDuplicateTransporters_KeepsNewest()
     {
         // Arrange
-        var dbName = nameof(BulkTransporterPositionAsync_HandlesDuplicateTransporters_KeepsLast);
+        var dbName = nameof(BulkTransporterPositionAsync_HandlesDuplicateTransporters_KeepsNewest);
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(dbName)
             .Options;
@@ -108,12 +108,12 @@ public class TransporterPositionWriterTests
 
         var transporterId = Guid.NewGuid();
 
-        // Multiple positions for same transporter
+        var baseTimestamp = DateTimeOffset.UtcNow;
         var positions = new List<TransporterPositionDto>
         {
-            CreatePositionDto(transporterId, 10.0, 20.0, speed: 50.0),
-            CreatePositionDto(transporterId, 30.0, 40.0, speed: 75.0),
-            CreatePositionDto(transporterId, 50.0, 60.0, speed: 100.0) // Last one
+            CreatePositionDto(transporterId, 10.0, 20.0, speed: 50.0, deviceDateTime: baseTimestamp),
+            CreatePositionDto(transporterId, 50.0, 60.0, speed: 100.0, deviceDateTime: baseTimestamp.AddMinutes(2)),
+            CreatePositionDto(transporterId, 30.0, 40.0, speed: 75.0, deviceDateTime: baseTimestamp.AddMinutes(1))
         };
 
         // Act
@@ -440,7 +440,8 @@ public class TransporterPositionWriterTests
         double longitude,
         double speed = 0.0,
         string? city = null,
-        AttributesDto? attributes = null)
+        AttributesDto? attributes = null,
+        DateTimeOffset? deviceDateTime = null)
     {
         return new TransporterPositionDto(
             transporterId,
@@ -448,7 +449,7 @@ public class TransporterPositionWriterTests
             latitude,
             longitude,
             null,
-            DateTimeOffset.UtcNow,
+            deviceDateTime ?? DateTimeOffset.UtcNow,
             speed,
             null,
             null,

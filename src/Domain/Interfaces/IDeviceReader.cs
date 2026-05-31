@@ -1,25 +1,15 @@
-﻿// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
-//
-//  Licensed under the Apache License, Version 2.0 (the "License").
-//  You may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
-//
+using Common.Domain.Helpers;
+using TrackHub.Manager.Domain.Records;
 
 namespace TrackHub.Manager.Domain.Interfaces;
 
 public interface IDeviceReader
 {
     Task<DeviceVm> GetDeviceAsync(Guid id, CancellationToken cancellationToken);
-    Task<DeviceVm> GetDeviceAsync(string serial, Guid operatorId, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<DeviceVm>> GetDevicesByAccountAsync(Guid accountId, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<DeviceVm>> GetDevicesByOperatorAsync(Guid operatorId, CancellationToken cancellationToken);
-    Task<bool> ExistDeviceAsync(Guid transporterId, Guid deviceId, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<DeviceVm>> GetUnassignedDevicesAsync(Guid accountId, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<DeviceVm>> SearchDevicesAsync(Guid accountId, Filters filters, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<(string Serial, Guid OperatorId)>> FindDuplicateSerialsAsync(
+        Guid accountId, Guid excludeOperatorId, IReadOnlyCollection<string> serials, CancellationToken cancellationToken);
 }

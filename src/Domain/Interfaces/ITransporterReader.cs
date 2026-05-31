@@ -22,4 +22,5 @@ public interface ITransporterReader
     Task<IReadOnlyCollection<TransporterVm>> GetTransportersByAccountAsync(Guid accountId, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<TransporterVm>> GetTransportersByGroupAsync(long groupId, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<TransporterVm>> GetTransportersByUserAsync(Guid userId, CancellationToken cancellationToken);
+    Task<Guid?> GetAccountIdAsync(Guid transporterId, CancellationToken cancellationToken);
 }

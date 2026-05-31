@@ -14,5 +14,6 @@
 //
 
 global using Common.Domain.Enums;
+global using TrackHub.Manager.Domain.Enums;
 global using TrackHub.Manager.Domain.Models;
 global using TrackHub.Manager.Domain.Records;

@@ -13,6 +13,7 @@
 //  limitations under the License.
 //
 
+using TrackHub.Manager.Application.GpsIntegration.Commands;
 using TrackHub.Manager.Application.Operators.Commands.Create;
 using TrackHub.Manager.Application.Operators.Commands.Delete;
 using TrackHub.Manager.Application.Operators.Commands.Update;
@@ -36,4 +37,13 @@ public partial class Mutation
         await sender.Send(new DeleteOperatorCommand(id));
         return id;
     }
+
+    public async Task<bool> SetOperatorEnabled([Service] ISender sender, SetOperatorEnabledCommand command)
+    { 
+        await sender.Send(command); 
+        return true; 
+    }
+
+    public async Task<bool> TriggerOperatorDeviceSync([Service] ISender sender, TriggerOperatorDeviceSyncCommand command)
+        => await sender.Send(command);
 }

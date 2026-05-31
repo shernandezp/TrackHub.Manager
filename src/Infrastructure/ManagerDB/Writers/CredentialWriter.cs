@@ -14,13 +14,15 @@
 //
 
 using Common.Domain.Extensions;
+using Common.Application.Interfaces;
 using TrackHub.Manager.Infrastructure.Entities;
 using TrackHub.Manager.Infrastructure.Interfaces;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Writers;
 
 // This class represents a writer for credentials in the infrastructure layer.
-public sealed class CredentialWriter(IApplicationDbContext context) : ICredentialWriter
+public sealed class CredentialWriter(IApplicationDbContext context, ICurrentPrincipal principal)
+    : AccountScopedDataAccess(context, principal), ICredentialWriter
 {
 
     /// <summary>
@@ -33,6 +35,7 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
     /// <returns>The created credential view model</returns>
     public async Task<CredentialVm> CreateCredentialAsync(CredentialDto credentialDto, byte[] salt, string key, CancellationToken cancellationToken)
     {
+        await RequireOperatorAccessAsync(credentialDto.OperatorId, cancellationToken);
         var credential = new Credential(
             credentialDto.Uri,
             credentialDto.Username.EncryptData(key, salt),
@@ -42,8 +45,8 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
             Convert.ToBase64String(salt),
             credentialDto.OperatorId);
 
-        await context.Credentials.AddAsync(credential, cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
+        await Context.Credentials.AddAsync(credential, cancellationToken);
+        await Context.SaveChangesAsync(cancellationToken);
 
         return new CredentialVm(
             credential.CredentialId,
@@ -64,10 +67,12 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
     /// <exception cref="NotFoundException"></exception>
     public async Task UpdateCredentialAsync(UpdateCredentialDto credentialDto, byte[] salt, string key, CancellationToken cancellationToken)
     {
-        var credential = await context.Credentials.FindAsync([credentialDto.CredentialId], cancellationToken)
+        var credential = await Context.Credentials.Include(c => c.Operator)
+            .FirstOrDefaultAsync(c => c.CredentialId == credentialDto.CredentialId, cancellationToken)
             ?? throw new NotFoundException(nameof(Credential), $"{credentialDto.CredentialId}");
+        RequireAccountAccess(credential.Operator.AccountId);
 
-        context.Credentials.Attach(credential);
+        Context.Credentials.Attach(credential);
 
         credential.Uri = credentialDto.Uri;
         credential.Username = credentialDto.Username.EncryptData(key, salt);
@@ -79,8 +84,18 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
         credential.TokenExpiration = null;
         credential.RefreshToken = null;
         credential.RefreshTokenExpiration = null;
+        credential.CredentialVersion += 1;
+        credential.RotatedAt = DateTimeOffset.UtcNow;
+        credential.RotatedByPrincipalType = Principal.PrincipalType.ToString();
+        credential.RotatedByPrincipalId = ResolveActorId();
+        if (credential.Operator.Enabled)
+        {
+            credential.Operator.HealthStatus = (int)OperatorHealthStatus.Unknown;
+            credential.Operator.LastFailureCode = null;
+            credential.Operator.LastFailureMessage = null;
+        }
 
-        await context.SaveChangesAsync(cancellationToken);
+        await Context.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -92,10 +107,12 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
     /// <exception cref="NotFoundException"></exception>
     public async Task UpdateTokenAsync(UpdateTokenDto credentialDto, string key, CancellationToken cancellationToken)
     {
-        var credential = await context.Credentials.FindAsync([credentialDto.CredentialId], cancellationToken)
+        var credential = await Context.Credentials.Include(c => c.Operator)
+            .FirstOrDefaultAsync(c => c.CredentialId == credentialDto.CredentialId, cancellationToken)
             ?? throw new NotFoundException(nameof(Credential), $"{credentialDto.CredentialId}");
+        RequireAccountAccess(credential.Operator.AccountId);
 
-        context.Credentials.Attach(credential);
+        Context.Credentials.Attach(credential);
 
         var salt = Convert.FromBase64String(credential.Salt);
         credential.Token = credentialDto.Token?.EncryptData(key, salt);
@@ -103,7 +120,7 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
         credential.RefreshToken = credentialDto.RefreshToken?.EncryptData(key, salt);
         credential.RefreshTokenExpiration = credentialDto.RefreshTokenExpiration;
 
-        await context.SaveChangesAsync(cancellationToken);
+        await Context.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -114,12 +131,30 @@ public sealed class CredentialWriter(IApplicationDbContext context) : ICredentia
     /// <exception cref="NotFoundException"></exception>
     public async Task DeleteCredentialAsync(Guid credentialId, CancellationToken cancellationToken)
     {
-        var credential = await context.Credentials.FindAsync([credentialId], cancellationToken)
+        var credential = await Context.Credentials.Include(c => c.Operator)
+            .FirstOrDefaultAsync(c => c.CredentialId == credentialId, cancellationToken)
             ?? throw new NotFoundException(nameof(Credential), $"{credentialId}");
+        RequireAccountAccess(credential.Operator.AccountId);
 
-        context.Credentials.Attach(credential);
+        Context.Credentials.Attach(credential);
 
-        context.Credentials.Remove(credential);
-        await context.SaveChangesAsync(cancellationToken);
+        Context.Credentials.Remove(credential);
+        await Context.SaveChangesAsync(cancellationToken);
     }
+
+    private async Task RequireOperatorAccessAsync(Guid operatorId, CancellationToken cancellationToken)
+    {
+        var accountId = await Context.Operators
+            .Where(o => o.OperatorId == operatorId)
+            .Select(o => (Guid?)o.AccountId)
+            .FirstOrDefaultAsync(cancellationToken)
+            ?? throw new NotFoundException(nameof(Operator), $"{operatorId}");
+        RequireAccountAccess(accountId);
+    }
+
+    private string ResolveActorId()
+        => Principal.UserId?.ToString()
+           ?? Principal.ClientId
+           ?? Principal.SubjectId
+           ?? "unknown";
 }

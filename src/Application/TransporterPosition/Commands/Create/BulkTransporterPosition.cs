@@ -13,15 +13,28 @@
 //  limitations under the License.
 //
 
+using Common.Application.Attributes;
+using Common.Domain.Constants;
+
 namespace TrackHub.Manager.Application.TransporterPosition.Commands.Create;
 
 [Authorize(Resource = Resources.Positions, Action = Actions.Custom)]
 public readonly record struct BulkTransporterPositionCommand(IEnumerable<TransporterPositionDto> Positions) : IRequest;
 
-public class CreateTransporterCommandHandler(ITransporterPositionWriter writer) : IRequestHandler<BulkTransporterPositionCommand>
+public class CreateTransporterCommandHandler(
+    ITransporterPositionWriter writer) : IRequestHandler<BulkTransporterPositionCommand>
 {
     public async Task Handle(BulkTransporterPositionCommand request, CancellationToken cancellationToken)
     {
-        await writer.BulkTransporterPositionAsync(request.Positions, cancellationToken);
+        var positions = request.Positions as IList<TransporterPositionDto> ?? [.. request.Positions];
+
+        // When several devices report for the same transporter in the same batch, keep only the
+        // most recent position per TransporterId so the latest snapshot reflects the freshest fix.
+        var grouped = positions.GroupBy(p => p.TransporterId).ToList();
+        var deduplicated = grouped
+            .Select(g => g.OrderByDescending(p => p.DeviceDateTime).First())
+            .ToList();
+
+        await writer.BulkTransporterPositionAsync(deduplicated, cancellationToken);
     }
 }

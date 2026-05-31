@@ -20,5 +20,6 @@ public interface IDeviceTransporterReader
 {
     Task<IReadOnlyCollection<DeviceTransporterVm>> GetDeviceTransporterByUserAsync(Guid userId, Guid operatorId, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<DeviceTransporterVm>> GetDeviceTransportersAsync(Filters filters, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<DeviceTransporterVm>> GetAssignedDeviceTransportersByOperatorAsync(Guid accountId, Guid operatorId, CancellationToken cancellationToken);
     Task<DeviceTransporterVm> GetDeviceTransporterAsync(Guid transporterId, CancellationToken cancellationToken);
 }

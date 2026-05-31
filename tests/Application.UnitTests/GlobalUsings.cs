@@ -16,3 +16,4 @@
 global using Moq;
 global using Common.Mediator;
 global using TrackHub.Manager.Domain.Models;
+global using TrackHub.Manager.Domain.Enums;

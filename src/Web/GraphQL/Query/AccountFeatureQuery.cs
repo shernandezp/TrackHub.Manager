@@ -1,4 +1,5 @@
-using TrackHub.Manager.Application.AccountFeatures.Queries;
+using TrackHub.Manager.Application.AccountFeatures.Queries.Get;
+using TrackHub.Manager.Application.AccountFeatures.Queries.Validate;
 
 namespace TrackHub.Manager.Web.GraphQL.Query;
 

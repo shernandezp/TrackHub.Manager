@@ -36,6 +36,11 @@ public sealed class CredentialConfiguration : IEntityTypeConfiguration<Credentia
         builder.Property(x => x.Token).HasColumnName("token");
         builder.Property(x => x.TokenExpiration).HasColumnName("tokenexpiration");
         builder.Property(x => x.RefreshToken).HasColumnName("refreshtoken");
+        builder.Property(x => x.RefreshTokenExpiration).HasColumnName("refreshtokenexpiration");
+        builder.Property(x => x.CredentialVersion).HasColumnName("credentialversion").HasDefaultValue(1);
+        builder.Property(x => x.RotatedAt).HasColumnName("rotatedat");
+        builder.Property(x => x.RotatedByPrincipalType).HasColumnName("rotatedbyprincipaltype").HasMaxLength(ColumnMetadata.DefaultNameLength);
+        builder.Property(x => x.RotatedByPrincipalId).HasColumnName("rotatedbyprincipalid").HasMaxLength(ColumnMetadata.DefaultNameLength);
         builder.Property(x => x.OperatorId).HasColumnName("operatorid");
 
         builder.Property(t => t.Uri)

@@ -36,6 +36,17 @@ public sealed class OperatorConfiguration : IEntityTypeConfiguration<Operator>
         builder.Property(x => x.ContactName).HasColumnName("contactname");
         builder.Property(x => x.ProtocolType).HasColumnName("protocoltype");
         builder.Property(x => x.AccountId).HasColumnName("accountid");
+        builder.Property(x => x.Enabled).HasColumnName("enabled").HasDefaultValue(true);
+        builder.Property(x => x.SyncIntervalMinutes).HasColumnName("syncintervalminutes").HasDefaultValue(60);
+        builder.Property(x => x.HealthStatus).HasColumnName("healthstatus").HasDefaultValue(0);
+        builder.Property(x => x.LastSuccessfulSyncAt).HasColumnName("lastsuccessfulsyncat");
+        builder.Property(x => x.LastFailedSyncAt).HasColumnName("lastfailedsyncat");
+        builder.Property(x => x.LastManualSyncAt).HasColumnName("lastmanualsyncat");
+        builder.Property(x => x.LastDeviceSyncAt).HasColumnName("lastdevicesyncat");
+        builder.Property(x => x.LastPositionSyncAt).HasColumnName("lastpositionsyncat");
+        builder.Property(x => x.LastFailureCode).HasColumnName("lastfailurecode").HasMaxLength(ColumnMetadata.DefaultNameLength);
+        builder.Property(x => x.LastFailureMessage).HasColumnName("lastfailuremessage").HasColumnType(ColumnMetadata.TextField);
+        builder.Property(x => x.LastLatencyMs).HasColumnName("lastlatencyms");
 
         builder.Property(t => t.Name)
             .HasMaxLength(ColumnMetadata.DefaultNameLength)
@@ -61,5 +72,8 @@ public sealed class OperatorConfiguration : IEntityTypeConfiguration<Operator>
             .WithOne(d => d.Operator)
             .HasForeignKey<Credential>(d => d.OperatorId)
             .IsRequired(false);
+
+        builder.HasIndex(o => new { o.AccountId, o.Enabled, o.ProtocolType });
+        builder.HasIndex(o => new { o.AccountId, o.HealthStatus });
     }
 }

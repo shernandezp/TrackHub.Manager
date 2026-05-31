@@ -23,5 +23,6 @@ public readonly record struct UpdateOperatorDto(
     string? EmailAddress,
     string? Address,
     string? ContactName,
-    short ProtocolTypeId
+    short ProtocolTypeId,
+    int SyncIntervalMinutes
     );
