@@ -33,17 +33,39 @@ public sealed class GpsIntegrationDashboardReader(IApplicationDbContext context,
 
         var deviceStats = await Context.Devices
             .Where(d => d.Operator!.AccountId == scoped)
-            .GroupBy(d => d.DetectedStatus)
+            .Select(d => new
+            {
+                Status = d.DetectedStatus == (int)DetectedStatus.Ignored
+                    ? (int)DetectedStatus.Ignored
+                    : d.DetectedStatus == (int)DetectedStatus.Removed
+                        ? (int)DetectedStatus.Removed
+                        : d.Assignments.Any(a => a.Status == (int)AssignmentStatus.Active)
+                            ? (int)DetectedStatus.Assigned
+                            : (int)DetectedStatus.Available
+            })
+            .GroupBy(d => d.Status)
             .Select(g => new { Status = g.Key, Count = g.Count() })
             .ToListAsync(cancellationToken);
 
         var deviceCountsByProviderStatus = await Context.Devices
             .Where(d => d.Operator!.AccountId == scoped)
-            .GroupBy(d => new { d.OperatorId, OperatorName = d.Operator!.Name, d.DetectedStatus })
+            .Select(d => new
+            {
+                d.OperatorId,
+                OperatorName = d.Operator!.Name,
+                Status = d.DetectedStatus == (int)DetectedStatus.Ignored
+                    ? (int)DetectedStatus.Ignored
+                    : d.DetectedStatus == (int)DetectedStatus.Removed
+                        ? (int)DetectedStatus.Removed
+                        : d.Assignments.Any(a => a.Status == (int)AssignmentStatus.Active)
+                            ? (int)DetectedStatus.Assigned
+                            : (int)DetectedStatus.Available
+            })
+            .GroupBy(d => new { d.OperatorId, d.OperatorName, d.Status })
             .Select(g => new DeviceProviderStatusCountVm(
                 g.Key.OperatorId,
                 g.Key.OperatorName,
-                (DetectedStatus)g.Key.DetectedStatus,
+                (DetectedStatus)g.Key.Status,
                 g.Count()))
             .ToListAsync(cancellationToken);
 
@@ -56,8 +78,9 @@ public sealed class GpsIntegrationDashboardReader(IApplicationDbContext context,
 
         var unassigned = await Context.Devices
             .Where(d => d.Operator!.AccountId == scoped
-                && (d.DetectedStatus == (int)DetectedStatus.New || d.DetectedStatus == (int)DetectedStatus.Available)
-                && !Context.TransporterDeviceAssignments.Any(a => a.DeviceId == d.DeviceId && a.Status == (int)AssignmentStatus.Active))
+                && d.DetectedStatus != (int)DetectedStatus.Ignored
+                && d.DetectedStatus != (int)DetectedStatus.Removed
+                && !d.Assignments.Any(a => a.Status == (int)AssignmentStatus.Active))
             .CountAsync(cancellationToken);
 
         var syncRuns = await Context.OperatorSyncRuns

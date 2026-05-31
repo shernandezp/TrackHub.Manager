@@ -2,5 +2,5 @@ namespace TrackHub.Manager.Domain.Interfaces;
 
 public interface ISyncDispatcher
 {
-    Task DispatchManualSyncAsync(Guid accountId, Guid operatorId, CancellationToken cancellationToken);
+    Task<bool> DispatchManualSyncAsync(Guid accountId, Guid operatorId, bool resetDeviceCatalog, bool? autoAssignNewDevices, CancellationToken cancellationToken);
 }

@@ -22,7 +22,14 @@ public sealed class DeviceReader(IApplicationDbContext context, ICurrentPrincipa
         d.Description,
         d.ProviderMetadataHash,
         d.ProviderStatus,
-        (DetectedStatus)d.DetectedStatus,
+        (DetectedStatus)(
+            d.DetectedStatus == (int)DetectedStatus.Ignored
+                ? (int)DetectedStatus.Ignored
+                : d.DetectedStatus == (int)DetectedStatus.Removed
+                    ? (int)DetectedStatus.Removed
+                    : d.Assignments.Any(a => a.Status == (int)AssignmentStatus.Active)
+                        ? (int)DetectedStatus.Assigned
+                        : (int)DetectedStatus.Available),
         d.FirstSeenAt,
         d.LastSeenAt,
         d.LastSyncedAt,

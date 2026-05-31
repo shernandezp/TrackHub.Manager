@@ -2,10 +2,9 @@ using TrackHub.Manager.Domain.Interfaces;
 
 namespace TrackHub.Manager.Application.GpsIntegration;
 
-/// Default no-op dispatcher. The Router replaces this with an HTTP-based implementation that
-/// signals the SyncWorker to run a manual cycle for the given operator.
+/// Default dispatcher used only when the Router integration is not registered.
 public sealed class NoopSyncDispatcher : ISyncDispatcher
 {
-    public Task DispatchManualSyncAsync(Guid accountId, Guid operatorId, CancellationToken cancellationToken)
-        => Task.CompletedTask;
+    public Task<bool> DispatchManualSyncAsync(Guid accountId, Guid operatorId, bool resetDeviceCatalog, bool? autoAssignNewDevices, CancellationToken cancellationToken)
+        => Task.FromResult(false);
 }

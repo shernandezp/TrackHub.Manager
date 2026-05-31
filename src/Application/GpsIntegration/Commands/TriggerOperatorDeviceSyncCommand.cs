@@ -4,19 +4,17 @@ using Microsoft.Extensions.Logging;
 namespace TrackHub.Manager.Application.GpsIntegration.Commands;
 
 [Authorize(Resource = Resources.SynchronizedDevices, Action = Actions.Execute)]
-[RequireFeature(FeatureKeys.GpsIntegration)]
-public readonly record struct TriggerOperatorDeviceSyncCommand(Guid OperatorId) : IRequest;
+
+public readonly record struct TriggerOperatorDeviceSyncCommand(Guid OperatorId, bool ResetDeviceCatalog = false, bool? AutoAssignNewDevices = null) : IRequest<bool>;
 
 public class TriggerOperatorDeviceSyncCommandHandler(
-    IOperatorSyncRunWriter syncWriter,
     IOperatorReader operatorReader,
-    IOperatorWriter operatorWriter,
     ISyncDispatcher dispatcher,
     IConfiguration configuration,
     ILogger<TriggerOperatorDeviceSyncCommandHandler> logger)
-    : IRequestHandler<TriggerOperatorDeviceSyncCommand>
+    : IRequestHandler<TriggerOperatorDeviceSyncCommand, bool>
 {
-    public async Task Handle(TriggerOperatorDeviceSyncCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(TriggerOperatorDeviceSyncCommand request, CancellationToken cancellationToken)
     {
         var op = await operatorReader.GetOperatorAsync(request.OperatorId, cancellationToken);
 
@@ -34,13 +32,11 @@ public class TriggerOperatorDeviceSyncCommandHandler(
             }
         }
 
-        var now = DateTimeOffset.UtcNow;
-        await operatorWriter.MarkManualSyncTriggeredAsync(request.OperatorId, now, cancellationToken);
-
-        var correlationId = Guid.NewGuid().ToString();
-        await syncWriter.RecordAsync(new OperatorSyncRunDto(
-            op.AccountId, request.OperatorId, SyncTriggerType.Manual, OperatorSyncResult.Pending,
-            now, null, 0, 0, 0, 0, 0, 0, 0, 0, null, null, correlationId), cancellationToken);
-        await dispatcher.DispatchManualSyncAsync(op.AccountId, request.OperatorId, cancellationToken);
+        return await dispatcher.DispatchManualSyncAsync(
+            op.AccountId,
+            request.OperatorId,
+            request.ResetDeviceCatalog,
+            request.AutoAssignNewDevices,
+            cancellationToken);
     }
 }

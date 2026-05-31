@@ -4,6 +4,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="GraphQL.Client" />
     <PackageReference Include="TrackHubCommon.Infrastructure" />
   </ItemGroup>
   <ItemGroup>

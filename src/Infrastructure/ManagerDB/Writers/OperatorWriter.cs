@@ -14,7 +14,6 @@
 //
 
 using Common.Domain.Enums;
-using TrackHub.Manager.Domain.Enums;
 using TrackHub.Manager.Infrastructure.Entities;
 using TrackHub.Manager.Infrastructure.Interfaces;
 
@@ -34,7 +33,10 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
             operatorDto.Address,
             operatorDto.ContactName,
             operatorDto.ProtocolTypeId,
-            accountId);
+            accountId)
+        {
+            SyncIntervalMinutes = operatorDto.SyncIntervalMinutes
+        };
 
         await context.Operators.AddAsync(@operator, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
@@ -101,10 +103,16 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
     {
         var @operator = await context.Operators.FindAsync([operatorId], cancellationToken)
             ?? throw new NotFoundException(nameof(Operator), $"{operatorId}");
+
+        context.Operators.Attach(@operator);
         @operator.Enabled = enabled;
         if (!enabled)
         {
             @operator.HealthStatus = (int)OperatorHealthStatus.Disabled;
+        }
+        else if (@operator.HealthStatus == (int)OperatorHealthStatus.Disabled)
+        {
+            @operator.HealthStatus = (int)OperatorHealthStatus.Unknown;
         }
         await context.SaveChangesAsync(cancellationToken);
     }
@@ -113,6 +121,7 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
     {
         var @operator = await context.Operators.FindAsync([operatorId], cancellationToken)
             ?? throw new NotFoundException(nameof(Operator), $"{operatorId}");
+        context.Operators.Attach(@operator);
         @operator.LastManualSyncAt = triggeredAt;
         await context.SaveChangesAsync(cancellationToken);
     }
@@ -121,6 +130,7 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
     {
         var @operator = await context.Operators.FindAsync([operatorId], cancellationToken)
             ?? throw new NotFoundException(nameof(Operator), $"{operatorId}");
+        context.Operators.Attach(@operator);
         @operator.HealthStatus = (int)status;
         @operator.LastLatencyMs = latencyMs;
         if (status is OperatorHealthStatus.Degraded or OperatorHealthStatus.Offline)
@@ -136,6 +146,7 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
     {
         var @operator = await context.Operators.FindAsync([operatorId], cancellationToken)
             ?? throw new NotFoundException(nameof(Operator), $"{operatorId}");
+        context.Operators.Attach(@operator);
 
         if (success)
         {

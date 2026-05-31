@@ -104,6 +104,8 @@ public sealed class DeviceWriter(IApplicationDbContext context, ICurrentPrincipa
             ?? throw new NotFoundException(nameof(Entities.Device), deviceId.ToString());
 
         RequireAccountAccess(device.AccountId);
+
+        Context.Devices.Attach(device);
         device.DetectedStatus = (int)status;
         if (status == DetectedStatus.Ignored)
         {
@@ -139,11 +141,38 @@ public sealed class DeviceWriter(IApplicationDbContext context, ICurrentPrincipa
 
         if (devices.Count == 0) return 0;
 
+        var deviceIds = devices.Select(d => d.DeviceId).ToHashSet();
+        var transporterIdsWithWipedDevices = await Context.TransporterDeviceAssignments
+            .Where(a => deviceIds.Contains(a.DeviceId))
+            .Select(a => a.TransporterId)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+
+        var transportersToDelete = await Context.Transporters
+            .Where(t => transporterIdsWithWipedDevices.Contains(t.TransporterId)
+                && !t.Assignments.Any(a => !deviceIds.Contains(a.DeviceId)))
+            .ToListAsync(cancellationToken);
+        var transporterIdsToDelete = transportersToDelete.Select(t => t.TransporterId).ToHashSet();
+
+        if (transporterIdsToDelete.Count > 0)
+        {
+            var positions = await Context.TransporterPositions
+                .Where(p => transporterIdsToDelete.Contains(p.TransporterId))
+                .ToListAsync(cancellationToken);
+            Context.TransporterPositions.RemoveRange(positions);
+        }
+
         foreach (var d in devices)
         {
             Context.Devices.Remove(d);
             AddAuditEvent(d.AccountId, "SynchronizedDevice.Wiped",
                 "SynchronizedDevice", d.DeviceId.ToString(), null, null);
+        }
+        foreach (var t in transportersToDelete)
+        {
+            Context.Transporters.Remove(t);
+            AddAuditEvent(t.AccountId, "Transporter.WipedWithSynchronizedDevices",
+                "Transporter", t.TransporterId.ToString(), null, $"{{\"operatorId\":\"{operatorId}\"}}");
         }
         await Context.SaveChangesAsync(cancellationToken);
         return devices.Count;

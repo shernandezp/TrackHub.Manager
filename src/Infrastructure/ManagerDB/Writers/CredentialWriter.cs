@@ -15,7 +15,6 @@
 
 using Common.Domain.Extensions;
 using Common.Application.Interfaces;
-using TrackHub.Manager.Domain.Records;
 using TrackHub.Manager.Infrastructure.Entities;
 using TrackHub.Manager.Infrastructure.Interfaces;
 
@@ -85,6 +84,16 @@ public sealed class CredentialWriter(IApplicationDbContext context, ICurrentPrin
         credential.TokenExpiration = null;
         credential.RefreshToken = null;
         credential.RefreshTokenExpiration = null;
+        credential.CredentialVersion += 1;
+        credential.RotatedAt = DateTimeOffset.UtcNow;
+        credential.RotatedByPrincipalType = Principal.PrincipalType.ToString();
+        credential.RotatedByPrincipalId = ResolveActorId();
+        if (credential.Operator.Enabled)
+        {
+            credential.Operator.HealthStatus = (int)OperatorHealthStatus.Unknown;
+            credential.Operator.LastFailureCode = null;
+            credential.Operator.LastFailureMessage = null;
+        }
 
         await Context.SaveChangesAsync(cancellationToken);
     }
@@ -133,31 +142,6 @@ public sealed class CredentialWriter(IApplicationDbContext context, ICurrentPrin
         await Context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task RotateCredentialAsync(RotateCredentialDto dto, byte[] salt, string key, string principalType, string principalId, CancellationToken cancellationToken)
-    {
-        var credential = await Context.Credentials.Include(c => c.Operator)
-            .FirstOrDefaultAsync(c => c.OperatorId == dto.OperatorId, cancellationToken)
-            ?? throw new NotFoundException(nameof(Credential), $"operator {dto.OperatorId}");
-        RequireAccountAccess(credential.Operator.AccountId);
-
-        credential.Uri = dto.Uri;
-        credential.Username = dto.Username.EncryptData(key, salt);
-        credential.Password = dto.Password.EncryptData(key, salt);
-        credential.Key = dto.Key?.EncryptData(key, salt);
-        credential.Key2 = dto.Key2?.EncryptData(key, salt);
-        credential.Salt = Convert.ToBase64String(salt);
-        credential.Token = null;
-        credential.TokenExpiration = null;
-        credential.RefreshToken = null;
-        credential.RefreshTokenExpiration = null;
-        credential.CredentialVersion += 1;
-        credential.RotatedAt = DateTimeOffset.UtcNow;
-        credential.RotatedByPrincipalType = principalType;
-        credential.RotatedByPrincipalId = principalId;
-
-        await Context.SaveChangesAsync(cancellationToken);
-    }
-
     private async Task RequireOperatorAccessAsync(Guid operatorId, CancellationToken cancellationToken)
     {
         var accountId = await Context.Operators
@@ -167,4 +151,10 @@ public sealed class CredentialWriter(IApplicationDbContext context, ICurrentPrin
             ?? throw new NotFoundException(nameof(Operator), $"{operatorId}");
         RequireAccountAccess(accountId);
     }
+
+    private string ResolveActorId()
+        => Principal.UserId?.ToString()
+           ?? Principal.ClientId
+           ?? Principal.SubjectId
+           ?? "unknown";
 }

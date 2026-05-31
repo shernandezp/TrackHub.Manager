@@ -1,7 +1,6 @@
 namespace TrackHub.Manager.Application.GpsIntegration.Commands;
 
-[Authorize(Resource = Resources.OperatorSyncRuns, Action = Actions.Write, PrincipalTypes = "ServiceClient")]
-[RequireFeature(FeatureKeys.GpsIntegration, AllowGlobalServiceClient = false)]
+[Authorize(Resource = Resources.OperatorSyncRuns, Action = Actions.Write, PrincipalTypes = "User,ServiceClient")]
 public readonly record struct RecordOperatorSyncRunCommand(OperatorSyncRunDto Run) : IRequest<OperatorSyncRunVm>;
 
 public class RecordOperatorSyncRunCommandHandler(IOperatorSyncRunWriter writer, IOperatorWriter operatorWriter)

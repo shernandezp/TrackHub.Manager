@@ -3,17 +3,20 @@ using Microsoft.Extensions.Logging;
 
 namespace TrackHub.Manager.Application.GpsIntegration.Commands;
 
-[Authorize(Resource = Resources.SynchronizedDevices, Action = Actions.Write, PrincipalTypes = "ServiceClient")]
-[RequireFeature(FeatureKeys.GpsIntegration, AllowGlobalServiceClient = false)]
+[Authorize(Resource = Resources.SynchronizedDevices, Action = Actions.Write, PrincipalTypes = "User,ServiceClient")]
 public readonly record struct SynchronizeOperatorDevicesCommand(
     Guid AccountId,
     Guid OperatorId,
     IReadOnlyCollection<DeviceDto> Devices,
-    string CorrelationId) : IRequest<OperatorSyncRunVm>;
+    string CorrelationId,
+    string TriggerType = "AUTOMATIC",
+    bool? AutoAssignNewDevices = null) : IRequest<OperatorSyncRunVm>;
 
 public class SynchronizeOperatorDevicesCommandHandler(
     IDeviceWriter deviceWriter,
     IDeviceReader deviceReader,
+    ITransporterWriter transporterWriter,
+    ITransporterDeviceAssignmentWriter assignmentWriter,
     IOperatorSyncRunWriter syncWriter,
     IOperatorWriter operatorWriter,
     IAlertEventWriter alertWriter,
@@ -35,6 +38,7 @@ public class SynchronizeOperatorDevicesCommandHandler(
 
         var incomingIdentifiers = new HashSet<int>();
         var newlyAdded = new List<DeviceDto>();
+        var newlyAddedDevices = new List<(DeviceDto Incoming, DeviceVm Device)>();
         int added = 0, updated = 0, ignored = 0;
         foreach (var incoming in request.Devices)
         {
@@ -45,6 +49,7 @@ public class SynchronizeOperatorDevicesCommandHandler(
             {
                 added++;
                 newlyAdded.Add(incoming);
+                newlyAddedDevices.Add((incoming, upserted));
             }
             else
             {
@@ -60,6 +65,11 @@ public class SynchronizeOperatorDevicesCommandHandler(
             .Select(kvp => kvp.Value)
             .ToList();
 
+        if (request.AutoAssignNewDevices ?? true)
+        {
+            await AutoAssignNewDevicesAsync(request.AccountId, newlyAddedDevices, cancellationToken);
+        }
+
         var duplicates = new List<(string Serial, Guid OtherOperatorId)>();
         if (newlyAdded.Count > 0)
         {
@@ -74,13 +84,14 @@ public class SynchronizeOperatorDevicesCommandHandler(
         await EmitDeviceAlertsAsync(request, newlyAdded, removed, duplicates, cancellationToken);
 
         var finishedAt = DateTimeOffset.UtcNow;
+        var triggerType = ResolveTriggerType(request.TriggerType);
         var run = await syncWriter.RecordAsync(new OperatorSyncRunDto(
-            request.AccountId, request.OperatorId, SyncTriggerType.Automatic, OperatorSyncResult.Succeeded,
+            request.AccountId, request.OperatorId, triggerType, OperatorSyncResult.Succeeded,
             startedAt, finishedAt, request.Devices.Count, added, updated, removed.Count, ignored, 0, 0, 0,
             null, null, request.CorrelationId), cancellationToken);
 
         await operatorWriter.UpdateSyncSummaryAsync(
-            request.OperatorId, success: true, finishedAt, SyncTriggerType.Automatic,
+            request.OperatorId, success: true, finishedAt, triggerType,
             deviceSync: true, positionSync: false, null, null, cancellationToken);
 
         return run;
@@ -145,4 +156,56 @@ public class SynchronizeOperatorDevicesCommandHandler(
                 request.OperatorId);
         }
     }
+
+    private async Task AutoAssignNewDevicesAsync(
+        Guid accountId,
+        IReadOnlyCollection<(DeviceDto Incoming, DeviceVm Device)> devices,
+        CancellationToken cancellationToken)
+    {
+        foreach (var (incoming, device) in devices)
+        {
+            var transporter = await transporterWriter.CreateTransporterAsync(
+                new TransporterDto(
+                    ResolveTransporterName(incoming),
+                    ResolveTransporterTypeId(incoming.DeviceTypeId),
+                    accountId),
+                cancellationToken);
+
+            await assignmentWriter.AssignAsync(
+                new TransporterDeviceAssignmentDto(
+                    accountId,
+                    transporter.TransporterId,
+                    device.DeviceId,
+                    Priority: 0,
+                    IsPrimary: true,
+                    AssignmentReason: "Initial provider sync"),
+                cancellationToken);
+        }
+    }
+
+    private static string ResolveTransporterName(DeviceDto device)
+        => FirstNonEmpty(device.ProviderDisplayName, device.Name, device.Serial, $"Device {device.Identifier}");
+
+    private static string FirstNonEmpty(params string?[] values)
+        => values.Select(v => v?.Trim()).FirstOrDefault(v => !string.IsNullOrWhiteSpace(v))!;
+
+    private static short ResolveTransporterTypeId(short deviceTypeId)
+        => (short)(Enum.IsDefined(typeof(Common.Domain.Enums.DeviceType), (int)deviceTypeId)
+            ? (Common.Domain.Enums.DeviceType)deviceTypeId switch
+            {
+                Common.Domain.Enums.DeviceType.Aviation => Common.Domain.Enums.TransporterType.Aircraft,
+                Common.Domain.Enums.DeviceType.Cycling => Common.Domain.Enums.TransporterType.Bicycle,
+                Common.Domain.Enums.DeviceType.Drones => Common.Domain.Enums.TransporterType.Drone,
+                Common.Domain.Enums.DeviceType.Marine => Common.Domain.Enums.TransporterType.Boat,
+                Common.Domain.Enums.DeviceType.PetTracking => Common.Domain.Enums.TransporterType.Pet,
+                Common.Domain.Enums.DeviceType.Phone or Common.Domain.Enums.DeviceType.Fitness or Common.Domain.Enums.DeviceType.Smartwatch or Common.Domain.Enums.DeviceType.Wearable => Common.Domain.Enums.TransporterType.Person,
+                Common.Domain.Enums.DeviceType.OBDScanner => Common.Domain.Enums.TransporterType.FleetVehicle,
+                _ => Common.Domain.Enums.TransporterType.Asset
+            }
+            : Common.Domain.Enums.TransporterType.Asset);
+
+    private static SyncTriggerType ResolveTriggerType(string triggerType)
+        => Enum.TryParse<SyncTriggerType>(triggerType, ignoreCase: true, out var parsed)
+            ? parsed
+            : SyncTriggerType.Automatic;
 }

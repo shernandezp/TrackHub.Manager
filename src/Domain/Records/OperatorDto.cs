@@ -21,5 +21,6 @@ public readonly record struct OperatorDto(
     string? EmailAddress,
     string? Address,
     string? ContactName,
-    short ProtocolTypeId
+    short ProtocolTypeId,
+    int SyncIntervalMinutes = 30
     );
