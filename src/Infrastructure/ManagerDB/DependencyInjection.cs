@@ -79,6 +79,8 @@ public static class DependencyInjection
         services.AddScoped<IGroupVisibilityReader, GroupVisibilityReader>();
         services.AddScoped<IAccountFeatureReader, AccountFeatureReader>();
         services.AddScoped<IAccountFeatureWriter, AccountFeatureWriter>();
+        services.AddScoped<IAccountFeatureMasterReader, AccountFeatureMasterReader>();
+        services.AddScoped<IAccountFeatureMasterWriter, AccountFeatureMasterWriter>();
         services.AddScoped<IAuditEventReader, AuditEventReader>();
         services.AddScoped<IAuditEventWriter, AuditEventWriter>();
         services.AddScoped<IDocumentReader, DocumentReader>();
@@ -108,7 +110,6 @@ public static class DependencyInjection
         services.AddScoped<ITransporterPositionHistoryWriter, TransporterPositionHistoryWriter>();
         services.AddScoped<IGpsIntegrationDashboardReader, GpsIntegrationDashboardReader>();
         services.AddScoped<IPositionRetentionPolicyReader, PositionRetentionPolicyReader>();
-        services.AddScoped<IPositionRetentionPolicyWriter, PositionRetentionPolicyWriter>();
         services.AddMemoryCache();
         services.AddScoped<Common.Application.Interfaces.IFeatureFlagService, TrackHub.Manager.Infrastructure.ManagerDB.Services.FeatureFlagService>();
 

@@ -32,8 +32,6 @@ public class AccountSettingsConfiguration : IEntityTypeConfiguration<AccountSett
         builder.Property(x => x.Maps).HasColumnName("maps");
         builder.Property(x => x.MapsKey).HasColumnName("mapskey");
         builder.Property(x => x.OnlineInterval).HasColumnName("onlineinterval");
-        builder.Property(x => x.StoreLastPosition).HasColumnName("storelastposition");
-        builder.Property(x => x.StoringInterval).HasColumnName("storinginterval");
         builder.Property(x => x.RefreshMap).HasColumnName("refreshmap");
         builder.Property(x => x.RefreshMapInterval).HasColumnName("refreshmapinterval");
 

@@ -10,7 +10,7 @@ public class AppendPositionHistoryCommandHandler(ITransporterPositionHistoryWrit
     public async Task<bool> Handle(AppendPositionHistoryCommand request, CancellationToken cancellationToken)
     {
         var policy = await policyReader.GetAsync(request.Position.AccountId, cancellationToken);
-        if (!policy.HistoryEnabled || policy.LatestOnly)
+        if (!policy.HistoryEnabled)
             return false;
         return await writer.AppendAsync(request.Position, cancellationToken);
     }

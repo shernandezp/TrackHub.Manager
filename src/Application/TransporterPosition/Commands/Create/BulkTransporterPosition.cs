@@ -13,9 +13,6 @@
 //  limitations under the License.
 //
 
-using Common.Application.Attributes;
-using Common.Domain.Constants;
-
 namespace TrackHub.Manager.Application.TransporterPosition.Commands.Create;
 
 [Authorize(Resource = Resources.Positions, Action = Actions.Custom)]
