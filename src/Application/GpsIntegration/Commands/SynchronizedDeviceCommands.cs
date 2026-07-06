@@ -17,7 +17,9 @@ public class SynchronizeOperatorDevicesCommandHandler(
     IDeviceReader deviceReader,
     ITransporterWriter transporterWriter,
     ITransporterDeviceAssignmentWriter assignmentWriter,
-    IOperatorSyncRunWriter syncWriter,
+    IGroupReader groupReader,
+    IGroupWriter groupWriter,
+    ITransporterGroupWriter transporterGroupWriter,
     IOperatorWriter operatorWriter,
     IAlertEventWriter alertWriter,
     ILogger<SynchronizeOperatorDevicesCommandHandler> logger)
@@ -85,16 +87,34 @@ public class SynchronizeOperatorDevicesCommandHandler(
 
         var finishedAt = DateTimeOffset.UtcNow;
         var triggerType = ResolveTriggerType(request.TriggerType);
-        var run = await syncWriter.RecordAsync(new OperatorSyncRunDto(
-            request.AccountId, request.OperatorId, triggerType, OperatorSyncResult.Succeeded,
-            startedAt, finishedAt, request.Devices.Count, added, updated, removed.Count, ignored, 0, 0, 0,
-            null, null, request.CorrelationId), cancellationToken);
 
         await operatorWriter.UpdateSyncSummaryAsync(
             request.OperatorId, success: true, finishedAt, triggerType,
             deviceSync: true, positionSync: false, null, null, cancellationToken);
 
-        return run;
+        // Manager no longer records the sync run (spec 01.3 A6): it returns the counts and Router is
+        // the single writer of sync-run telemetry, recording exactly one run per attempt (success or
+        // failure) with identical field completeness. OperatorSyncRunId is left empty because this VM
+        // is not persisted here.
+        return new OperatorSyncRunVm(
+            OperatorSyncRunId: Guid.Empty,
+            request.AccountId,
+            request.OperatorId,
+            triggerType,
+            OperatorSyncResult.Succeeded,
+            startedAt,
+            finishedAt,
+            request.Devices.Count,
+            added,
+            updated,
+            removed.Count,
+            ignored,
+            PositionsRead: 0,
+            PositionsAccepted: 0,
+            PositionsRejected: 0,
+            ErrorCode: null,
+            ErrorMessage: null,
+            request.CorrelationId);
     }
 
     private async Task EmitDeviceAlertsAsync(
@@ -162,6 +182,13 @@ public class SynchronizeOperatorDevicesCommandHandler(
         IReadOnlyCollection<(DeviceDto Incoming, DeviceVm Device)> devices,
         CancellationToken cancellationToken)
     {
+        if (devices.Count == 0)
+        {
+            return;
+        }
+
+        var defaultGroupId = await ResolveDefaultGroupIdAsync(accountId, cancellationToken);
+
         foreach (var (incoming, device) in devices)
         {
             var transporter = await transporterWriter.CreateTransporterAsync(
@@ -180,7 +207,32 @@ public class SynchronizeOperatorDevicesCommandHandler(
                     IsPrimary: true,
                     AssignmentReason: "Initial provider sync"),
                 cancellationToken);
+
+            // Place every auto-provisioned transporter into the account's default group so plain
+            // (group-scoped) users can see it on the live map. Manual group management can move it
+            // later; the sync never moves it again (spec 01.3 A1.1, root defect §2.1 / K2).
+            await transporterGroupWriter.CreateTransporterGroupAsync(
+                new TransporterGroupDto(transporter.TransporterId, defaultGroupId),
+                cancellationToken);
         }
+    }
+
+    // Resolves the account's default group by name, creating it (Active) on first use.
+    private async Task<long> ResolveDefaultGroupIdAsync(Guid accountId, CancellationToken cancellationToken)
+    {
+        var groups = await groupReader.GetGroupsByAccountAsync(accountId, cancellationToken);
+        var existing = groups.FirstOrDefault(g =>
+            string.Equals(g.Name, GroupMetadata.DefaultGroupName, StringComparison.OrdinalIgnoreCase));
+        if (existing.GroupId != 0)
+        {
+            return existing.GroupId;
+        }
+
+        var created = await groupWriter.CreateGroupAsync(
+            new GroupDto(GroupMetadata.DefaultGroupName, GroupMetadata.DefaultGroupDescription, Active: true),
+            accountId,
+            cancellationToken);
+        return created.GroupId;
     }
 
     private static string ResolveTransporterName(DeviceDto device)

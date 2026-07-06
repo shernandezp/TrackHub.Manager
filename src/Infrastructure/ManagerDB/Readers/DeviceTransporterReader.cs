@@ -5,15 +5,24 @@ using TransporterType = Common.Domain.Enums.TransporterType;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
-public sealed class DeviceTransporterReader(IApplicationDbContext context, ICurrentPrincipal principal)
+public sealed class DeviceTransporterReader(IApplicationDbContext context, ICurrentPrincipal principal, IVisibleTransporterReader visibleReader)
     : AccountScopedDataAccess(context, principal), IDeviceTransporterReader
 {
     public async Task<IReadOnlyCollection<DeviceTransporterVm>> GetDeviceTransporterByUserAsync(Guid userId, Guid operatorId, CancellationToken cancellationToken)
-        => await Context.UsersGroup
-            .Where(ug => ug.UserId == userId)
-            .SelectMany(ug => ug.Group.Transporters)
-            .SelectMany(t => t.Assignments)
-            .Where(a => a.Status == (int)AssignmentStatus.Active && a.Device.OperatorId == operatorId)
+    {
+        // Reimplemented on the single visibility primitive (spec 01.3 A1.2/A1.3): privileged roles
+        // read account-wide, plain users are group-scoped. The map, its stored fallback, and the
+        // replay check all answer through GetVisibleTransporterIdsAsync so they cannot diverge (K1).
+        var accountId = await Context.Users
+            .Where(u => u.UserId == userId)
+            .Select(u => u.AccountId)
+            .FirstOrDefaultAsync(cancellationToken);
+        var visibleTransporterIds = (await visibleReader.GetVisibleTransporterIdsAsync(userId, accountId, cancellationToken)).ToArray();
+
+        return await Context.TransporterDeviceAssignments
+            .Where(a => a.Status == (int)AssignmentStatus.Active
+                && a.Device.OperatorId == operatorId
+                && visibleTransporterIds.Contains(a.TransporterId))
             .Select(a => new DeviceTransporterVm(
                 a.TransporterId,
                 a.Device.Identifier,
@@ -23,6 +32,7 @@ public sealed class DeviceTransporterReader(IApplicationDbContext context, ICurr
                 a.Transporter.TransporterTypeId))
             .Distinct()
             .ToListAsync(cancellationToken);
+    }
 
     public async Task<IReadOnlyCollection<DeviceTransporterVm>> GetDeviceTransportersAsync(Filters filters, CancellationToken cancellationToken)
     {

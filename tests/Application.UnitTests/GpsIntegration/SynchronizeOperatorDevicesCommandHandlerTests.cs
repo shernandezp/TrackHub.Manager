@@ -13,9 +13,13 @@ public class SynchronizeOperatorDevicesCommandHandlerTests
     private Mock<IDeviceReader> _deviceReader = null!;
     private Mock<ITransporterWriter> _transporterWriter = null!;
     private Mock<ITransporterDeviceAssignmentWriter> _assignmentWriter = null!;
-    private Mock<IOperatorSyncRunWriter> _syncWriter = null!;
+    private Mock<IGroupReader> _groupReader = null!;
+    private Mock<IGroupWriter> _groupWriter = null!;
+    private Mock<ITransporterGroupWriter> _transporterGroupWriter = null!;
     private Mock<IOperatorWriter> _operatorWriter = null!;
     private Mock<IAlertEventWriter> _alertWriter = null!;
+
+    private const long DefaultGroupId = 42L;
 
     [SetUp]
     public void SetUp()
@@ -24,33 +28,22 @@ public class SynchronizeOperatorDevicesCommandHandlerTests
         _deviceReader = new Mock<IDeviceReader>();
         _transporterWriter = new Mock<ITransporterWriter>();
         _assignmentWriter = new Mock<ITransporterDeviceAssignmentWriter>();
-        _syncWriter = new Mock<IOperatorSyncRunWriter>();
+        _groupReader = new Mock<IGroupReader>();
+        _groupWriter = new Mock<IGroupWriter>();
+        _transporterGroupWriter = new Mock<ITransporterGroupWriter>();
         _operatorWriter = new Mock<IOperatorWriter>();
         _alertWriter = new Mock<IAlertEventWriter>();
         _deviceReader.Setup(x => x.GetDevicesByOperatorAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync([]);
         _deviceReader.Setup(x => x.FindDuplicateSerialsAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<IReadOnlyCollection<string>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync([]);
-        _syncWriter.Setup(x => x.RecordAsync(It.IsAny<OperatorSyncRunDto>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((OperatorSyncRunDto dto, CancellationToken _) => new OperatorSyncRunVm(
-                Guid.NewGuid(),
-                dto.AccountId,
-                dto.OperatorId,
-                dto.TriggerType,
-                dto.Result,
-                dto.StartedAt,
-                dto.CompletedAt,
-                dto.DevicesSeen,
-                dto.DevicesAdded,
-                dto.DevicesUpdated,
-                dto.DevicesRemoved,
-                dto.DevicesIgnored,
-                dto.PositionsRead,
-                dto.PositionsAccepted,
-                dto.PositionsRejected,
-                dto.ErrorCode,
-                dto.ErrorMessage,
-                dto.CorrelationId));
+        // No existing groups -> the default "General" group is created on first use.
+        _groupReader.Setup(x => x.GetGroupsByAccountAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+        _groupWriter.Setup(x => x.CreateGroupAsync(It.IsAny<GroupDto>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((GroupDto dto, Guid accountId, CancellationToken _) => new GroupVm(DefaultGroupId, dto.Name, dto.Description, dto.Active, accountId));
+        _transporterGroupWriter.Setup(x => x.CreateTransporterGroupAsync(It.IsAny<TransporterGroupDto>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((TransporterGroupDto dto, CancellationToken _) => new TransporterGroupVm(dto.TransporterId, dto.GroupId));
     }
 
     private SynchronizeOperatorDevicesCommandHandler CreateHandler() => new(
@@ -58,13 +51,15 @@ public class SynchronizeOperatorDevicesCommandHandlerTests
         _deviceReader.Object,
         _transporterWriter.Object,
         _assignmentWriter.Object,
-        _syncWriter.Object,
+        _groupReader.Object,
+        _groupWriter.Object,
+        _transporterGroupWriter.Object,
         _operatorWriter.Object,
         _alertWriter.Object,
         Mock.Of<ILogger<SynchronizeOperatorDevicesCommandHandler>>());
 
     [Test]
-    public async Task Handle_NewDevices_AutoCreatesTransportersAndAssignmentsAndRecordsManualTrigger()
+    public async Task Handle_NewDevices_AutoCreatesTransportersAssignsToDefaultGroupAndReturnsManualCounts()
     {
         var accountId = Guid.NewGuid();
         var operatorId = Guid.NewGuid();
@@ -127,7 +122,15 @@ public class SynchronizeOperatorDevicesCommandHandlerTests
             new SynchronizeOperatorDevicesCommand(accountId, operatorId, [device], "corr-1", "MANUAL"),
             CancellationToken.None);
 
-        Assert.That(result.TriggerType, Is.EqualTo(SyncTriggerType.Manual));
+        // Manager no longer records the run (A6); it returns the counts in the VM for Router to write.
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.TriggerType, Is.EqualTo(SyncTriggerType.Manual));
+            Assert.That(result.Result, Is.EqualTo(OperatorSyncResult.Succeeded));
+            Assert.That(result.DevicesSeen, Is.EqualTo(1));
+            Assert.That(result.DevicesAdded, Is.EqualTo(1));
+            Assert.That(result.CorrelationId, Is.EqualTo("corr-1"));
+        });
         _assignmentWriter.Verify(x => x.AssignAsync(
             It.Is<TransporterDeviceAssignmentDto>(dto =>
                 dto.AccountId == accountId
@@ -136,12 +139,13 @@ public class SynchronizeOperatorDevicesCommandHandlerTests
                 && dto.IsPrimary
                 && dto.AssignmentReason == "Initial provider sync"),
             It.IsAny<CancellationToken>()), Times.Once);
-        _syncWriter.Verify(x => x.RecordAsync(
-            It.Is<OperatorSyncRunDto>(dto =>
-                dto.TriggerType == SyncTriggerType.Manual
-                && dto.DevicesSeen == 1
-                && dto.DevicesAdded == 1
-                && dto.CorrelationId == "corr-1"),
+        // The auto-provisioned transporter is placed into the account's default group (A1).
+        _groupWriter.Verify(x => x.CreateGroupAsync(
+            It.Is<GroupDto>(dto => dto.Name == "General"),
+            accountId,
+            It.IsAny<CancellationToken>()), Times.Once);
+        _transporterGroupWriter.Verify(x => x.CreateTransporterGroupAsync(
+            It.Is<TransporterGroupDto>(dto => dto.TransporterId == transporterId && dto.GroupId == DefaultGroupId),
             It.IsAny<CancellationToken>()), Times.Once);
     }
 

@@ -126,22 +126,6 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task UpdateHealthSummaryAsync(Guid operatorId, OperatorHealthStatus status, DateTimeOffset checkAt, int? latencyMs, string? errorCode, string? errorMessage, CancellationToken cancellationToken)
-    {
-        var @operator = await context.Operators.FindAsync([operatorId], cancellationToken)
-            ?? throw new NotFoundException(nameof(Operator), $"{operatorId}");
-        context.Operators.Attach(@operator);
-        @operator.HealthStatus = (int)status;
-        @operator.LastLatencyMs = latencyMs;
-        if (status is OperatorHealthStatus.Degraded or OperatorHealthStatus.Offline)
-        {
-            @operator.LastFailedSyncAt = checkAt;
-            @operator.LastFailureCode = errorCode;
-            @operator.LastFailureMessage = errorMessage;
-        }
-        await context.SaveChangesAsync(cancellationToken);
-    }
-
     public async Task UpdateSyncSummaryAsync(Guid operatorId, bool success, DateTimeOffset finishedAt, SyncTriggerType trigger, bool deviceSync, bool positionSync, string? errorCode, string? errorMessage, CancellationToken cancellationToken)
     {
         var @operator = await context.Operators.FindAsync([operatorId], cancellationToken)

@@ -8,7 +8,7 @@ public class OperatorSyncRunConfiguration : IEntityTypeConfiguration<OperatorSyn
 {
     public void Configure(EntityTypeBuilder<OperatorSyncRun> builder)
     {
-        builder.ToTable(name: TableMetadata.OperatorSyncRun, schema: SchemaMetadata.Application);
+        builder.ToTable(name: TableMetadata.OperatorSyncRun, schema: SchemaMetadata.Telemetry);
         builder.Property(x => x.OperatorSyncRunId).HasColumnName("id");
         builder.Property(x => x.AccountId).HasColumnName("accountid");
         builder.Property(x => x.OperatorId).HasColumnName("operatorid");

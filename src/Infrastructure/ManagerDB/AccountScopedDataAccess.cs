@@ -13,6 +13,16 @@ public abstract class AccountScopedDataAccess(IApplicationDbContext context, ICu
 
     protected bool CanAccessAllAccounts => Principal.PrincipalType == PrincipalType.ServiceClient && !Principal.AccountId.HasValue;
 
+    /// <summary>
+    /// Whether the current principal reads account-wide (bypassing group scoping): Administrator or
+    /// Manager roles, or a global service client. Plain users are narrowed by group membership.
+    /// Mirrors the POI privileged-bypass rule.
+    /// </summary>
+    protected bool IsPrivileged =>
+        CanAccessAllAccounts
+        || string.Equals(Principal.Role, Roles.Administrator, StringComparison.OrdinalIgnoreCase)
+        || string.Equals(Principal.Role, Roles.Manager, StringComparison.OrdinalIgnoreCase);
+
     protected Guid RequireAccountAccess(Guid accountId)
     {
         if (accountId == Guid.Empty)

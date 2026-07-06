@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
+// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License").
 //  You may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Credential> Credentials { get; set; }
     public DbSet<Document> Documents { get; set; }
     public DbSet<Driver> Drivers { get; set; }
+    public DbSet<GeocodingProvider> GeocodingProviders { get; set; }
+    public DbSet<PointOfInterest> PointsOfInterest { get; set; }
     public DbSet<Transporter> Transporters { get; set; }
     public DbSet<TransporterGroup> TransportersGroup { get; set; }
     public DbSet<Device> Devices { get; set; }

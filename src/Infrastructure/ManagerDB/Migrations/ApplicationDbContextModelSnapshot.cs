@@ -869,6 +869,75 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     b.ToTable("drivers", "app");
                 });
 
+            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.GeocodingProvider", b =>
+                {
+                    b.Property<Guid>("GeocodingProviderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean")
+                        .HasColumnName("active");
+
+                    b.Property<string>("ApiKey")
+                        .HasColumnType("text")
+                        .HasColumnName("apikey");
+
+                    b.Property<string>("ConfigurationJson")
+                        .HasColumnType("text")
+                        .HasColumnName("configurationjson");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("EndpointUri")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("endpointuri");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<int>("RequestsPerSecond")
+                        .HasColumnType("integer")
+                        .HasColumnName("requestspersecond");
+
+                    b.Property<string>("Salt")
+                        .HasColumnType("text")
+                        .HasColumnName("salt");
+
+                    b.Property<int>("TimeoutSeconds")
+                        .HasColumnType("integer")
+                        .HasColumnName("timeoutseconds");
+
+                    b.Property<short>("Type")
+                        .HasColumnType("smallint")
+                        .HasColumnName("type");
+
+                    b.HasKey("GeocodingProviderId");
+
+                    b.HasIndex("Active")
+                        .IsUnique()
+                        .HasDatabaseName("ix_geocoding_providers_single_active")
+                        .HasFilter("active = true");
+
+                    b.ToTable("geocoding_providers", "map");
+                });
+
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.Group", b =>
                 {
                     b.Property<long>("GroupId")
@@ -1248,7 +1317,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
 
                     b.HasIndex("AccountId", "OperatorId", "StartedAt");
 
-                    b.ToTable("operator_health_checks", "app");
+                    b.ToTable("operator_health_checks", "telemetry");
                 });
 
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.OperatorSyncRun", b =>
@@ -1334,7 +1403,81 @@ namespace TrackHub.Manager.Infrastructure.Migrations
 
                     b.HasIndex("AccountId", "OperatorId", "StartedAt");
 
-                    b.ToTable("operator_sync_runs", "app");
+                    b.ToTable("operator_sync_runs", "telemetry");
+                });
+
+            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.PointOfInterest", b =>
+                {
+                    b.Property<Guid>("PointOfInterestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("accountid");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean")
+                        .HasColumnName("active");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("address");
+
+                    b.Property<short?>("Color")
+                        .HasColumnType("smallint")
+                        .HasColumnName("color");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<long?>("GroupId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("groupid");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("latitude");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("longitude");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<short>("Type")
+                        .HasColumnType("smallint")
+                        .HasColumnName("type");
+
+                    b.HasKey("PointOfInterestId");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("AccountId", "Active");
+
+                    b.ToTable("points_of_interest", "map");
                 });
 
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.PublicLinkGrant", b =>
@@ -1681,7 +1824,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     b.HasIndex("TransporterId")
                         .IsUnique();
 
-                    b.ToTable("transporter_position", "app");
+                    b.ToTable("transporter_position", "telemetry");
                 });
 
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.TransporterPositionHistory", b =>
@@ -1778,7 +1921,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
 
                     b.HasIndex("AccountId", "TransporterId", "SourceTimestamp");
 
-                    b.ToTable("transporter_position_history", "app");
+                    b.ToTable("transporter_position_history", "telemetry");
                 });
 
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.TransporterType", b =>
@@ -1971,6 +2114,23 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.PointOfInterest", b =>
+                {
+                    b.HasOne("TrackHub.Manager.Infrastructure.Entities.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TrackHub.Manager.Infrastructure.Entities.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId");
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.Transporter", b =>

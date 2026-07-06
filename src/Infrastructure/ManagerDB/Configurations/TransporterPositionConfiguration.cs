@@ -24,7 +24,7 @@ public sealed class TransporterPositionConfiguration : IEntityTypeConfiguration<
     public void Configure(EntityTypeBuilder<TransporterPosition> builder)
     {
         //Table name
-        builder.ToTable(name: TableMetadata.TransporterPosition, schema: SchemaMetadata.Application);
+        builder.ToTable(name: TableMetadata.TransporterPosition, schema: SchemaMetadata.Telemetry);
 
         //Column names
         builder.Property(x => x.TransporterPositionId).HasColumnName("id");

@@ -65,7 +65,6 @@ public static class DependencyInjection
         services.AddScoped<IDeviceReader, DeviceReader>();
         services.AddScoped<IDeviceTransporterReader, DeviceTransporterReader>();
         services.AddScoped<ITransporterReader, TransporterReader>();
-        services.AddScoped<ITransporterPositionReader, TransporterPositionReader>();
         services.AddScoped<ITransporterTypeWriter, TransporterTypeWriter>();
         services.AddScoped<ITransporterTypeReader, TransporterTypeReader>();
         services.AddScoped<IGroupWriter, GroupWriter>();
@@ -77,6 +76,7 @@ public static class DependencyInjection
         services.AddScoped<IDriverReader, DriverReader>();
         services.AddScoped<IDriverWriter, DriverWriter>();
         services.AddScoped<IGroupVisibilityReader, GroupVisibilityReader>();
+        services.AddScoped<IVisibleTransporterReader, VisibleTransporterReader>();
         services.AddScoped<IAccountFeatureReader, AccountFeatureReader>();
         services.AddScoped<IAccountFeatureWriter, AccountFeatureWriter>();
         services.AddScoped<IAccountFeatureMasterReader, AccountFeatureMasterReader>();
@@ -102,14 +102,11 @@ public static class DependencyInjection
         services.AddScoped<IUserGroupWriter, UserGroupWriter>();
         services.AddScoped<ITransporterDeviceAssignmentReader, TransporterDeviceAssignmentReader>();
         services.AddScoped<ITransporterDeviceAssignmentWriter, TransporterDeviceAssignmentWriter>();
-        services.AddScoped<IOperatorHealthCheckReader, OperatorHealthCheckReader>();
-        services.AddScoped<IOperatorHealthCheckWriter, OperatorHealthCheckWriter>();
-        services.AddScoped<IOperatorSyncRunReader, OperatorSyncRunReader>();
-        services.AddScoped<IOperatorSyncRunWriter, OperatorSyncRunWriter>();
-        services.AddScoped<ITransporterPositionHistoryReader, TransporterPositionHistoryReader>();
-        services.AddScoped<ITransporterPositionHistoryWriter, TransporterPositionHistoryWriter>();
+        services.AddScoped<IPointOfInterestReader, PointOfInterestReader>();
+        services.AddScoped<IPointOfInterestWriter, PointOfInterestWriter>();
+        services.AddScoped<IGeocodingProviderReader, GeocodingProviderReader>();
+        services.AddScoped<IGeocodingProviderWriter, GeocodingProviderWriter>();
         services.AddScoped<IGpsIntegrationDashboardReader, GpsIntegrationDashboardReader>();
-        services.AddScoped<IPositionRetentionPolicyReader, PositionRetentionPolicyReader>();
         services.AddMemoryCache();
         services.AddScoped<Common.Application.Interfaces.IFeatureFlagService, TrackHub.Manager.Infrastructure.ManagerDB.Services.FeatureFlagService>();
 

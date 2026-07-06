@@ -8,7 +8,7 @@ public class OperatorHealthCheckConfiguration : IEntityTypeConfiguration<Operato
 {
     public void Configure(EntityTypeBuilder<OperatorHealthCheck> builder)
     {
-        builder.ToTable(name: TableMetadata.OperatorHealthCheck, schema: SchemaMetadata.Application);
+        builder.ToTable(name: TableMetadata.OperatorHealthCheck, schema: SchemaMetadata.Telemetry);
         builder.Property(x => x.OperatorHealthCheckId).HasColumnName("id");
         builder.Property(x => x.AccountId).HasColumnName("accountid");
         builder.Property(x => x.OperatorId).HasColumnName("operatorid");
