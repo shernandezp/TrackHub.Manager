@@ -40,14 +40,7 @@ builder.Services.AddWebServices();
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<ApplicationDbContext>();
 
-builder.Services
-    .AddGraphQLServer()
-    .AddAuthorization()
-    .AddMaxExecutionDepthRule(15)
-    .AddErrorFilter<TrackHubGraphQLErrorFilter>()
-    .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = builder.Environment.IsDevelopment())
-    .AddQueryType<Query>()
-    .AddMutationType<Mutation>();
+builder.Services.AddTrackHubGraphQLServer<Query, Mutation>(builder.Environment.IsDevelopment());
 
 builder.Services.AddCors(options => options
     .AddPolicy("AllowFrontend",

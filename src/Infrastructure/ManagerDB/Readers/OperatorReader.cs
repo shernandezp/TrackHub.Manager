@@ -170,6 +170,22 @@ public sealed class OperatorReader(
         return Map(op, includeCredentials, summary);
     }
 
+    // Resolves the operator that owns the transporter's device. Restored for the Router's
+    // position read/replay flows (operatorByTransporter); delegates to GetOperatorAsync so
+    // credential gating and the derived telemetry summary behave exactly like the by-id read.
+    public async Task<OperatorVm> GetOperatorByTransporterAsync(Guid transporterId, CancellationToken cancellationToken)
+    {
+        var operatorId = await context.TransporterDeviceAssignments
+            .Where(a => a.TransporterId == transporterId && a.Status == (int)AssignmentStatus.Active)
+            .OrderByDescending(a => a.IsPrimary)
+            .ThenBy(a => a.Priority)
+            .Select(a => (Guid?)a.Device.OperatorId)
+            .FirstOrDefaultAsync(cancellationToken)
+            ?? throw new NotFoundException(nameof(Entities.Operator), transporterId.ToString());
+
+        return await GetOperatorAsync(operatorId, cancellationToken);
+    }
+
     public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsAsync(Filters filters, CancellationToken cancellationToken)
     {
         var query = context.Operators.Include(o => o.Credential).AsQueryable();
