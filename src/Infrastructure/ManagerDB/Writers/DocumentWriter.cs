@@ -8,7 +8,7 @@ public sealed class DocumentWriter(IApplicationDbContext context, ICurrentPrinci
 {
     public async Task<DocumentVm> CreateDocumentMetadataAsync(DocumentDto document, CancellationToken cancellationToken)
     {
-        var entity = new Document(RequireAccountAccess(document.AccountId), document.OwnerEntityType, document.OwnerEntityId, document.UploadedByPrincipalType, document.UploadedByPrincipalId, document.StorageProvider, document.StorageKey, document.ContentType, document.SizeBytes, document.Sha256Hash, document.Classification, document.Status, document.ExpiresAt, document.VisibilityScope, document.ScanStatus);
+        var entity = new Document(RequireAccountWriteAccess(document.AccountId), document.OwnerEntityType, document.OwnerEntityId, document.UploadedByPrincipalType, document.UploadedByPrincipalId, document.StorageProvider, document.StorageKey, document.ContentType, document.SizeBytes, document.Sha256Hash, document.Classification, document.Status, document.ExpiresAt, document.VisibilityScope, document.ScanStatus);
         await Context.Documents.AddAsync(entity, cancellationToken);
         await Context.SaveChangesAsync(cancellationToken);
         return ToVm(entity);
@@ -29,7 +29,7 @@ public sealed class DocumentWriter(IApplicationDbContext context, ICurrentPrinci
     private async Task UpdateDocumentAsync(Guid documentId, Action<Document> update, CancellationToken cancellationToken)
     {
         var entity = await Context.Documents.FirstAsync(x => x.DocumentId == documentId, cancellationToken);
-        RequireAccountAccess(entity.AccountId);
+        RequireAccountWriteAccess(entity.AccountId);
         Context.Documents.Attach(entity);
         update(entity);
         await Context.SaveChangesAsync(cancellationToken);

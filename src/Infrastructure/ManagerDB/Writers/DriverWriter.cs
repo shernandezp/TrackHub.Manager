@@ -9,8 +9,9 @@ public sealed class DriverWriter(IApplicationDbContext context, ICurrentPrincipa
 {
     public async Task<DriverVm> CreateDriverAsync(DriverDto driver, CancellationToken cancellationToken)
     {
-        var entity = new Driver(RequireAccountAccess(driver.AccountId), driver.Name, driver.Phone, driver.DocumentType, driver.DocumentNumber, driver.Active, driver.EmployeeCode, driver.LicenseNumber, driver.LicenseExpiresAt, driver.DefaultTransporterId);
+        var entity = new Driver(RequireAccountWriteAccess(driver.AccountId), driver.Name, driver.Phone, driver.DocumentType, driver.DocumentNumber, driver.Active, driver.EmployeeCode, driver.LicenseNumber, driver.LicenseExpiresAt, driver.DefaultTransporterId);
         await Context.Drivers.AddAsync(entity, cancellationToken);
+        AddAuditEvent(entity.AccountId, "CreateDriver", "Driver", entity.DriverId.ToString(), null, AuditValues(entity));
         await Context.SaveChangesAsync(cancellationToken);
         return ToVm(entity);
     }
@@ -24,6 +25,7 @@ public sealed class DriverWriter(IApplicationDbContext context, ICurrentPrincipa
         }
 
         Context.Drivers.Attach(entity);
+        var oldValues = AuditValues(entity);
         entity.Name = driver.Name;
         entity.Phone = driver.Phone;
         entity.DocumentType = driver.DocumentType;
@@ -33,6 +35,7 @@ public sealed class DriverWriter(IApplicationDbContext context, ICurrentPrincipa
         entity.LicenseNumber = driver.LicenseNumber;
         entity.LicenseExpiresAt = driver.LicenseExpiresAt;
         entity.DefaultTransporterId = driver.DefaultTransporterId;
+        AddAuditEvent(entity.AccountId, "UpdateDriver", "Driver", entity.DriverId.ToString(), oldValues, AuditValues(entity));
         await Context.SaveChangesAsync(cancellationToken);
     }
 
@@ -40,16 +43,21 @@ public sealed class DriverWriter(IApplicationDbContext context, ICurrentPrincipa
     {
         var entity = await GetDriverForWriteAsync(driverId, cancellationToken);
         Context.Drivers.Attach(entity);
+        var oldValues = AuditValues(entity);
         entity.Active = false;
+        AddAuditEvent(entity.AccountId, "DeactivateDriver", "Driver", entity.DriverId.ToString(), oldValues, AuditValues(entity));
         await Context.SaveChangesAsync(cancellationToken);
     }
 
     private async Task<Driver> GetDriverForWriteAsync(Guid driverId, CancellationToken cancellationToken)
     {
         var entity = await Context.Drivers.FirstAsync(x => x.DriverId == driverId, cancellationToken);
-        RequireAccountAccess(entity.AccountId);
+        RequireAccountWriteAccess(entity.AccountId);
         return entity;
     }
 
     private static DriverVm ToVm(Driver x) => new(x.DriverId, x.AccountId, x.Name, x.Phone, x.DocumentType, x.DocumentNumber, x.Active, x.EmployeeCode, x.LicenseNumber, x.LicenseExpiresAt, x.DefaultTransporterId, x.LastModified);
+
+    private static string AuditValues(Driver driver)
+        => $$"""{"name":{{Quote(driver.Name)}},"phone":{{Quote(driver.Phone)}},"documentType":{{Quote(driver.DocumentType)}},"documentNumber":{{Quote(driver.DocumentNumber)}},"active":{{(driver.Active ? "true" : "false")}},"employeeCode":{{Quote(driver.EmployeeCode)}},"licenseNumber":{{Quote(driver.LicenseNumber)}},"defaultTransporterId":{{Quote(driver.DefaultTransporterId?.ToString())}}}""";
 }

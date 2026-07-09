@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
+// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License").
 //  You may not use this file except in compliance with the License.
@@ -13,14 +13,22 @@
 //  limitations under the License.
 //
 
+using Common.Application.Interfaces;
 using TrackHub.Manager.Infrastructure.Entities;
 using TrackHub.Manager.Infrastructure.Interfaces;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Writers;
 
 // This class represents a writer for UserGroup entities in the infrastructure layer.
-public sealed class UserGroupWriter(IApplicationDbContext context) : IUserGroupWriter
+public sealed class UserGroupWriter(IApplicationDbContext context, ICurrentPrincipal principal) : AccountScopedDataAccess(context, principal), IUserGroupWriter
 {
+    // UserGroup carries no account of its own; derive it from the group for the audit trail.
+    private async Task<Guid> ResolveGroupAccountAsync(long groupId, CancellationToken cancellationToken)
+        => await Context.Groups
+            .Where(g => g.GroupId == groupId)
+            .Select(g => g.AccountId)
+            .FirstOrDefaultAsync(cancellationToken);
+
     // Creates a new UserGroup asynchronously.
     // Parameters:
     //   userGroupDto: The UserGroupDto object containing the data for the new UserGroup.
@@ -35,8 +43,12 @@ public sealed class UserGroupWriter(IApplicationDbContext context) : IUserGroupW
             GroupId = userGroupDto.GroupId
         };
 
-        await context.UsersGroup.AddAsync(userGroup, cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
+        var accountId = await ResolveGroupAccountAsync(userGroup.GroupId, cancellationToken);
+        RequireAccountWriteAccess(accountId);
+        await Context.UsersGroup.AddAsync(userGroup, cancellationToken);
+        AddAuditEvent(accountId, "CreateUserGroup", "UserGroup", $"{userGroup.UserId}:{userGroup.GroupId}", null,
+            $$"""{"userId":"{{userGroup.UserId}}","groupId":{{userGroup.GroupId}}}""");
+        await Context.SaveChangesAsync(cancellationToken);
 
         return new UserGroupVm(
             userGroup.UserId,
@@ -52,12 +64,16 @@ public sealed class UserGroupWriter(IApplicationDbContext context) : IUserGroupW
     //   NotFoundException: If the UserGroup with the specified userId and groupId is not found.
     public async Task DeleteUserGroupAsync(Guid userId, long groupId, CancellationToken cancellationToken)
     {
-        var userGroup = await context.UsersGroup.FindAsync([groupId, userId], cancellationToken)
+        var userGroup = await Context.UsersGroup.FindAsync([groupId, userId], cancellationToken)
             ?? throw new NotFoundException(nameof(UserGroup), $"{userId},{groupId}");
 
-        context.UsersGroup.Attach(userGroup);
+        var accountId = await ResolveGroupAccountAsync(groupId, cancellationToken);
+        RequireAccountWriteAccess(accountId);
+        Context.UsersGroup.Attach(userGroup);
 
-        context.UsersGroup.Remove(userGroup);
-        await context.SaveChangesAsync(cancellationToken);
+        AddAuditEvent(accountId, "DeleteUserGroup", "UserGroup", $"{userId}:{groupId}",
+            $$"""{"userId":"{{userId}}","groupId":{{groupId}}}""", null);
+        Context.UsersGroup.Remove(userGroup);
+        await Context.SaveChangesAsync(cancellationToken);
     }
 }

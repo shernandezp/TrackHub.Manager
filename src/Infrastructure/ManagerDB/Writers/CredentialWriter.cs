@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
+// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License").
 //  You may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ public sealed class CredentialWriter(IApplicationDbContext context, ICurrentPrin
         var credential = await Context.Credentials.Include(c => c.Operator)
             .FirstOrDefaultAsync(c => c.CredentialId == credentialDto.CredentialId, cancellationToken)
             ?? throw new NotFoundException(nameof(Credential), $"{credentialDto.CredentialId}");
-        RequireAccountAccess(credential.Operator.AccountId);
+        RequireAccountWriteAccess(credential.Operator.AccountId);
 
         Context.Credentials.Attach(credential);
 
@@ -110,7 +110,7 @@ public sealed class CredentialWriter(IApplicationDbContext context, ICurrentPrin
         var credential = await Context.Credentials.Include(c => c.Operator)
             .FirstOrDefaultAsync(c => c.CredentialId == credentialDto.CredentialId, cancellationToken)
             ?? throw new NotFoundException(nameof(Credential), $"{credentialDto.CredentialId}");
-        RequireAccountAccess(credential.Operator.AccountId);
+        RequireAccountWriteAccess(credential.Operator.AccountId);
 
         Context.Credentials.Attach(credential);
 
@@ -134,7 +134,7 @@ public sealed class CredentialWriter(IApplicationDbContext context, ICurrentPrin
         var credential = await Context.Credentials.Include(c => c.Operator)
             .FirstOrDefaultAsync(c => c.CredentialId == credentialId, cancellationToken)
             ?? throw new NotFoundException(nameof(Credential), $"{credentialId}");
-        RequireAccountAccess(credential.Operator.AccountId);
+        RequireAccountWriteAccess(credential.Operator.AccountId);
 
         Context.Credentials.Attach(credential);
 
@@ -149,7 +149,7 @@ public sealed class CredentialWriter(IApplicationDbContext context, ICurrentPrin
             .Select(o => (Guid?)o.AccountId)
             .FirstOrDefaultAsync(cancellationToken)
             ?? throw new NotFoundException(nameof(Operator), $"{operatorId}");
-        RequireAccountAccess(accountId);
+        RequireAccountWriteAccess(accountId);
     }
 
     private string ResolveActorId()

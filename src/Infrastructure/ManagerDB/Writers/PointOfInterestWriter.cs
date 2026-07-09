@@ -25,7 +25,7 @@ public sealed class PointOfInterestWriter(IApplicationDbContext context, ICurren
 {
     public async Task<PointOfInterestVm> CreatePointOfInterestAsync(PointOfInterestDto pointOfInterestDto, CancellationToken cancellationToken)
     {
-        var accountId = RequireAccountAccess(pointOfInterestDto.AccountId);
+        var accountId = RequireAccountWriteAccess(pointOfInterestDto.AccountId);
         await RequireGroupInAccountAsync(pointOfInterestDto.GroupId, accountId, cancellationToken);
 
         var pointOfInterest = new PointOfInterest(
@@ -62,7 +62,7 @@ public sealed class PointOfInterestWriter(IApplicationDbContext context, ICurren
         var pointOfInterest = await Context.PointsOfInterest.FindAsync([pointOfInterestId], cancellationToken)
             ?? throw new NotFoundException(nameof(PointOfInterest), $"{pointOfInterestId}");
 
-        var accountId = RequireAccountAccess(pointOfInterest.AccountId);
+        var accountId = RequireAccountWriteAccess(pointOfInterest.AccountId);
         await RequireGroupInAccountAsync(pointOfInterestDto.GroupId, accountId, cancellationToken);
 
         Context.PointsOfInterest.Attach(pointOfInterest);
@@ -85,7 +85,7 @@ public sealed class PointOfInterestWriter(IApplicationDbContext context, ICurren
         var pointOfInterest = await Context.PointsOfInterest.FindAsync([pointOfInterestId], cancellationToken)
             ?? throw new NotFoundException(nameof(PointOfInterest), $"{pointOfInterestId}");
 
-        var accountId = RequireAccountAccess(pointOfInterest.AccountId);
+        var accountId = RequireAccountWriteAccess(pointOfInterest.AccountId);
 
         Context.PointsOfInterest.Attach(pointOfInterest);
         Context.PointsOfInterest.Remove(pointOfInterest);

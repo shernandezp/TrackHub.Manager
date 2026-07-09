@@ -8,7 +8,7 @@ public sealed class AlertEventWriter(IApplicationDbContext context, ICurrentPrin
 {
     public async Task<AlertEventVm> RecordAlertEventAsync(AlertEventDto alertEvent, CancellationToken cancellationToken)
     {
-        var accountId = RequireAccountAccess(alertEvent.AccountId);
+        var accountId = RequireAccountWriteAccess(alertEvent.AccountId);
         var entity = await Context.AlertEvents.FirstOrDefaultAsync(x => x.AccountId == accountId && x.DeduplicationKey == alertEvent.DeduplicationKey && x.Status != "Resolved", cancellationToken);
         if (entity == null)
         {
@@ -32,7 +32,7 @@ public sealed class AlertEventWriter(IApplicationDbContext context, ICurrentPrin
     private async Task UpdateStatusAsync(Guid alertEventId, string status, CancellationToken cancellationToken)
     {
         var entity = await Context.AlertEvents.FirstAsync(x => x.AlertEventId == alertEventId, cancellationToken);
-        RequireAccountAccess(entity.AccountId);
+        RequireAccountWriteAccess(entity.AccountId);
         Context.AlertEvents.Attach(entity);
         entity.Status = status;
         await Context.SaveChangesAsync(cancellationToken);

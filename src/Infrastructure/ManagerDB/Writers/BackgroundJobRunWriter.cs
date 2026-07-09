@@ -10,7 +10,7 @@ public sealed class BackgroundJobRunWriter(IApplicationDbContext context, ICurre
     public async Task<BackgroundJobRunVm> CreateBackgroundJobRunAsync(BackgroundJobRunDto backgroundJobRun, CancellationToken cancellationToken)
     {
         Guid? accountId = backgroundJobRun.AccountId.HasValue
-            ? RequireAccountAccess(backgroundJobRun.AccountId.Value)
+            ? RequireAccountWriteAccess(backgroundJobRun.AccountId.Value)
             : CanAccessAllAccounts ? null : throw new ForbiddenAccessException();
         var entity = new BackgroundJobRun(backgroundJobRun.JobKey, accountId, backgroundJobRun.ResourceKey, backgroundJobRun.IdempotencyKey, backgroundJobRun.Status, backgroundJobRun.Attempts, backgroundJobRun.StartedAt)
         {

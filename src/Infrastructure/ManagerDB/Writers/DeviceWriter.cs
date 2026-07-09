@@ -10,7 +10,7 @@ public sealed class DeviceWriter(IApplicationDbContext context, ICurrentPrincipa
 {
     public async Task<DeviceVm> UpsertSynchronizedDeviceAsync(DeviceDto deviceDto, CancellationToken cancellationToken)
     {
-        var accountId = RequireAccountAccess(deviceDto.AccountId);
+        var accountId = RequireAccountWriteAccess(deviceDto.AccountId);
         var operatorAccountId = await Context.Operators
             .Where(o => o.OperatorId == deviceDto.OperatorId)
             .Select(o => (Guid?)o.AccountId)
@@ -103,7 +103,7 @@ public sealed class DeviceWriter(IApplicationDbContext context, ICurrentPrincipa
         var device = await Context.Devices.FindAsync([deviceId], cancellationToken)
             ?? throw new NotFoundException(nameof(Entities.Device), deviceId.ToString());
 
-        RequireAccountAccess(device.AccountId);
+        RequireAccountWriteAccess(device.AccountId);
 
         Context.Devices.Attach(device);
         device.DetectedStatus = (int)status;
@@ -125,7 +125,7 @@ public sealed class DeviceWriter(IApplicationDbContext context, ICurrentPrincipa
         var device = await Context.Devices.FindAsync([deviceId], cancellationToken)
             ?? throw new NotFoundException(nameof(Entities.Device), deviceId.ToString());
 
-        RequireAccountAccess(device.AccountId);
+        RequireAccountWriteAccess(device.AccountId);
         Context.Devices.Remove(device);
         AddAuditEvent(device.AccountId, "SynchronizedDevice.Deleted",
             "SynchronizedDevice", deviceId.ToString(), null, null);
