@@ -25,7 +25,22 @@ public class DocumentConfiguration : IEntityTypeConfiguration<Document>
         builder.Property(x => x.ExpiresAt).HasColumnName("expiresat");
         builder.Property(x => x.VisibilityScope).HasColumnName("visibilityscope").HasMaxLength(ColumnMetadata.DefaultNameLength).IsRequired();
         builder.Property(x => x.ScanStatus).HasColumnName("scanstatus").HasMaxLength(ColumnMetadata.DefaultNameLength).IsRequired();
+
+        // Spec 04 §6.1 additions.
+        builder.Property(x => x.FileName).HasColumnName("filename").HasMaxLength(ColumnMetadata.DefaultNameLength).IsRequired();
+        builder.Property(x => x.Category).HasColumnName("category").HasMaxLength(ColumnMetadata.DefaultNameLength).IsRequired();
+        builder.Property(x => x.Title).HasColumnName("title").HasMaxLength(ColumnMetadata.DefaultNameLength);
+        builder.Property(x => x.Description).HasColumnName("description").HasMaxLength(ColumnMetadata.DefaultDescriptionLength);
+        builder.Property(x => x.CurrentVersion).HasColumnName("currentversion").HasDefaultValue(1);
+        builder.Property(x => x.CapturedLatitude).HasColumnName("capturedlatitude");
+        builder.Property(x => x.CapturedLongitude).HasColumnName("capturedlongitude");
+        builder.Property(x => x.CapturedAtDeviceTime).HasColumnName("capturedatdevicetime");
+        builder.Property(x => x.SourceDeviceRegistrationId).HasColumnName("sourcedeviceregistrationid");
+
         builder.HasIndex(x => new { x.AccountId, x.OwnerEntityType, x.OwnerEntityId });
         builder.HasIndex(x => x.Sha256Hash);
+        // Spec 04 §6.1: expiration scan + per-owner active-type lookup.
+        builder.HasIndex(x => new { x.AccountId, x.ExpiresAt, x.Status });
+        builder.HasIndex(x => new { x.AccountId, x.OwnerEntityType, x.OwnerEntityId, x.Category, x.Status });
     }
 }

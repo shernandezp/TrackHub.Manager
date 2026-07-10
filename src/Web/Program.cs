@@ -18,6 +18,7 @@ using Common.Application;
 using Common.Web.Infrastructure;
 using System.Reflection;
 using TrackHub.Manager.Infrastructure;
+using TrackHub.Manager.Web.BackgroundServices;
 using TrackHub.Manager.Web.GraphQL.Mutation;
 using TrackHub.Manager.Web.GraphQL.Query;
 
@@ -35,6 +36,15 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddAppSecurityContext();
 builder.Services.AddAppRouterContext(builder.Configuration);
 builder.Services.AddWebServices();
+
+// Trial-expiration enforcement job (spec 03 §10).
+builder.Services.AddHostedService<TrialExpirationService>();
+
+// Document jobs (spec 04 §10): scan-result processing (quarantine → clean/infected) and the
+// 30/15/7-day expiration scan.
+builder.Services.AddHostedService<DocumentScanService>();
+builder.Services.AddHostedService<DocumentExpirationService>();
+builder.Services.AddHostedService<DocumentRetentionCleanupService>();
 
 // Add HealthChecks
 builder.Services.AddHealthChecks()

@@ -45,6 +45,8 @@ public sealed class AccountWriter(IApplicationDbContext context) : IAccountWrite
             account.Description,
             (AccountType)account.Type,
             account.Type,
+            (AccountStatus)account.Status,
+            account.Status,
             account.Active,
             account.LastModified);
     }
@@ -63,7 +65,12 @@ public sealed class AccountWriter(IApplicationDbContext context) : IAccountWrite
         account.Name = accountDto.Name;
         account.Description = accountDto.Description;
         account.Type = accountDto.TypeId;
-        account.Active = accountDto.Active;
+
+        // The legacy `active` flag can no longer change lifecycle state (spec 03 §6.1, AC6):
+        // suspend/cancel/archive and re-activation all require ChangeAccountStatus. Keep Active as the
+        // derived read of the unchanged Status so updateAccount can never move an account out of, or
+        // into, the operational band {Trial, Active}.
+        account.Active = ((AccountStatus)account.Status).IsOperational();
 
         await context.SaveChangesAsync(cancellationToken);
     }

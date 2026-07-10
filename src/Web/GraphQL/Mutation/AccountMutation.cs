@@ -13,8 +13,10 @@
 //  limitations under the License.
 //
 
+using TrackHub.Manager.Application.Accounts.Commands.ChangeStatus;
 using TrackHub.Manager.Application.Accounts.Commands.Create;
 using TrackHub.Manager.Application.Accounts.Commands.Update;
+using TrackHub.Manager.Application.Accounts.Commands.UpdateBranding;
 using TrackHub.Manager.Application.Accounts.Commands.UpdateSettings;
 
 namespace TrackHub.Manager.Web.GraphQL.Mutation;
@@ -22,6 +24,12 @@ namespace TrackHub.Manager.Web.GraphQL.Mutation;
 public partial class Mutation
 {
     public async Task<AccountVm> CreateAccount([Service] ISender sender, CreateAccountCommand command)
+        => await sender.Send(command);
+
+    public async Task<AccountVm> ChangeAccountStatus([Service] ISender sender, ChangeAccountStatusCommand command)
+        => await sender.Send(command);
+
+    public async Task<AccountBrandingVm> UpdateAccountBranding([Service] ISender sender, UpdateAccountBrandingCommand command)
         => await sender.Send(command);
 
     public async Task<bool> UpdateAccount([Service] ISender sender, Guid id, UpdateAccountCommand command)

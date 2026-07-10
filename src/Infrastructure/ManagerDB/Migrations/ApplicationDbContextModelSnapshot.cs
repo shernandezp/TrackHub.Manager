@@ -58,13 +58,68 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("name");
 
+                    b.Property<short>("Status")
+                        .HasColumnType("smallint")
+                        .HasColumnName("status");
+
+                    b.Property<DateTimeOffset?>("StatusChangedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("statuschangedat");
+
                     b.Property<short>("Type")
                         .HasColumnType("smallint")
                         .HasColumnName("type");
 
                     b.HasKey("AccountId");
 
+                    b.HasIndex("Name");
+
+                    b.HasIndex("Status");
+
                     b.ToTable("accounts", "app");
+                });
+
+            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.AccountBranding", b =>
+                {
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("accountid");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("displayname");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("LogoDocumentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("logodocumentid");
+
+                    b.Property<string>("PrimaryColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("character varying(7)")
+                        .HasColumnName("primarycolor");
+
+                    b.Property<string>("ReportHeader")
+                        .HasColumnType("text")
+                        .HasColumnName("reportheader");
+
+                    b.HasKey("AccountId");
+
+                    b.ToTable("account_branding", "app");
                 });
 
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.AccountFeature", b =>
@@ -696,6 +751,24 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("accountid");
 
+                    b.Property<DateTimeOffset?>("CapturedAtDeviceTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("capturedatdevicetime");
+
+                    b.Property<double?>("CapturedLatitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("capturedlatitude");
+
+                    b.Property<double?>("CapturedLongitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("capturedlongitude");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("category");
+
                     b.Property<string>("Classification")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -714,9 +787,26 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
+                    b.Property<int>("CurrentVersion")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("currentversion");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
                     b.Property<DateTimeOffset?>("ExpiresAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expiresat");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("filename");
 
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("timestamp with time zone");
@@ -752,6 +842,10 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("sizebytes");
 
+                    b.Property<Guid?>("SourceDeviceRegistrationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sourcedeviceregistrationid");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -768,6 +862,11 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
                         .HasColumnName("storageprovider");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("title");
 
                     b.Property<string>("UploadedByPrincipalId")
                         .IsRequired()
@@ -791,9 +890,221 @@ namespace TrackHub.Manager.Infrastructure.Migrations
 
                     b.HasIndex("Sha256Hash");
 
+                    b.HasIndex("AccountId", "ExpiresAt", "Status");
+
                     b.HasIndex("AccountId", "OwnerEntityType", "OwnerEntityId");
 
+                    b.HasIndex("AccountId", "OwnerEntityType", "OwnerEntityId", "Category", "Status");
+
                     b.ToTable("documents", "app");
+                });
+
+            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.DocumentSignature", b =>
+                {
+                    b.Property<Guid>("DocumentSignatureId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("accountid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("createdat");
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("documentid");
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("latitude");
+
+                    b.Property<string>("LegalTextAccepted")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("legaltextaccepted");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("longitude");
+
+                    b.Property<Guid?>("SignatureImageDocumentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("signatureimagedocumentid");
+
+                    b.Property<DateTimeOffset>("SignedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("signedat");
+
+                    b.Property<string>("SignerName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("signername");
+
+                    b.Property<string>("SignerPrincipalId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("signerprincipalid");
+
+                    b.Property<string>("SignerPrincipalType")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("signerprincipaltype");
+
+                    b.HasKey("DocumentSignatureId");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("DocumentId");
+
+                    b.ToTable("document_signatures", "app");
+                });
+
+            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.DocumentType", b =>
+                {
+                    b.Property<Guid>("DocumentTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("accountid");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("category");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("createdat");
+
+                    b.Property<int?>("DefaultValidityDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("defaultvaliditydays");
+
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("displayname");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("boolean")
+                        .HasColumnName("enabled");
+
+                    b.Property<bool>("Expiring")
+                        .HasColumnType("boolean")
+                        .HasColumnName("expiring");
+
+                    b.Property<bool>("Required")
+                        .HasColumnType("boolean")
+                        .HasColumnName("required");
+
+                    b.HasKey("DocumentTypeId");
+
+                    b.HasIndex("AccountId", "Category")
+                        .IsUnique();
+
+                    b.ToTable("document_types", "app");
+                });
+
+            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.DocumentVersion", b =>
+                {
+                    b.Property<Guid>("DocumentVersionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("accountid");
+
+                    b.Property<DateTimeOffset?>("BytesPurgedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("bytespurgedat");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("contenttype");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("createdat");
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("documentid");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("filename");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("reason");
+
+                    b.Property<string>("ReplacedByPrincipalId")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("replacedbyprincipalid");
+
+                    b.Property<string>("ReplacedByPrincipalType")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("replacedbyprincipaltype");
+
+                    b.Property<string>("ScanStatus")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("scanstatus");
+
+                    b.Property<string>("Sha256Hash")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("sha256hash");
+
+                    b.Property<long>("SizeBytes")
+                        .HasColumnType("bigint")
+                        .HasColumnName("sizebytes");
+
+                    b.Property<string>("StorageKey")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("storagekey");
+
+                    b.Property<string>("StorageProvider")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("storageprovider");
+
+                    b.Property<int>("VersionNumber")
+                        .HasColumnType("integer")
+                        .HasColumnName("versionnumber");
+
+                    b.HasKey("DocumentVersionId");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("DocumentId", "VersionNumber")
+                        .IsUnique();
+
+                    b.ToTable("document_versions", "app");
                 });
 
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.Driver", b =>
@@ -2039,6 +2350,15 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     b.ToTable("user_settings", "app");
                 });
 
+            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.AccountBranding", b =>
+                {
+                    b.HasOne("TrackHub.Manager.Infrastructure.Entities.Account", "Account")
+                        .WithOne("AccountBranding")
+                        .HasForeignKey("TrackHub.Manager.Infrastructure.Entities.AccountBranding", "AccountId");
+
+                    b.Navigation("Account");
+                });
+
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.AccountFeature", b =>
                 {
                     b.HasOne("TrackHub.Manager.Infrastructure.Entities.Account", null)
@@ -2238,6 +2558,8 @@ namespace TrackHub.Manager.Infrastructure.Migrations
 
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.Account", b =>
                 {
+                    b.Navigation("AccountBranding");
+
                     b.Navigation("AccountFeatures");
 
                     b.Navigation("AccountSettings");
