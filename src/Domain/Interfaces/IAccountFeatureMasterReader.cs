@@ -8,4 +8,5 @@ namespace TrackHub.Manager.Domain.Interfaces;
 public interface IAccountFeatureMasterReader
 {
     Task<IReadOnlyCollection<AccountFeatureVm>> GetAccountFeaturesAsync(Guid accountId, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<AccountFeatureVm>> GetAllAccountFeaturesAsync(CancellationToken cancellationToken);
 }

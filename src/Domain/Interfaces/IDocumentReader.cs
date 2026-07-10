@@ -11,4 +11,5 @@ public interface IDocumentReader
     Task<IReadOnlyCollection<PublicLinkGrantVm>> GetDocumentSharesAsync(Guid documentId, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<DocumentTypeVm>> GetDocumentTypesAsync(Guid accountId, bool includeDisabled, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<DocumentSignatureVm>> GetDocumentSignaturesAsync(Guid documentId, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<TransporterDocumentComplianceVm>> GetTransporterDocumentComplianceAsync(Guid accountId, CancellationToken cancellationToken);
 }

@@ -154,9 +154,9 @@ public sealed class OperatorReader(
         }
 
         var userId = principal.UserId.Value;
-        var roleAuthorized = await identityService.IsInRoleAsync(userId, Resources.Credentials, Actions.Custom, cancellationToken);
-        return roleAuthorized
-               && await identityService.AuthorizeAsync(userId, Resources.Credentials, Actions.Custom, cancellationToken);
+        // Single combined role+policy decision (cached in Common's IdentityService) instead of
+        // two sequential Security round trips per operator read.
+        return await identityService.AuthorizeUserAsync(userId, Resources.Credentials, Actions.Custom, cancellationToken);
     }
 
     public async Task<OperatorVm> GetOperatorAsync(Guid id, CancellationToken cancellationToken)

@@ -88,12 +88,8 @@ public sealed class CredentialWriter(IApplicationDbContext context, ICurrentPrin
         credential.RotatedAt = DateTimeOffset.UtcNow;
         credential.RotatedByPrincipalType = Principal.PrincipalType.ToString();
         credential.RotatedByPrincipalId = ResolveActorId();
-        if (credential.Operator.Enabled)
-        {
-            credential.Operator.HealthStatus = (int)OperatorHealthStatus.Unknown;
-            credential.Operator.LastFailureCode = null;
-            credential.Operator.LastFailureMessage = null;
-        }
+        // No health-rollup reset needed: operator health is derived from the latest health
+        // check, so the next check after rotation reflects reality on its own.
 
         await Context.SaveChangesAsync(cancellationToken);
     }

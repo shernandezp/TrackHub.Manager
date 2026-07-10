@@ -32,15 +32,12 @@ public sealed class Operator(string name, string? description, string? phoneNumb
 
     public bool Enabled { get; set; } = true;
     public int SyncIntervalMinutes { get; set; } = 60;
-    public int HealthStatus { get; set; }
+    // Health, failure detail, latency, and failed/position sync timestamps are DERIVED from
+    // telemetry (operator health checks + sync runs) at read time — the row keeps only the
+    // successful-sync stamps the schedulers gate on.
     public DateTimeOffset? LastSuccessfulSyncAt { get; set; }
-    public DateTimeOffset? LastFailedSyncAt { get; set; }
     public DateTimeOffset? LastManualSyncAt { get; set; }
     public DateTimeOffset? LastDeviceSyncAt { get; set; }
-    public DateTimeOffset? LastPositionSyncAt { get; set; }
-    public string? LastFailureCode { get; set; }
-    public string? LastFailureMessage { get; set; }
-    public int? LastLatencyMs { get; set; }
 
     public Credential? Credential { get; set; }
     public ICollection<Device> Devices { get; } = [];

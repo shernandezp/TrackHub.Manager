@@ -8,3 +8,16 @@ public class GetAccountFeaturesMasterQueryHandler(IAccountFeatureMasterReader re
     public async Task<IReadOnlyCollection<AccountFeatureVm>> Handle(GetAccountFeaturesMasterQuery request, CancellationToken cancellationToken)
         => await reader.GetAccountFeaturesAsync(request.AccountId, cancellationToken);
 }
+
+/// <summary>
+/// Every account's features in one call — the batched variant schedulers (Router SyncWorker)
+/// and cross-account reports use instead of one accountFeaturesMaster call per account.
+/// </summary>
+[Authorize(Resource = Resources.AccountFeaturesMaster, Action = Actions.Read)]
+public readonly record struct GetAllAccountFeaturesMasterQuery() : IRequest<IReadOnlyCollection<AccountFeatureVm>>;
+
+public class GetAllAccountFeaturesMasterQueryHandler(IAccountFeatureMasterReader reader) : IRequestHandler<GetAllAccountFeaturesMasterQuery, IReadOnlyCollection<AccountFeatureVm>>
+{
+    public async Task<IReadOnlyCollection<AccountFeatureVm>> Handle(GetAllAccountFeaturesMasterQuery request, CancellationToken cancellationToken)
+        => await reader.GetAllAccountFeaturesAsync(cancellationToken);
+}

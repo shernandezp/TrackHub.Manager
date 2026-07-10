@@ -48,6 +48,44 @@ public sealed class DocumentReader(IApplicationDbContext context, ICurrentPrinci
         return ToVm(entity);
     }
 
+    // Batched compliance projection: every group-visible transporter with its Active document
+    // categories, in two queries total. Visibility and sensitive-classification rules match
+    // GetDocumentsForOwnerAsync (an uncleared caller does not see Confidential/Legal documents
+    // as present).
+    public async Task<IReadOnlyCollection<TransporterDocumentComplianceVm>> GetTransporterDocumentComplianceAsync(Guid accountId, CancellationToken cancellationToken)
+    {
+        var scopedAccountId = RequireAccountAccess(accountId);
+        var visibleIds = await accessPolicy.GetVisibleTransporterIdsAsync(scopedAccountId, cancellationToken);
+
+        var transporters = await Context.Transporters
+            .Where(t => t.AccountId == scopedAccountId && visibleIds.Contains(t.TransporterId))
+            .Select(t => new { t.TransporterId, t.Name })
+            .ToListAsync(cancellationToken);
+
+        var ownerIds = transporters.Select(t => t.TransporterId.ToString()).ToList();
+        var canSeeSensitive = CanSeeSensitive;
+        var activeDocuments = await Context.Documents
+            .Where(x => x.AccountId == scopedAccountId
+                && x.OwnerEntityType == DocumentOwnerTypes.Transporter
+                && ownerIds.Contains(x.OwnerEntityId)
+                && x.Status == DocumentStatuses.Active
+                && (canSeeSensitive || (x.Classification != DocumentClassifications.Confidential && x.Classification != DocumentClassifications.Legal)))
+            .Select(x => new { x.OwnerEntityId, x.Category })
+            .ToListAsync(cancellationToken);
+
+        var categoriesByOwner = activeDocuments
+            .GroupBy(d => d.OwnerEntityId)
+            .ToDictionary(g => g.Key, g => (IReadOnlyCollection<string>)g.Select(d => d.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToList());
+
+        return transporters
+            .OrderBy(t => t.Name, StringComparer.OrdinalIgnoreCase)
+            .Select(t => new TransporterDocumentComplianceVm(
+                t.TransporterId,
+                t.Name,
+                categoriesByOwner.GetValueOrDefault(t.TransporterId.ToString(), [])))
+            .ToList();
+    }
+
     public async Task<IReadOnlyCollection<DocumentVersionVm>> GetDocumentVersionsAsync(Guid documentId, int skip, int take, CancellationToken cancellationToken)
     {
         await LoadAuthorizedDocumentAsync(documentId, cancellationToken);

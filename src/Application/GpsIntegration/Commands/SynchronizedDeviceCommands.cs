@@ -88,9 +88,7 @@ public class SynchronizeOperatorDevicesCommandHandler(
         var finishedAt = DateTimeOffset.UtcNow;
         var triggerType = ResolveTriggerType(request.TriggerType);
 
-        await operatorWriter.UpdateSyncSummaryAsync(
-            request.OperatorId, success: true, finishedAt, triggerType,
-            deviceSync: true, positionSync: false, null, null, cancellationToken);
+        await operatorWriter.UpdateSyncSummaryAsync(request.OperatorId, finishedAt, triggerType, cancellationToken);
 
         // Manager no longer records the sync run (spec 01.3 A6): it returns the counts and Router is
         // the single writer of sync-run telemetry, recording exactly one run per attempt (success or

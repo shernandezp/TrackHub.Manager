@@ -22,15 +22,13 @@ public class OperatorReaderTests
         return principal.Object;
     }
 
-    private static Mock<IIdentityService> IdentityService(bool roleAuthorized = false, bool policyAuthorized = false)
+    private static Mock<IIdentityService> IdentityService(bool credentialsAuthorized = false)
     {
         var identityService = new Mock<IIdentityService>();
+        // The reader gates credential exposure through the single combined role+policy decision.
         identityService
-            .Setup(x => x.IsInRoleAsync(It.IsAny<Guid>(), Resources.Credentials, Actions.Custom, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(roleAuthorized);
-        identityService
-            .Setup(x => x.AuthorizeAsync(It.IsAny<Guid>(), Resources.Credentials, Actions.Custom, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(policyAuthorized);
+            .Setup(x => x.AuthorizeUserAsync(It.IsAny<Guid>(), Resources.Credentials, Actions.Custom, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(credentialsAuthorized);
         return identityService;
     }
 
@@ -96,7 +94,7 @@ public class OperatorReaderTests
         var reader = new OperatorReader(
             context as IApplicationDbContext,
             Principal(userId: userId),
-            IdentityService(roleAuthorized: true, policyAuthorized: true).Object);
+            IdentityService(credentialsAuthorized: true).Object);
         var result = await reader.GetOperatorAsync(@operator.OperatorId, CancellationToken.None);
 
         Assert.That(result.OperatorId, Is.EqualTo(@operator.OperatorId));

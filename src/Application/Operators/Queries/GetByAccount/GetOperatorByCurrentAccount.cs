@@ -23,7 +23,7 @@ public readonly record struct GetOperatorByCurrentAccountQuery() : IRequest<IRea
 
 public class GetOperatorsCurrentAccountQueryHandler(IOperatorReader reader, IUserReader userReader, IUser user) : IRequestHandler<GetOperatorByCurrentAccountQuery, IReadOnlyCollection<OperatorVm>>
 {
-    private Guid UserId { get; } = user.Id is null ? throw new UnauthorizedAccessException() : new Guid(user.Id);
+    private Guid UserId { get; } = Guid.TryParse(user.Id, out var userId) ? userId : throw new UnauthorizedAccessException();
 
     public async Task<IReadOnlyCollection<OperatorVm>> Handle(GetOperatorByCurrentAccountQuery request, CancellationToken cancellationToken)
     {

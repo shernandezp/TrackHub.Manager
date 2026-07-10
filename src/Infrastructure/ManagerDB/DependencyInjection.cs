@@ -55,7 +55,7 @@ public static class DependencyInjection
             options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
 
-        services.AddHeaderPropagation(o => o.Headers.Add("Authorization"));
+        services.AddTrackHubHeaderPropagation();
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
         services.AddScoped<IAccountSettingsWriter, AccountSettingsWriter>();

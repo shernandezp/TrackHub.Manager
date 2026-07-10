@@ -13,4 +13,5 @@ public partial class Query
     public async Task<IReadOnlyCollection<DocumentVm>> GetExpiringDocuments([Service] ISender sender, [AsParameters] GetExpiringDocumentsQuery query) => await sender.Send(query);
     public async Task<IReadOnlyCollection<PublicLinkGrantVm>> GetDocumentShares([Service] ISender sender, [AsParameters] GetDocumentSharesQuery query) => await sender.Send(query);
     public async Task<IReadOnlyCollection<DocumentTypeVm>> GetDocumentTypes([Service] ISender sender, [AsParameters] GetDocumentTypesQuery query) => await sender.Send(query);
+    public async Task<IReadOnlyCollection<TransporterDocumentComplianceVm>> GetTransporterDocumentCompliance([Service] ISender sender, [AsParameters] GetTransporterDocumentComplianceQuery query) => await sender.Send(query);
 }

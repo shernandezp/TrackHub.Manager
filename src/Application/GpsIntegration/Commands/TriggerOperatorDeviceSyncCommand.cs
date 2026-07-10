@@ -9,6 +9,7 @@ public readonly record struct TriggerOperatorDeviceSyncCommand(Guid OperatorId, 
 
 public class TriggerOperatorDeviceSyncCommandHandler(
     IOperatorReader operatorReader,
+    IOperatorWriter operatorWriter,
     ISyncDispatcher dispatcher,
     IConfiguration configuration,
     ILogger<TriggerOperatorDeviceSyncCommandHandler> logger)
@@ -28,9 +29,14 @@ public class TriggerOperatorDeviceSyncCommandHandler(
                     "Manual sync for operator {OperatorId} throttled; last trigger {Elapsed}s ago (min {Min}s).",
                     request.OperatorId, (int)elapsed.TotalSeconds, minIntervalSeconds);
                 throw new Common.Application.Exceptions.TooManyRequestsException(
-                    $"Manual sync throttled. Wait {minIntervalSeconds - (int)elapsed.TotalSeconds}s before retrying.");
+                    $"Manual sync throttled. Wait {minIntervalSeconds - (int)elapsed.TotalSeconds}s before retrying.")
+                { RetryAfterSeconds = minIntervalSeconds - (int)elapsed.TotalSeconds };
             }
         }
+
+        // Stamp BEFORE dispatching so failed syncs are throttled too; the completion path
+        // re-stamps on success.
+        await operatorWriter.MarkManualSyncTriggeredAsync(request.OperatorId, DateTimeOffset.UtcNow, cancellationToken);
 
         return await dispatcher.DispatchManualSyncAsync(
             op.AccountId,

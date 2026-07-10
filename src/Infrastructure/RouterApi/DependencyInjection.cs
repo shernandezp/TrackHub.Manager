@@ -24,14 +24,9 @@ public static class RouterApiDependencyInjection
 {
     public static IServiceCollection AddAppRouterContext(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddHeaderPropagation(o =>
-        {
-            o.Headers.Add("Authorization");
-            o.Headers.Add("x-correlation-id");
-        });
-
-        services.AddHttpClient(Clients.Router, client => client.Timeout = TimeSpan.FromSeconds(30))
-            .AddHeaderPropagation();
+        // The sync dispatch awaits Router's whole chain (provider fetch + device write-back),
+        // which can legitimately exceed the default 30 s on large first syncs.
+        services.AddGraphQLClient(Clients.Router, timeoutSeconds: 120);
 
         services.AddScoped<ISyncDispatcher, RouterSyncDispatcher>();
 

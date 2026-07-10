@@ -70,3 +70,14 @@ public class GetDocumentTypesQueryHandler(IDocumentReader reader) : IRequestHand
 {
     public async Task<IReadOnlyCollection<DocumentTypeVm>> Handle(GetDocumentTypesQuery request, CancellationToken cancellationToken) => await reader.GetDocumentTypesAsync(request.AccountId, request.IncludeDisabled, cancellationToken);
 }
+
+// Batched compliance read for the missing-required-documents report: every group-visible
+// transporter with its Active document categories in one call (replaces one documentsForOwner
+// call per transporter).
+[Authorize(Resource = Resources.Documents, Action = Actions.Read)]
+[RequireFeature(FeatureKeys.Documents)]
+public readonly record struct GetTransporterDocumentComplianceQuery(Guid AccountId) : IRequest<IReadOnlyCollection<TransporterDocumentComplianceVm>>;
+public class GetTransporterDocumentComplianceQueryHandler(IDocumentReader reader) : IRequestHandler<GetTransporterDocumentComplianceQuery, IReadOnlyCollection<TransporterDocumentComplianceVm>>
+{
+    public async Task<IReadOnlyCollection<TransporterDocumentComplianceVm>> Handle(GetTransporterDocumentComplianceQuery request, CancellationToken cancellationToken) => await reader.GetTransporterDocumentComplianceAsync(request.AccountId, cancellationToken);
+}

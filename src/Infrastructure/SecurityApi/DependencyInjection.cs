@@ -23,11 +23,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddAppSecurityContext(this IServiceCollection services)
     {
-        services.AddHeaderPropagation(o => o.Headers.Add("Authorization"));
-
-        services.AddHttpClient(Clients.Security,
-            client => client.Timeout = TimeSpan.FromSeconds(30))
-            .AddHeaderPropagation();
+        // User-provisioning writer carries mutations — no retry.
+        services.AddGraphQLClient(Clients.Security);
 
         services.AddScoped<ISecurityWriter, SecurityWriter>();
 
