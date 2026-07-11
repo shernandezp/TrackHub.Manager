@@ -14,6 +14,7 @@
 //
 
 using System.Reflection;
+using Common.Infrastructure;
 using TrackHub.Manager.Infrastructure.Entities;
 using TrackHub.Manager.Infrastructure.Interfaces;
 
@@ -60,6 +61,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(builder);
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        // Normalize every DateTimeOffset to UTC on write (workspace UTC-timestamp policy).
+        configurationBuilder.UseUtcTimestamps();
+        base.ConfigureConventions(configurationBuilder);
     }
 
 }

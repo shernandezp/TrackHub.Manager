@@ -57,7 +57,7 @@ public sealed class S3DocumentStorage(IAmazonS3 s3, string bucketName, TimeSpan 
             BucketName = bucketName,
             Key = storageKey,
             Verb = HttpVerb.GET,
-            Expires = DateTime.UtcNow.Add(expiry),
+            Expires = DateTimeOffset.UtcNow.Add(expiry).UtcDateTime,
             ResponseHeaderOverrides = new ResponseHeaderOverrides
             {
                 ContentDisposition = $"attachment; filename=\"{SanitizeFileName(fileName)}\"",

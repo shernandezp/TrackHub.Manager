@@ -25,7 +25,7 @@ public class UpdateTokenTests
     [Test]
     public async Task Handle_Calls_UpdateToken()
     {
-        var dto = new UpdateTokenDto(Guid.NewGuid(), "t", DateTime.UtcNow.AddHours(1), "r", DateTime.UtcNow.AddDays(1));
+        var dto = new UpdateTokenDto(Guid.NewGuid(), "t", DateTimeOffset.UtcNow.AddHours(1), "r", DateTimeOffset.UtcNow.AddDays(1));
         _configurationMock.Setup(c => c["AppSettings:EncryptionKey"]).Returns("key");
         _writerMock.Setup(w => w.UpdateTokenAsync(dto, "key", CancellationToken.None)).Returns(Task.CompletedTask);
 
