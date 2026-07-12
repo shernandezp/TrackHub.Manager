@@ -24,8 +24,13 @@ We believe in the strength of community collaboration to create effective and ac
 | **Router API**              | [https://github.com/shernandezp/TrackHubRouter](https://github.com/shernandezp/TrackHubRouter)    |
 | **Geofencing API**          | [https://github.com/shernandezp/TrackHub.Geofencing](https://github.com/shernandezp/TrackHub.Geofencing)    |
 | **Reporting API**           | [https://github.com/shernandezp/TrackHub.Reporting](https://github.com/shernandezp/TrackHub.Reporting)    |
+| **Telemetry API**           | [https://github.com/shernandezp/TrackHub.Telemetry](https://github.com/shernandezp/TrackHub.Telemetry)    |
 | **TrackHub Web**            | [https://github.com/shernandezp/TrackHub](https://github.com/shernandezp/TrackHub)          |
 | **TrackHub Mobile**         | [https://github.com/shernandezp/TrackHubMobile](https://github.com/shernandezp/TrackHubMobile)      |
 
 
 
+
+## Overview
+
+The Management API is the master-data service. It owns accounts, users, groups; operators, devices, transporters, and device–transporter assignments; points of interest and geocoding providers; account features; alert events and audit events; and the device-synchronization command surface. High-volume position and operator-telemetry data is owned by the **Telemetry API**.

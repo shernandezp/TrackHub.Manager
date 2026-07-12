@@ -20,6 +20,8 @@ public readonly record struct AccountVm(
     string? Description,
     AccountType Type,
     short TypeId,
+    AccountStatus Status,
+    short StatusId,
     bool Active,
     DateTimeOffset LastModified
     );

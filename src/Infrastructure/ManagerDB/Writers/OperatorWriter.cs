@@ -56,15 +56,15 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
             null,
             @operator.Enabled,
             @operator.SyncIntervalMinutes,
-            (OperatorHealthStatus)@operator.HealthStatus,
+            OperatorHealthStatus.Unknown,
             @operator.LastSuccessfulSyncAt,
-            @operator.LastFailedSyncAt,
+            null,
             @operator.LastManualSyncAt,
             @operator.LastDeviceSyncAt,
-            @operator.LastPositionSyncAt,
-            @operator.LastFailureCode,
-            @operator.LastFailureMessage,
-            @operator.LastLatencyMs);
+            null,
+            null,
+            null,
+            null);
     }
 
     // UpdateOperatorAsync method updates an existing operator
@@ -106,14 +106,6 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
 
         context.Operators.Attach(@operator);
         @operator.Enabled = enabled;
-        if (!enabled)
-        {
-            @operator.HealthStatus = (int)OperatorHealthStatus.Disabled;
-        }
-        else if (@operator.HealthStatus == (int)OperatorHealthStatus.Disabled)
-        {
-            @operator.HealthStatus = (int)OperatorHealthStatus.Unknown;
-        }
         await context.SaveChangesAsync(cancellationToken);
     }
 
@@ -126,56 +118,20 @@ public sealed class OperatorWriter(IApplicationDbContext context) : IOperatorWri
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task UpdateHealthSummaryAsync(Guid operatorId, OperatorHealthStatus status, DateTimeOffset checkAt, int? latencyMs, string? errorCode, string? errorMessage, CancellationToken cancellationToken)
-    {
-        var @operator = await context.Operators.FindAsync([operatorId], cancellationToken)
-            ?? throw new NotFoundException(nameof(Operator), $"{operatorId}");
-        context.Operators.Attach(@operator);
-        @operator.HealthStatus = (int)status;
-        @operator.LastLatencyMs = latencyMs;
-        if (status is OperatorHealthStatus.Degraded or OperatorHealthStatus.Offline)
-        {
-            @operator.LastFailedSyncAt = checkAt;
-            @operator.LastFailureCode = errorCode;
-            @operator.LastFailureMessage = errorMessage;
-        }
-        await context.SaveChangesAsync(cancellationToken);
-    }
-
-    public async Task UpdateSyncSummaryAsync(Guid operatorId, bool success, DateTimeOffset finishedAt, SyncTriggerType trigger, bool deviceSync, bool positionSync, string? errorCode, string? errorMessage, CancellationToken cancellationToken)
+    // Stamps the successful device-sync timestamps the schedulers gate on. Failure detail,
+    // health, and position-sync history are telemetry-derived at read time (sync runs +
+    // health checks), not row state.
+    public async Task UpdateSyncSummaryAsync(Guid operatorId, DateTimeOffset finishedAt, SyncTriggerType trigger, CancellationToken cancellationToken)
     {
         var @operator = await context.Operators.FindAsync([operatorId], cancellationToken)
             ?? throw new NotFoundException(nameof(Operator), $"{operatorId}");
         context.Operators.Attach(@operator);
 
-        if (success)
-        {
-            @operator.LastSuccessfulSyncAt = finishedAt;
-            @operator.LastFailureCode = null;
-            @operator.LastFailureMessage = null;
-            if (@operator.HealthStatus is (int)OperatorHealthStatus.Offline or (int)OperatorHealthStatus.Degraded or (int)OperatorHealthStatus.Unknown)
-            {
-                @operator.HealthStatus = (int)OperatorHealthStatus.Healthy;
-            }
-        }
-        else
-        {
-            @operator.LastFailedSyncAt = finishedAt;
-            @operator.LastFailureCode = errorCode;
-            @operator.LastFailureMessage = errorMessage;
-        }
-
+        @operator.LastSuccessfulSyncAt = finishedAt;
+        @operator.LastDeviceSyncAt = finishedAt;
         if (trigger == SyncTriggerType.Manual)
         {
             @operator.LastManualSyncAt = finishedAt;
-        }
-        if (deviceSync)
-        {
-            @operator.LastDeviceSyncAt = finishedAt;
-        }
-        if (positionSync)
-        {
-            @operator.LastPositionSyncAt = finishedAt;
         }
 
         await context.SaveChangesAsync(cancellationToken);

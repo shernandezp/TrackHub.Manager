@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
+// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License").
 //  You may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace TrackHub.Manager.Infrastructure.Interfaces;
 public interface IApplicationDbContext
 {
     DbSet<Account> Accounts { get; set; }
+    DbSet<AccountBranding> AccountBrandings { get; set; }
     DbSet<AccountFeature> AccountFeatures { get; set; }
     DbSet<AccountSettings> AccountSettings { get; set; }
     DbSet<AccountSupportGrant> AccountSupportGrants { get; set; }
@@ -28,7 +29,12 @@ public interface IApplicationDbContext
     DbSet<BackgroundJobRun> BackgroundJobRuns { get; set; }
     DbSet<Credential> Credentials { get; set; }
     DbSet<Document> Documents { get; set; }
+    DbSet<DocumentVersion> DocumentVersions { get; set; }
+    DbSet<DocumentSignature> DocumentSignatures { get; set; }
+    DbSet<DocumentType> DocumentTypes { get; set; }
     DbSet<Driver> Drivers { get; set; }
+    DbSet<GeocodingProvider> GeocodingProviders { get; set; }
+    DbSet<PointOfInterest> PointsOfInterest { get; set; }
     DbSet<Transporter> Transporters { get; set; }
     DbSet<TransporterGroup> TransportersGroup { get; set; }
     DbSet<Device> Devices { get; set; }

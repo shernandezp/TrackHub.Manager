@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
+// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License").
 //  You may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 //
 
 using System.Reflection;
+using Common.Infrastructure;
 using TrackHub.Manager.Infrastructure.Entities;
 using TrackHub.Manager.Infrastructure.Interfaces;
 
@@ -22,6 +23,7 @@ namespace TrackHub.Manager.Infrastructure;
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IApplicationDbContext
 {
     public DbSet<Account> Accounts { get; set; }
+    public DbSet<AccountBranding> AccountBrandings { get; set; }
     public DbSet<AccountFeature> AccountFeatures { get; set; }
     public DbSet<AccountSettings> AccountSettings { get; set; }
     public DbSet<AccountSupportGrant> AccountSupportGrants { get; set; }
@@ -30,7 +32,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<BackgroundJobRun> BackgroundJobRuns { get; set; }
     public DbSet<Credential> Credentials { get; set; }
     public DbSet<Document> Documents { get; set; }
+    public DbSet<DocumentVersion> DocumentVersions { get; set; }
+    public DbSet<DocumentSignature> DocumentSignatures { get; set; }
+    public DbSet<DocumentType> DocumentTypes { get; set; }
     public DbSet<Driver> Drivers { get; set; }
+    public DbSet<GeocodingProvider> GeocodingProviders { get; set; }
+    public DbSet<PointOfInterest> PointsOfInterest { get; set; }
     public DbSet<Transporter> Transporters { get; set; }
     public DbSet<TransporterGroup> TransportersGroup { get; set; }
     public DbSet<Device> Devices { get; set; }
@@ -54,6 +61,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(builder);
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        // Normalize every DateTimeOffset to UTC on write (workspace UTC-timestamp policy).
+        configurationBuilder.UseUtcTimestamps();
+        base.ConfigureConventions(configurationBuilder);
     }
 
 }

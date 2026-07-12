@@ -22,7 +22,7 @@ public readonly record struct CreateOperatorCommand(OperatorDto Operator) : IReq
 
 public class CreateOperatorCommandHandler(IOperatorWriter writer, IUserReader userReader, IUser user) : IRequestHandler<CreateOperatorCommand, OperatorVm>
 {
-    private Guid UserId { get; } = user.Id is null ? throw new UnauthorizedAccessException() : new Guid(user.Id);
+    private Guid UserId { get; } = Guid.TryParse(user.Id, out var userId) ? userId : throw new UnauthorizedAccessException();
 
     // This method handles the CreateOperatorCommand and creates an operator.
     public async Task<OperatorVm> Handle(CreateOperatorCommand request, CancellationToken cancellationToken)

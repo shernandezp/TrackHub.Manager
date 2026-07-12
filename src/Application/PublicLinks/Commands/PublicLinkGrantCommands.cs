@@ -1,6 +1,7 @@
 namespace TrackHub.Manager.Application.PublicLinks.Commands;
 
 [Authorize(Resource = Resources.PublicLinks, Action = Actions.Write)]
+[RequireFeature(FeatureKeys.PublicLinks)]
 public readonly record struct CreatePublicLinkGrantCommand(PublicLinkGrantDto PublicLinkGrant) : IRequest<PublicLinkGrantVm>;
 public class CreatePublicLinkGrantCommandHandler(IPublicLinkGrantWriter writer) : IRequestHandler<CreatePublicLinkGrantCommand, PublicLinkGrantVm>
 {

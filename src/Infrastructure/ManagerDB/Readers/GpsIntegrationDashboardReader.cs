@@ -28,8 +28,34 @@ public sealed class GpsIntegrationDashboardReader(IApplicationDbContext context,
         var since = now.AddHours(-24);
 
         var operators = await Context.Operators.Where(o => o.AccountId == scoped)
-            .Select(o => new { o.Enabled, o.HealthStatus, o.LastSuccessfulSyncAt, o.LastManualSyncAt })
+            .Select(o => new { o.OperatorId, o.Enabled })
             .ToListAsync(cancellationToken);
+
+        // Health is derived from the latest telemetry health check per enabled operator —
+        // the operator row carries no health rollup (single source of truth with the
+        // operators table, which derives the same way).
+        var enabledIds = operators.Where(o => o.Enabled).Select(o => o.OperatorId).ToList();
+        var healthStatuses = new List<int>();
+        if (enabledIds.Count > 0)
+        {
+            var latestCheckTimes = await Context.OperatorHealthChecks
+                .Where(c => enabledIds.Contains(c.OperatorId))
+                .GroupBy(c => c.OperatorId)
+                .Select(g => new { OperatorId = g.Key, Ts = g.Max(x => x.StartedAt) })
+                .ToListAsync(cancellationToken);
+            var latestTsSet = latestCheckTimes.Select(x => x.Ts).Distinct().ToList();
+            var latestRows = latestTsSet.Count == 0
+                ? []
+                : await Context.OperatorHealthChecks
+                    .Where(c => enabledIds.Contains(c.OperatorId) && latestTsSet.Contains(c.StartedAt))
+                    .Select(c => new { c.OperatorId, c.StartedAt, c.Status })
+                    .ToListAsync(cancellationToken);
+            healthStatuses = latestCheckTimes
+                .Select(t => latestRows.FirstOrDefault(r => r.OperatorId == t.OperatorId && r.StartedAt == t.Ts)?.Status)
+                .Where(s => s.HasValue)
+                .Select(s => s!.Value)
+                .ToList();
+        }
 
         var deviceStats = await Context.Devices
             .Where(d => d.Operator!.AccountId == scoped)
@@ -98,9 +124,9 @@ public sealed class GpsIntegrationDashboardReader(IApplicationDbContext context,
         return new GpsIntegrationDashboardVm(
             OperatorsTotal: operators.Count,
             OperatorsEnabled: operators.Count(o => o.Enabled),
-            OperatorsHealthy: operators.Count(o => o.HealthStatus == (int)OperatorHealthStatus.Healthy),
-            OperatorsDegraded: operators.Count(o => o.HealthStatus == (int)OperatorHealthStatus.Degraded),
-            OperatorsOffline: operators.Count(o => o.HealthStatus == (int)OperatorHealthStatus.Offline),
+            OperatorsHealthy: healthStatuses.Count(s => s == (int)OperatorHealthStatus.Healthy),
+            OperatorsDegraded: healthStatuses.Count(s => s == (int)OperatorHealthStatus.Degraded),
+            OperatorsOffline: healthStatuses.Count(s => s == (int)OperatorHealthStatus.Offline),
             DevicesTotal: devicesTotal,
             DevicesNew: CountStatus(DetectedStatus.New),
             DevicesAvailable: CountStatus(DetectedStatus.Available),

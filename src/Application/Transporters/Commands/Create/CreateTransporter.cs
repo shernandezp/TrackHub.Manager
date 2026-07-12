@@ -22,7 +22,7 @@ public readonly record struct CreateTransporterCommand(TransporterDto Transporte
 
 public class CreateTransporterCommandHandler(ITransporterWriter writer, IUserReader userReader, IUser user) : IRequestHandler<CreateTransporterCommand, TransporterVm>
 {
-    private Guid UserId { get; } = user.Id is null ? throw new UnauthorizedAccessException() : new Guid(user.Id);
+    private Guid UserId { get; } = Guid.TryParse(user.Id, out var userId) ? userId : throw new UnauthorizedAccessException();
 
     public async Task<TransporterVm> Handle(CreateTransporterCommand request, CancellationToken cancellationToken)
     {

@@ -21,7 +21,7 @@ public class GetAccountsQueryTests
     [Test]
     public async Task Handle_ReturnsAccounts()
     {
-        var list = new List<AccountVm> { new(Guid.NewGuid(), "A", null, default, 1, true, DateTimeOffset.UtcNow) };
+        var list = new List<AccountVm> { new(Guid.NewGuid(), "A", null, default, 1, Common.Domain.Enums.AccountStatus.Active, 2, true, DateTimeOffset.UtcNow) };
         _readerMock.Setup(r => r.GetAccountsAsync(CancellationToken.None)).ReturnsAsync(list);
 
         var result = await _handler.Handle(new GetAccountsQuery(), CancellationToken.None);

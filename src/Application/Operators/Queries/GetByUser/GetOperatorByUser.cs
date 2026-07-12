@@ -22,7 +22,7 @@ public readonly record struct GetOperatorByUserQuery() : IRequest<IReadOnlyColle
 
 public class GetOperatorsByUserQueryHandler(IOperatorReader reader, IUser user) : IRequestHandler<GetOperatorByUserQuery, IReadOnlyCollection<OperatorVm>>
 {
-    private Guid UserId { get; } = user.Id is null ? throw new UnauthorizedAccessException() : new Guid(user.Id);
+    private Guid UserId { get; } = Guid.TryParse(user.Id, out var userId) ? userId : throw new UnauthorizedAccessException();
 
     public async Task<IReadOnlyCollection<OperatorVm>> Handle(GetOperatorByUserQuery request, CancellationToken cancellationToken)
         => await reader.GetOperatorsByUserAsync(UserId, cancellationToken);

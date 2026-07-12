@@ -14,7 +14,7 @@ public sealed class TransporterDeviceAssignmentWriter(IApplicationDbContext cont
 {
     public async Task<TransporterDeviceAssignmentVm> AssignAsync(TransporterDeviceAssignmentDto dto, CancellationToken cancellationToken)
     {
-        var scopedAccount = RequireAccountAccess(dto.AccountId);
+        var scopedAccount = RequireAccountWriteAccess(dto.AccountId);
 
         var device = await Context.Devices.Include(d => d.Operator)
             .FirstOrDefaultAsync(d => d.DeviceId == dto.DeviceId, cancellationToken)
@@ -89,7 +89,7 @@ public sealed class TransporterDeviceAssignmentWriter(IApplicationDbContext cont
         var entity = await Context.TransporterDeviceAssignments.Include(a => a.Device)
             .FirstOrDefaultAsync(a => a.TransporterDeviceAssignmentId == assignmentId, cancellationToken)
             ?? throw new NotFoundException(nameof(TransporterDeviceAssignment), $"{assignmentId}");
-        RequireAccountAccess(entity.AccountId);
+        RequireAccountWriteAccess(entity.AccountId);
         if (entity.Status != (int)AssignmentStatus.Active)
         {
             return;

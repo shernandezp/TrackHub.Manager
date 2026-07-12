@@ -18,6 +18,7 @@ using Common.Application;
 using Common.Web.Infrastructure;
 using System.Reflection;
 using TrackHub.Manager.Infrastructure;
+using TrackHub.Manager.Web.BackgroundServices;
 using TrackHub.Manager.Web.GraphQL.Mutation;
 using TrackHub.Manager.Web.GraphQL.Query;
 
@@ -36,18 +37,20 @@ builder.Services.AddAppSecurityContext();
 builder.Services.AddAppRouterContext(builder.Configuration);
 builder.Services.AddWebServices();
 
+// Trial-expiration enforcement job (spec 03 §10).
+builder.Services.AddHostedService<TrialExpirationService>();
+
+// Document jobs (spec 04 §10): scan-result processing (quarantine → clean/infected) and the
+// 30/15/7-day expiration scan.
+builder.Services.AddHostedService<DocumentScanService>();
+builder.Services.AddHostedService<DocumentExpirationService>();
+builder.Services.AddHostedService<DocumentRetentionCleanupService>();
+
 // Add HealthChecks
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<ApplicationDbContext>();
 
-builder.Services
-    .AddGraphQLServer()
-    .AddAuthorization()
-    .AddMaxExecutionDepthRule(15)
-    .AddErrorFilter<TrackHubGraphQLErrorFilter>()
-    .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = builder.Environment.IsDevelopment())
-    .AddQueryType<Query>()
-    .AddMutationType<Mutation>();
+builder.Services.AddTrackHubGraphQLServer<Query, Mutation>(builder.Environment.IsDevelopment());
 
 builder.Services.AddCors(options => options
     .AddPolicy("AllowFrontend",
@@ -81,6 +84,11 @@ if (!app.Environment.IsDevelopment())
 app.UseHealthChecks("/health");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+// Explicit: WebApplication would auto-insert these, but authentication must not depend on
+// pipeline inference.
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseExceptionHandler(options => { });
 

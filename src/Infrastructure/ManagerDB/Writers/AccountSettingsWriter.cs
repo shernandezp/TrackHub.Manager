@@ -39,8 +39,6 @@ public sealed class AccountSettingsWriter(IApplicationDbContext context) : IAcco
             accountSettings.Maps,
             accountSettings.MapsKey,
             accountSettings.OnlineInterval,
-            accountSettings.StoreLastPosition,
-            accountSettings.StoringInterval,
             accountSettings.RefreshMap,
             accountSettings.RefreshMapInterval);
     }
@@ -62,8 +60,6 @@ public sealed class AccountSettingsWriter(IApplicationDbContext context) : IAcco
         accountSettings.Maps = accountSettingsDto.Maps;
         accountSettings.MapsKey = accountSettingsDto.MapsKey;
         accountSettings.OnlineInterval = accountSettingsDto.OnlineInterval;
-        accountSettings.StoreLastPosition = accountSettingsDto.StoreLastPosition;
-        accountSettings.StoringInterval = accountSettingsDto.StoringInterval;
         accountSettings.RefreshMap = accountSettingsDto.RefreshMap;
         accountSettings.RefreshMapInterval = accountSettingsDto.RefreshMapInterval;
 

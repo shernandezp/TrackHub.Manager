@@ -1,6 +1,7 @@
 using Common.Application.Exceptions;
 using Common.Application.Interfaces;
 using Common.Domain.Constants;
+using TrackHub.Manager.Domain.Constants;
 using TrackHub.Manager.Infrastructure.Entities;
 using TrackHub.Manager.Infrastructure.Interfaces;
 
@@ -13,7 +14,32 @@ public abstract class AccountScopedDataAccess(IApplicationDbContext context, ICu
 
     protected bool CanAccessAllAccounts => Principal.PrincipalType == PrincipalType.ServiceClient && !Principal.AccountId.HasValue;
 
+    /// <summary>
+    /// Whether the current principal reads account-wide (bypassing group scoping): Administrator or
+    /// Manager roles, or a global service client. Plain users are narrowed by group membership.
+    /// Mirrors the POI privileged-bypass rule.
+    /// </summary>
+    protected bool IsPrivileged =>
+        CanAccessAllAccounts
+        || string.Equals(Principal.Role, Roles.Administrator, StringComparison.OrdinalIgnoreCase)
+        || string.Equals(Principal.Role, Roles.Manager, StringComparison.OrdinalIgnoreCase);
+
     protected Guid RequireAccountAccess(Guid accountId)
+        => RequireAccountAccess(accountId, forWrite: false);
+
+    /// <summary>
+    /// Account-access check for mutation paths: a support-grant-based access requires a writable
+    /// (AccessLevel = Full) grant. Writers call this instead of <see cref="RequireAccountAccess(Guid)"/>.
+    /// </summary>
+    protected Guid RequireAccountWriteAccess(Guid accountId)
+        => RequireAccountAccess(accountId, forWrite: true);
+
+    /// <summary>
+    /// Authorizes access to <paramref name="accountId"/>. When <paramref name="forWrite"/> is true and
+    /// the only basis for access is an <c>AccountSupportGrant</c>, the grant must permit writes
+    /// (AccessLevel = Full); a read-only grant is rejected for mutations.
+    /// </summary>
+    protected Guid RequireAccountAccess(Guid accountId, bool forWrite)
     {
         if (accountId == Guid.Empty)
         {
@@ -23,7 +49,7 @@ public abstract class AccountScopedDataAccess(IApplicationDbContext context, ICu
         if (CanAccessAllAccounts
             || Principal.AccountId == accountId
             || UserBelongsToAccount(accountId)
-            || HasActiveSupportGrant(accountId))
+            || HasActiveSupportGrant(accountId, forWrite))
         {
             return accountId;
         }
@@ -93,7 +119,7 @@ public abstract class AccountScopedDataAccess(IApplicationDbContext context, ICu
             Principal.CorrelationId));
     }
 
-    private bool HasActiveSupportGrant(Guid accountId)
+    private bool HasActiveSupportGrant(Guid accountId, bool forWrite)
     {
         if (!Principal.UserId.HasValue || !string.Equals(Principal.Role, Roles.Administrator, StringComparison.OrdinalIgnoreCase))
         {
@@ -107,7 +133,9 @@ public abstract class AccountScopedDataAccess(IApplicationDbContext context, ICu
             && x.ApprovedAt.HasValue
             && x.StartsAt <= now
             && x.EndsAt >= now
-            && !x.RevokedAt.HasValue);
+            && !x.RevokedAt.HasValue
+            // A read-only grant may satisfy reads but never a mutation.
+            && (!forWrite || x.AccessLevel == SupportAccessLevels.Full));
     }
 
     private bool UserBelongsToAccount(Guid accountId)

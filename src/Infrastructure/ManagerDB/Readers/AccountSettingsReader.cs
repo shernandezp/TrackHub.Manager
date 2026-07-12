@@ -65,8 +65,6 @@ public sealed class AccountSettingsReader(IApplicationDbContext context) : IAcco
             accountSettings.Maps,
             accountSettings.MapsKey,
             accountSettings.OnlineInterval,
-            accountSettings.StoreLastPosition,
-            accountSettings.StoringInterval,
             accountSettings.RefreshMap,
             accountSettings.RefreshMapInterval);
 }

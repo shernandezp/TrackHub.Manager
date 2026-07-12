@@ -31,6 +31,8 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
         builder.Property(x => x.Description).HasColumnName("description");
         builder.Property(x => x.Type).HasColumnName("type");
         builder.Property(x => x.Active).HasColumnName("active");
+        builder.Property(x => x.Status).HasColumnName("status");
+        builder.Property(x => x.StatusChangedAt).HasColumnName("statuschangedat");
 
         builder.Property(t => t.Name)
             .HasMaxLength(ColumnMetadata.DefaultNameLength)
@@ -39,6 +41,10 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
         builder.Property(t => t.Description)
             .HasMaxLength(ColumnMetadata.DefaultDescriptionLength)
             .IsRequired();
+
+        // Lifecycle reports/filtering (spec 03 §6.2) and the DM-05 secondary-index gap.
+        builder.HasIndex(x => x.Status);
+        builder.HasIndex(x => x.Name);
 
         builder
             .HasMany(e => e.Users)
@@ -74,6 +80,12 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             .HasOne(d => d.AccountSettings)
             .WithOne(d => d.Account)
             .HasForeignKey<AccountSettings>(d => d.AccountId)
+            .IsRequired(false);
+
+        builder
+            .HasOne(d => d.AccountBranding)
+            .WithOne(d => d.Account)
+            .HasForeignKey<AccountBranding>(d => d.AccountId)
             .IsRequired(false);
     }
 }

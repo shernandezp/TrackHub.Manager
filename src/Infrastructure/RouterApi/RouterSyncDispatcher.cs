@@ -24,6 +24,13 @@ namespace TrackHub.Manager.Infrastructure.RouterApi;
 public sealed class RouterSyncDispatcher(IGraphQLClientFactory graphQLClient)
     : GraphQLService(graphQLClient.CreateClient(Clients.Router)), ISyncDispatcher
 {
+    // Single source of truth for the mutation this dispatcher sends; the
+    // ServiceContracts tests validate this exact string against the Router schema.
+    internal const string TriggerOperatorSyncMutation = @"
+                mutation($command: TriggerOperatorSyncCommandInput!) {
+                    triggerOperatorSync(command: $command)
+                }";
+
     public async Task<bool> DispatchManualSyncAsync(
         Guid accountId,
         Guid operatorId,
@@ -33,10 +40,7 @@ public sealed class RouterSyncDispatcher(IGraphQLClientFactory graphQLClient)
     {
         var request = new GraphQLRequest
         {
-            Query = @"
-                mutation($command: TriggerOperatorSyncCommandInput!) {
-                    triggerOperatorSync(command: $command)
-                }",
+            Query = TriggerOperatorSyncMutation,
             Variables = new
             {
                 command = new

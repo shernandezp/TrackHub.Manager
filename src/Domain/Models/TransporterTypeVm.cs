@@ -21,4 +21,4 @@ public record struct TransporterTypeVm(
     double StoppedGap,
     double MaxDistance,
     double MaxTimeGap,
-    TransporterType type);
+    TransporterType Type);

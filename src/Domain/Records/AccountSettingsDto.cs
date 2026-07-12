@@ -20,8 +20,6 @@ public readonly record struct AccountSettingsDto(
     string Maps,
     string? MapsKey,
     int OnlineInterval,
-    bool StoreLastPosition,
-    int StoringInterval,
     bool RefreshMap,
     int RefreshMapInterval
     );

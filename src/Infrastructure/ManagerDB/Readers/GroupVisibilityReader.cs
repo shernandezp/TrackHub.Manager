@@ -4,7 +4,7 @@ using TrackHub.Manager.Infrastructure.Interfaces;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
-public sealed class GroupVisibilityReader(IApplicationDbContext context, ICurrentPrincipal principal) : AccountScopedDataAccess(context, principal), IGroupVisibilityReader
+public sealed class GroupVisibilityReader(IApplicationDbContext context, ICurrentPrincipal principal, IVisibleTransporterReader visibleReader) : AccountScopedDataAccess(context, principal), IGroupVisibilityReader
 {
     public async Task<bool> ValidateGroupVisibilityAsync(Guid accountId, Guid userId, string resourceType, string resourceId, CancellationToken cancellationToken)
     {
@@ -20,12 +20,10 @@ public sealed class GroupVisibilityReader(IApplicationDbContext context, ICurren
             return false;
         }
 
-        return await Context.Users
-            .Where(user => user.UserId == userId && user.AccountId == scopedAccountId && user.Active)
-            .SelectMany(user => user.Groups.Select(group => group.GroupId))
-            .Intersect(Context.Transporters
-                .Where(transporter => transporter.TransporterId == parsedResourceId && transporter.AccountId == scopedAccountId)
-                .SelectMany(transporter => transporter.Groups.Select(group => group.GroupId)))
-            .AnyAsync(cancellationToken);
+        // Reuse the single visibility primitive so the replay check answers identically to the map
+        // and its stored fallback — including the Administrator/Manager account-wide bypass
+        // (spec 01.3 A1.3, resolves K1).
+        var visibleTransporterIds = await visibleReader.GetVisibleTransporterIdsAsync(userId, scopedAccountId, cancellationToken);
+        return visibleTransporterIds.Contains(parsedResourceId);
     }
 }

@@ -13,6 +13,7 @@
 //  limitations under the License.
 //
 
+using Common.Domain.Enums;
 using Common.Infrastructure;
 
 namespace TrackHub.Manager.Infrastructure.Entities;
@@ -27,7 +28,14 @@ public class Account(string name, string? description, short type, bool active) 
 
     public short Type { get; set; } = type;
 
+    // Legacy on/off flag, retained as a derived compatibility surface: Active == Status ∈ {Trial, Active}.
     public bool Active { get; set; } = active;
+
+    // Authoritative operational state (spec 03 §6.1). Backfilled from Active on migration; seeded
+    // from Active on create.
+    public short Status { get; set; } = (short)AccountStatusExtensions.FromActiveFlag(active);
+
+    public DateTimeOffset? StatusChangedAt { get; set; }
 
     public IEnumerable<User> Users { get; } = [];
     public IEnumerable<Group> Groups { get; } = [];
@@ -37,5 +45,6 @@ public class Account(string name, string? description, short type, bool active) 
     public IEnumerable<Transporter> Transporters { get; } = [];
     public IEnumerable<Device> Devices { get; } = [];
     public AccountSettings? AccountSettings { get; set; }
+    public AccountBranding? AccountBranding { get; set; }
 
 }

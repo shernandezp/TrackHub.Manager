@@ -48,6 +48,8 @@ public class CreateAccountCommandHandlerTests
             accountDto.Description,
             default,
             accountDto.TypeId,
+            Common.Domain.Enums.AccountStatus.Active,
+            2,
             accountDto.Active,
             DateTimeOffset.UtcNow);
 

@@ -8,7 +8,9 @@ public class TransporterPositionHistoryConfiguration : IEntityTypeConfiguration<
 {
     public void Configure(EntityTypeBuilder<TransporterPositionHistory> builder)
     {
-        builder.ToTable(name: TableMetadata.TransporterPositionHistory, schema: SchemaMetadata.Application);
+        // Telemetry schema: append-heavy history is isolated from the app schema so a
+        // future Positions/Telemetry service extraction is a schema handover, not a hunt.
+        builder.ToTable(name: TableMetadata.TransporterPositionHistory, schema: SchemaMetadata.Telemetry);
         builder.Property(x => x.TransporterPositionHistoryId).HasColumnName("id");
         builder.Property(x => x.AccountId).HasColumnName("accountid");
         builder.Property(x => x.OperatorId).HasColumnName("operatorid");

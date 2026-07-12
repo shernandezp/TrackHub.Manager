@@ -1,3 +1,4 @@
+using Common.Application.Exceptions;
 using Common.Application.Interfaces;
 using TrackHub.Manager.Infrastructure.Entities;
 using TrackHub.Manager.Infrastructure.Interfaces;
@@ -8,7 +9,7 @@ public sealed class AccountSupportGrantWriter(IApplicationDbContext context, ICu
 {
     public async Task<AccountSupportGrantVm> CreateAccountSupportGrantAsync(AccountSupportGrantDto accountSupportGrant, CancellationToken cancellationToken)
     {
-        var entity = new AccountSupportGrant(RequireAccountAccess(accountSupportGrant.AccountId), accountSupportGrant.SupportUserId, accountSupportGrant.Reason, accountSupportGrant.TicketReference, accountSupportGrant.AccessLevel, accountSupportGrant.StartsAt, accountSupportGrant.EndsAt);
+        var entity = new AccountSupportGrant(RequireAccountWriteAccess(accountSupportGrant.AccountId), accountSupportGrant.SupportUserId, accountSupportGrant.Reason, accountSupportGrant.TicketReference, accountSupportGrant.AccessLevel, accountSupportGrant.StartsAt, accountSupportGrant.EndsAt);
         await Context.AccountSupportGrants.AddAsync(entity, cancellationToken);
         AddAuditEvent(entity.AccountId, "CreateAccountSupportGrant", "AccountSupportGrant", entity.AccountSupportGrantId.ToString(), null, AuditValues(entity));
         await Context.SaveChangesAsync(cancellationToken);
@@ -18,7 +19,15 @@ public sealed class AccountSupportGrantWriter(IApplicationDbContext context, ICu
     public async Task ApproveAccountSupportGrantAsync(Guid accountSupportGrantId, string approvedBy, CancellationToken cancellationToken)
     {
         var entity = await Context.AccountSupportGrants.FirstAsync(x => x.AccountSupportGrantId == accountSupportGrantId, cancellationToken);
-        RequireAccountAccess(entity.AccountId);
+        RequireAccountWriteAccess(entity.AccountId);
+
+        // Separation of duties: a grant may not be approved by the principal that created it.
+        var approverId = Principal.UserId?.ToString() ?? Principal.SubjectId;
+        if (!string.IsNullOrEmpty(entity.CreatedBy) && string.Equals(entity.CreatedBy, approverId, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new ForbiddenAccessException("A support grant must be approved by a principal other than its creator.");
+        }
+
         Context.AccountSupportGrants.Attach(entity);
         var oldValues = AuditValues(entity);
         entity.ApprovedBy = approvedBy;
@@ -30,7 +39,7 @@ public sealed class AccountSupportGrantWriter(IApplicationDbContext context, ICu
     public async Task RevokeAccountSupportGrantAsync(Guid accountSupportGrantId, string revokedBy, CancellationToken cancellationToken)
     {
         var entity = await Context.AccountSupportGrants.FirstAsync(x => x.AccountSupportGrantId == accountSupportGrantId, cancellationToken);
-        RequireAccountAccess(entity.AccountId);
+        RequireAccountWriteAccess(entity.AccountId);
         Context.AccountSupportGrants.Attach(entity);
         var oldValues = AuditValues(entity);
         entity.RevokedBy = revokedBy;

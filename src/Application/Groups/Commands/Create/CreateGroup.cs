@@ -22,7 +22,7 @@ public readonly record struct CreateGroupCommand(GroupDto Group) : IRequest<Grou
 
 public class CreateGroupCommandHandler(IGroupWriter writer, IUserReader userReader, IUser user) : IRequestHandler<CreateGroupCommand, GroupVm>
 {
-    private Guid UserId { get; } = user.Id is null ? throw new UnauthorizedAccessException() : new Guid(user.Id);
+    private Guid UserId { get; } = Guid.TryParse(user.Id, out var userId) ? userId : throw new UnauthorizedAccessException();
 
     public async Task<GroupVm> Handle(CreateGroupCommand request, CancellationToken cancellationToken)
     {

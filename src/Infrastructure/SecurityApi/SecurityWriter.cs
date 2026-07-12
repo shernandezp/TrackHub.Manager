@@ -26,12 +26,9 @@ namespace TrackHub.Manager.Infrastructure.SecurityApi;
 public class SecurityWriter(IGraphQLClientFactory graphQLClient)
     : GraphQLService(graphQLClient.CreateClient(Clients.Security)), ISecurityWriter
 {
-    // Creates a new user asynchronously.
-    public async Task<UserVm> CreateUserAsync(CreateUserDto user, CancellationToken token)
-    {
-        var request = new GraphQLRequest
-        {
-            Query = @"
+    // Single source of truth for the mutation this writer sends; the
+    // ServiceContracts tests validate this exact string against the Security schema.
+    internal const string CreateManagerMutation = @"
                     mutation($username: String!, $password: String!, $lastName: String!, $firstName: String!, $emailAddress: String!, $active: Boolean!, $accountId: UUID!)
                     {
                       createManager(
@@ -43,6 +40,7 @@ public class SecurityWriter(IGraphQLClientFactory graphQLClient)
                             firstName: $firstName
                             emailAddress: $emailAddress
                             active: $active
+                            integrationUser: false
                           }
                           accountId: $accountId
                         }
@@ -52,7 +50,14 @@ public class SecurityWriter(IGraphQLClientFactory graphQLClient)
                             active
                             username
                         }
-                    }",
+                    }";
+
+    // Creates a new user asynchronously.
+    public async Task<UserVm> CreateUserAsync(CreateUserDto user, CancellationToken token)
+    {
+        var request = new GraphQLRequest
+        {
+            Query = CreateManagerMutation,
             Variables = new
             {
                 user.Username,

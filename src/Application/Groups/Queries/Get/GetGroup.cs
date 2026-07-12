@@ -22,7 +22,7 @@ public readonly record struct GetGroupQuery(long Id) : IRequest<GroupVm>;
 
 public class GetGroupsQueryHandler(IGroupReader reader, IUserReader userReader, IUser user) : IRequestHandler<GetGroupQuery, GroupVm>
 {
-    private Guid UserId { get; } = user.Id is null ? throw new UnauthorizedAccessException() : new Guid(user.Id);
+    private Guid UserId { get; } = Guid.TryParse(user.Id, out var userId) ? userId : throw new UnauthorizedAccessException();
 
     public async Task<GroupVm> Handle(GetGroupQuery request, CancellationToken cancellationToken)
     {

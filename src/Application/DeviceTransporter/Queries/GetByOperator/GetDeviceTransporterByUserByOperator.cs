@@ -22,7 +22,7 @@ public readonly record struct GetDeviceTransporterByUserByOperatorQuery(Guid Ope
 
 public class GetDeviceByUserByOperatorQueryHandler(IDeviceTransporterReader reader, IUser user) : IRequestHandler<GetDeviceTransporterByUserByOperatorQuery, IReadOnlyCollection<DeviceTransporterVm>>
 {
-    private Guid UserId { get; } = user.Id is null ? throw new UnauthorizedAccessException() : new Guid(user.Id);
+    private Guid UserId { get; } = Guid.TryParse(user.Id, out var userId) ? userId : throw new UnauthorizedAccessException();
 
     public async Task<IReadOnlyCollection<DeviceTransporterVm>> Handle(GetDeviceTransporterByUserByOperatorQuery request, CancellationToken cancellationToken)
         => await reader.GetDeviceTransporterByUserAsync(UserId, request.OperatorId, cancellationToken);

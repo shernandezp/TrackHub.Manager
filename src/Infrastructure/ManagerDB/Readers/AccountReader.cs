@@ -36,6 +36,8 @@ public sealed class AccountReader(IApplicationDbContext context) : IAccountReade
                 a.Description,
                 (AccountType)a.Type,
                 a.Type,
+                (AccountStatus)a.Status,
+                a.Status,
                 a.Active,
                 a.LastModified))
             .FirstAsync(cancellationToken);
@@ -53,6 +55,8 @@ public sealed class AccountReader(IApplicationDbContext context) : IAccountReade
                 a.Description,
                 (AccountType)a.Type,
                 a.Type,
+                (AccountStatus)a.Status,
+                a.Status,
                 a.Active,
                 a.LastModified))
             .ToListAsync(cancellationToken);

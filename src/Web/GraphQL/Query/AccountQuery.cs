@@ -15,6 +15,9 @@
 
 using TrackHub.Manager.Application.Accounts.Queries.Get;
 using TrackHub.Manager.Application.Accounts.Queries.GetAll;
+using TrackHub.Manager.Application.Accounts.Queries.GetBranding;
+using TrackHub.Manager.Application.Accounts.Queries.GetContext;
+using TrackHub.Manager.Application.Accounts.Queries.GetStatus;
 using TrackHub.Manager.Application.Accounts.Queries.GetMaster;
 using TrackHub.Manager.Application.Accounts.Queries.GetSettings;
 
@@ -23,6 +26,15 @@ namespace TrackHub.Manager.Web.GraphQL.Query;
 public partial class Query
 {
     public async Task<AccountVm> GetAccount([Service] ISender sender, [AsParameters] GetAccountQuery query)
+        => await sender.Send(query);
+
+    public async Task<AccountBrandingVm> GetAccountBranding([Service] ISender sender, [AsParameters] GetAccountBrandingQuery query)
+        => await sender.Send(query);
+
+    public async Task<AccountContextVm> GetAccountContext([Service] ISender sender)
+        => await sender.Send(new GetAccountContextQuery());
+
+    public async Task<short> GetAccountStatus([Service] ISender sender, [AsParameters] GetAccountStatusQuery query)
         => await sender.Send(query);
 
     public async Task<AccountVm> GetAccountByUser([Service] ISender sender)

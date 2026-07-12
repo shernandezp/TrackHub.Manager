@@ -13,12 +13,11 @@
 //  limitations under the License.
 //
 
-using System.Security.Cryptography;
-using System.Text;
 using Common.Web.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using TrackHub.Manager.Infrastructure;
 using TrackHub.Manager.Infrastructure.Entities;
+using TrackHub.Manager.Infrastructure.ManagerDB;
 
 namespace TrackHub.Manager.Web.Endpoints;
 
@@ -48,7 +47,7 @@ public sealed class PublicLinks : EndpointGroupBase
             return Results.BadRequest();
         }
 
-        var tokenHash = HashPublicLinkToken(token);
+        var tokenHash = PublicLinkTokenHasher.Hash(token);
         var grant = await context.PublicLinkGrants
             .FirstOrDefaultAsync(x =>
                 x.PublicLinkGrantId == publicLinkGrantId
@@ -99,9 +98,6 @@ public sealed class PublicLinks : EndpointGroupBase
             grant.LastAccessedAt
         });
     }
-
-    private static string HashPublicLinkToken(string token)
-        => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
 
     private static bool HasScope(string scopes, string requestedScope)
         => scopes

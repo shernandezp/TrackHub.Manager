@@ -22,7 +22,7 @@ public readonly record struct GetGroupByAccountQuery() : IRequest<IReadOnlyColle
 
 public class GetGroupsQueryHandler(IGroupReader reader, IUserReader userReader, IUser user) : IRequestHandler<GetGroupByAccountQuery, IReadOnlyCollection<GroupVm>>
 {
-    private Guid UserId { get; } = user.Id is null ? throw new UnauthorizedAccessException() : new Guid(user.Id);
+    private Guid UserId { get; } = Guid.TryParse(user.Id, out var userId) ? userId : throw new UnauthorizedAccessException();
 
     public async Task<IReadOnlyCollection<GroupVm>> Handle(GetGroupByAccountQuery request, CancellationToken cancellationToken)
     {

@@ -84,7 +84,7 @@ public class CredentialWriterTests
         await context.SaveChangesAsync(CancellationToken.None);
 
         var writer = new CredentialWriter(context as IApplicationDbContext, Principal(accountId));
-        var dto = new UpdateTokenDto(credential.CredentialId, "token", DateTime.UtcNow.AddHours(1), "refresh", DateTime.UtcNow.AddDays(1));
+        var dto = new UpdateTokenDto(credential.CredentialId, "token", DateTimeOffset.UtcNow.AddHours(1), "refresh", DateTimeOffset.UtcNow.AddDays(1));
 
         await writer.UpdateTokenAsync(dto, EncryptionKey, CancellationToken.None);
 
@@ -105,7 +105,7 @@ public class CredentialWriterTests
         await context.SaveChangesAsync(CancellationToken.None);
 
         var writer = new CredentialWriter(context as IApplicationDbContext, Principal(Guid.NewGuid()));
-        var dto = new UpdateTokenDto(credential.CredentialId, "token", DateTime.UtcNow.AddHours(1), "refresh", DateTime.UtcNow.AddDays(1));
+        var dto = new UpdateTokenDto(credential.CredentialId, "token", DateTimeOffset.UtcNow.AddHours(1), "refresh", DateTimeOffset.UtcNow.AddDays(1));
 
         Assert.ThrowsAsync<ForbiddenAccessException>(async () =>
             await writer.UpdateTokenAsync(dto, EncryptionKey, CancellationToken.None));
@@ -124,7 +124,7 @@ public class CredentialWriterTests
         principal.SetupGet(p => p.PrincipalType).Returns(PrincipalType.ServiceClient);
 
         var writer = new CredentialWriter(context as IApplicationDbContext, principal.Object);
-        var dto = new UpdateTokenDto(credential.CredentialId, "token", DateTime.UtcNow.AddHours(1), "refresh", DateTime.UtcNow.AddDays(1));
+        var dto = new UpdateTokenDto(credential.CredentialId, "token", DateTimeOffset.UtcNow.AddHours(1), "refresh", DateTimeOffset.UtcNow.AddDays(1));
 
         await writer.UpdateTokenAsync(dto, EncryptionKey, CancellationToken.None);
 
