@@ -28,6 +28,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<AccountSettings> AccountSettings { get; set; }
     public DbSet<AccountSupportGrant> AccountSupportGrants { get; set; }
     public DbSet<AlertEvent> AlertEvents { get; set; }
+    public DbSet<AlertSubscription> AlertSubscriptions { get; set; }
     public DbSet<AuditEvent> AuditEvents { get; set; }
     public DbSet<BackgroundJobRun> BackgroundJobRuns { get; set; }
     public DbSet<Credential> Credentials { get; set; }
@@ -44,6 +45,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Group> Groups { get; set; }
     public DbSet<NotificationDelivery> NotificationDeliveries { get; set; }
     public DbSet<NotificationRule> NotificationRules { get; set; }
+    public DbSet<NotificationTemplate> NotificationTemplates { get; set; }
     public DbSet<Operator> Operators { get; set; }
     public DbSet<PublicLinkGrant> PublicLinkGrants { get; set; }
     public DbSet<Report> Reports { get; set; }

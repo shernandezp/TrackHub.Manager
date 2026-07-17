@@ -6,4 +6,6 @@ public interface INotificationWriter
     Task UpdateNotificationRuleAsync(Guid notificationRuleId, NotificationRuleDto notificationRule, CancellationToken cancellationToken);
     Task DisableNotificationRuleAsync(Guid notificationRuleId, CancellationToken cancellationToken);
     Task<NotificationDeliveryVm> CreateNotificationDeliveryAsync(NotificationDeliveryDto notificationDelivery, CancellationToken cancellationToken);
+    Task RetryNotificationDeliveryAsync(Guid notificationDeliveryId, CancellationToken cancellationToken);
+    Task MarkNotificationReadAsync(Guid notificationDeliveryId, CancellationToken cancellationToken);
 }

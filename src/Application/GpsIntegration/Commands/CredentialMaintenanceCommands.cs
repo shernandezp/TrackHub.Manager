@@ -7,6 +7,7 @@
 
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using TrackHub.Manager.Application.AlertEvents.Events;
 
 namespace TrackHub.Manager.Application.GpsIntegration.Commands;
 
@@ -17,6 +18,7 @@ public readonly record struct EmitExpiringCredentialAlertsCommand(int WithinDays
 public class EmitExpiringCredentialAlertsCommandHandler(
     ICredentialReader credentialReader,
     IAlertEventWriter alertWriter,
+    IPublisher publisher,
     ILogger<EmitExpiringCredentialAlertsCommandHandler> logger)
     : IRequestHandler<EmitExpiringCredentialAlertsCommand, int>
 {
@@ -38,7 +40,7 @@ public class EmitExpiringCredentialAlertsCommandHandler(
             try
             {
                 var bucket = DateTimeOffset.UtcNow.ToString("yyyyMMdd");
-                await alertWriter.RecordAlertEventAsync(new AlertEventDto(
+                var alertEvent = await alertWriter.RecordAlertEventAsync(new AlertEventDto(
                     credential.AccountId,
                     EventType: "GpsCredentialExpiring",
                     Severity: "Warning",
@@ -57,6 +59,8 @@ public class EmitExpiringCredentialAlertsCommandHandler(
                     }),
                     DeduplicationKey: $"gps-credential-expiring:{credential.OperatorId:N}:{bucket}"),
                     cancellationToken);
+                // Notification fan-out (spec 05 §7.4); the event handler is non-blocking.
+                await publisher.Publish(new AlertEventRecorded.Notification(alertEvent), cancellationToken);
                 emitted++;
             }
             catch (Exception ex)

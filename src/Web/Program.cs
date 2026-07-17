@@ -46,6 +46,14 @@ builder.Services.AddHostedService<DocumentScanService>();
 builder.Services.AddHostedService<DocumentExpirationService>();
 builder.Services.AddHostedService<DocumentRetentionCleanupService>();
 
+// Alerts/notifications jobs (spec 05 §10): 30 s delivery dispatch, 5 min alert evaluation
+// (communication loss + escalation + daily credential-expiry emission), hourly digest fold, and
+// daily delivery retention.
+builder.Services.AddHostedService<NotificationDispatchService>();
+builder.Services.AddHostedService<AlertEvaluationService>();
+builder.Services.AddHostedService<NotificationDigestService>();
+builder.Services.AddHostedService<DeliveryRetentionService>();
+
 // Add HealthChecks
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<ApplicationDbContext>();

@@ -126,5 +126,35 @@ internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextIniti
             context.UserSettings.Add(new UserSettings(user.UserId));
             await context.SaveChangesAsync();
         }
+
+        // Platform default notification templates are NOT seeded (spec 05 audit decision): localized
+        // text never lives in the database. Defaults come from the NotificationDefaultMessages
+        // resources at render time; the templates table holds account-authored overrides only.
+        // Remove rows an earlier initializer version may have seeded.
+        var seededDefaults = await context.NotificationTemplates.Where(t => t.AccountId == null).ToListAsync();
+        if (seededDefaults.Count > 0)
+        {
+            context.NotificationTemplates.RemoveRange(seededDefaults);
+            await context.SaveChangesAsync();
+        }
+
+        // One-time gating backfill (spec 05 §15): rule CRUD is now gated by the `notifications`
+        // feature, so every account that already has NotificationRule rows gets an enabled feature
+        // row. Idempotent; runs through the entity writer path, never raw SQL.
+        var ruleAccounts = await context.NotificationRules.Select(r => r.AccountId).Distinct().ToListAsync();
+        var gatedAccounts = await context.AccountFeatures
+            .Where(f => f.FeatureKey == FeatureKeys.Notifications)
+            .Select(f => f.AccountId)
+            .Distinct()
+            .ToListAsync();
+        var missing = ruleAccounts.Except(gatedAccounts).ToList();
+        if (missing.Count > 0)
+        {
+            foreach (var accountId in missing)
+            {
+                context.AccountFeatures.Add(new AccountFeature(accountId, FeatureKeys.Notifications, true, "standard", "migration", null, null, null));
+            }
+            await context.SaveChangesAsync();
+        }
     }
 }

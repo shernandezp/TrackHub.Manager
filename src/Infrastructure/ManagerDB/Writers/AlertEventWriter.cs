@@ -1,3 +1,4 @@
+using Common.Application.Exceptions;
 using Common.Application.Interfaces;
 using TrackHub.Manager.Infrastructure.Entities;
 using TrackHub.Manager.Infrastructure.Interfaces;
@@ -9,6 +10,7 @@ public sealed class AlertEventWriter(IApplicationDbContext context, ICurrentPrin
     public async Task<AlertEventVm> RecordAlertEventAsync(AlertEventDto alertEvent, CancellationToken cancellationToken)
     {
         var accountId = RequireAccountWriteAccess(alertEvent.AccountId);
+        await RequireResourceInAccountAsync(accountId, alertEvent.ResourceType, alertEvent.ResourceId, cancellationToken);
         var entity = await Context.AlertEvents.FirstOrDefaultAsync(x => x.AccountId == accountId && x.DeduplicationKey == alertEvent.DeduplicationKey && x.Status != "Resolved", cancellationToken);
         if (entity == null)
         {
@@ -36,6 +38,29 @@ public sealed class AlertEventWriter(IApplicationDbContext context, ICurrentPrin
         Context.AlertEvents.Attach(entity);
         entity.Status = status;
         await Context.SaveChangesAsync(cancellationToken);
+    }
+
+    // The source resource must belong to the event's account (spec 05 §5). Resource types without a
+    // mapping in this context (e.g. Geofence, owned by the Geofencing service) pass through.
+    private async Task RequireResourceInAccountAsync(Guid accountId, string resourceType, string resourceId, CancellationToken cancellationToken)
+    {
+        var belongs = resourceType switch
+        {
+            "Transporter" => Guid.TryParse(resourceId, out var transporterId)
+                && await Context.Transporters.AnyAsync(x => x.TransporterId == transporterId && x.AccountId == accountId, cancellationToken),
+            "Operator" => Guid.TryParse(resourceId, out var operatorId)
+                && await Context.Operators.AnyAsync(x => x.OperatorId == operatorId && x.AccountId == accountId, cancellationToken),
+            "Document" => Guid.TryParse(resourceId, out var documentId)
+                && await Context.Documents.AnyAsync(x => x.DocumentId == documentId && x.AccountId == accountId, cancellationToken),
+            "Driver" => Guid.TryParse(resourceId, out var driverId)
+                && await Context.Drivers.AnyAsync(x => x.DriverId == driverId && x.AccountId == accountId, cancellationToken),
+            _ => true
+        };
+
+        if (!belongs)
+        {
+            throw new ForbiddenAccessException($"Alert source resource {resourceType} {resourceId} does not belong to account {accountId}.");
+        }
     }
 
     private static AlertEventVm ToVm(AlertEvent x) => new(x.AlertEventId, x.AccountId, x.EventType, x.Severity, x.SourceModule, x.ResourceType, x.ResourceId, x.Status, x.FirstSeenAt, x.LastSeenAt, x.PayloadJson, x.DeduplicationKey, x.LastModified);

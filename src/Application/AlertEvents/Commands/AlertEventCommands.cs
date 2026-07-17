@@ -1,10 +1,18 @@
+using TrackHub.Manager.Application.AlertEvents.Events;
+
 namespace TrackHub.Manager.Application.AlertEvents.Commands;
 
 [Authorize(Resource = Resources.Alerts, Action = Actions.Write)]
 public readonly record struct RecordAlertEventCommand(AlertEventDto AlertEvent) : IRequest<AlertEventVm>;
-public class RecordAlertEventCommandHandler(IAlertEventWriter writer) : IRequestHandler<RecordAlertEventCommand, AlertEventVm>
+public class RecordAlertEventCommandHandler(IAlertEventWriter writer, IPublisher publisher) : IRequestHandler<RecordAlertEventCommand, AlertEventVm>
 {
-    public async Task<AlertEventVm> Handle(RecordAlertEventCommand request, CancellationToken cancellationToken) => await writer.RecordAlertEventAsync(request.AlertEvent, cancellationToken);
+    public async Task<AlertEventVm> Handle(RecordAlertEventCommand request, CancellationToken cancellationToken)
+    {
+        var alertEvent = await writer.RecordAlertEventAsync(request.AlertEvent, cancellationToken);
+        // Rule evaluation is non-blocking: the event handler swallows its own failures (spec 05 §7.4).
+        await publisher.Publish(new AlertEventRecorded.Notification(alertEvent), cancellationToken);
+        return alertEvent;
+    }
 }
 
 [Authorize(Resource = Resources.Alerts, Action = Actions.Edit)]
