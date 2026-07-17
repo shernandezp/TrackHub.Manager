@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
+// Copyright (c) 2026 Sergio Hernandez. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License").
 //  You may not use this file except in compliance with the License.
@@ -11,20 +11,14 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
 
-using TrackHub.Manager.Application.Reports.Queries.GetAll;
-using TrackHub.Manager.Application.Reports.Queries.GetByCode;
+namespace TrackHub.Manager.Application.Reports.Queries.GetByCode;
 
-namespace TrackHub.Manager.Web.GraphQL.Query;
-
-public partial class Query
+public sealed class GetReportByCodeValidator : AbstractValidator<GetReportByCodeQuery>
 {
-
-    public async Task<IReadOnlyCollection<ReportVm>> GetReports([Service] ISender sender)
-        => await sender.Send(new GetReportsQuery());
-
-    public async Task<ReportVm?> GetReportByCode([Service] ISender sender, string code)
-        => await sender.Send(new GetReportByCodeQuery(code));
-
+    public GetReportByCodeValidator()
+    {
+        RuleFor(v => v.Code)
+            .NotEmpty();
+    }
 }

@@ -32,6 +32,11 @@ public class ReportConfiguration : IEntityTypeConfiguration<Report>
         builder.Property(x => x.Description).HasColumnName("description");
         builder.Property(x => x.Type).HasColumnName("type");
         builder.Property(x => x.Active).HasColumnName("active");
+        builder.Property(x => x.Category).HasColumnName("category").HasMaxLength(ColumnMetadata.DefaultFieldLength).IsRequired();
+        builder.Property(x => x.RequiredFeatureKey).HasColumnName("requiredfeaturekey").HasMaxLength(ColumnMetadata.DefaultNameLength);
+        builder.Property(x => x.ManagerOnly).HasColumnName("manageronly");
+        builder.Property(x => x.SupportsPdf).HasColumnName("supportspdf");
+        builder.Property(x => x.SortOrder).HasColumnName("sortorder");
 
         builder.Property(t => t.Description)
             .HasMaxLength(ColumnMetadata.DefaultDescriptionLength)

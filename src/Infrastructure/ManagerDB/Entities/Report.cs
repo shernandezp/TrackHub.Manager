@@ -17,7 +17,16 @@ using Common.Infrastructure;
 
 namespace TrackHub.Manager.Infrastructure.Entities;
 
-public class Report(string code, string? description, short type, bool active) : BaseAuditableEntity
+public class Report(
+    string code,
+    string? description,
+    short type,
+    bool active,
+    string category = "Operations",
+    string? requiredFeatureKey = null,
+    bool managerOnly = false,
+    bool supportsPdf = false,
+    int sortOrder = 0) : BaseAuditableEntity
 {
     public Guid ReportId { get; private set; } = Guid.NewGuid();
     public string Code { get; set; } = code;
@@ -25,4 +34,10 @@ public class Report(string code, string? description, short type, bool active) :
     public short Type { get; set; } = type;
     public bool Active { get; set; } = active;
 
+    // Catalog governance metadata (spec 06 §6): grouping, feature/role gating and format support.
+    public string Category { get; set; } = category;
+    public string? RequiredFeatureKey { get; set; } = requiredFeatureKey;
+    public bool ManagerOnly { get; set; } = managerOnly;
+    public bool SupportsPdf { get; set; } = supportsPdf;
+    public int SortOrder { get; set; } = sortOrder;
 }
