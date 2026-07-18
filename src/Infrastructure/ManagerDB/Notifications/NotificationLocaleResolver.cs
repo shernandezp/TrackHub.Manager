@@ -20,7 +20,7 @@ using TrackHub.Manager.Infrastructure.Interfaces;
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Notifications;
 
 /// <summary>
-/// Localization comes from the recipient, not the content (spec 05 audit decision): a User
+/// Localization comes from the recipient, not the content: a User
 /// recipient's own UserSettings.Language drives the message locale; contact endpoints and
 /// webhooks (no user identity behind them) fall back to the rule's configured locale, then
 /// English. In-app deliveries are never rendered server-side — the portal localizes them.

@@ -1,6 +1,6 @@
 namespace TrackHub.Manager.Domain.Records;
 
-// Evidence-only signature capture (spec 04 §6.3) — not a legal e-signature workflow.
+// Evidence-only signature capture — not a legal e-signature workflow.
 public readonly record struct DocumentSignatureDto(
     Guid DocumentId,
     string SignerPrincipalType,

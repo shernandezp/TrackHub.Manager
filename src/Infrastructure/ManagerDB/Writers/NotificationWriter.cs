@@ -74,7 +74,7 @@ public sealed class NotificationWriter(IApplicationDbContext context, ICurrentPr
         }
 
         Context.NotificationDeliveries.Attach(entity);
-        // Attempt counter preserved on manual retry (spec 05 §7.2).
+        // Attempt counter preserved on manual retry.
         entity.Status = DeliveryStatuses.Pending;
         entity.Error = null;
         await Context.SaveChangesAsync(cancellationToken);
@@ -96,7 +96,7 @@ public sealed class NotificationWriter(IApplicationDbContext context, ICurrentPr
         }
     }
 
-    // Rules, deliveries, and retries are administrative surfaces (spec 05 §4): the Notifications
+    // Rules, deliveries, and retries are administrative surfaces: the Notifications
     // resource-action grants are held by every portal role for the self-service surfaces
     // (feed/mark-read/subscriptions), so the admin-only distinction is enforced here.
     private void RequirePrivileged()
@@ -107,7 +107,7 @@ public sealed class NotificationWriter(IApplicationDbContext context, ICurrentPr
         }
     }
 
-    // Cross-account recipients are invalid (spec 05 §5): every explicit user/driver id in the
+    // Cross-account recipients are invalid: every explicit user/driver id in the
     // selector must belong to the rule's account. Malformed JSON is rejected upstream by the
     // command validator; this guard owns the membership part.
     private async Task RequireSelectorPrincipalsInAccountAsync(Guid accountId, string recipientSelector, CancellationToken cancellationToken)
@@ -153,7 +153,7 @@ public sealed class NotificationWriter(IApplicationDbContext context, ICurrentPr
             }
 
             // Role-addressed rows are shared by every account user holding the role; any of them may
-            // mark the single delivery read (spec 05 role-recipient decision).
+            // mark the single delivery read.
             if (entity.RecipientPrincipalType == RecipientPrincipalTypes.Role)
             {
                 return string.Equals(entity.Recipient, Principal.Role, StringComparison.OrdinalIgnoreCase)

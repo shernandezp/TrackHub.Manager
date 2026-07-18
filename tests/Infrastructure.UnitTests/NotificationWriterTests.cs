@@ -59,7 +59,7 @@ public class NotificationWriterTests
 
     // Rules/deliveries are admin surfaces: the Notifications action grants are held by every
     // portal role for self-service (feed/mark-read/subscriptions), so the privileged check
-    // lives in the writer (spec 05 §4).
+    // lives in the writer.
     [Test]
     public async Task CreateNotificationRuleAsync_NonPrivilegedUser_ThrowsForbidden()
     {

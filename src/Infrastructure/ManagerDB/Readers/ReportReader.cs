@@ -21,7 +21,7 @@ using TrackHub.Manager.Infrastructure.Interfaces;
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
 /// <summary>
-/// Provides methods to read report catalog data, applying the spec 06 §5/§6 visibility rules
+/// Provides methods to read report catalog data, applying the catalog visibility rules
 /// (feature gating + manager-only) against the caller's account and role.
 /// </summary>
 public sealed class ReportReader(IApplicationDbContext context, ICurrentPrincipal principal)

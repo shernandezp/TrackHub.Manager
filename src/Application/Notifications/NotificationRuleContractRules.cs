@@ -19,7 +19,7 @@ using TrackHub.Manager.Domain.Constants;
 namespace TrackHub.Manager.Application.Notifications;
 
 /// <summary>
-/// Formalized JSON contract validation for NotificationRule columns (spec 05 §7.1), shared by the
+/// Formalized JSON contract validation for NotificationRule columns, shared by the
 /// create/update rule validators. Legacy '' values parse as empty and stay valid. Account
 /// membership of selector ids is enforced by the writer; formats are enforced here.
 /// </summary>

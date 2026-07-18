@@ -15,7 +15,7 @@
 
 namespace TrackHub.Manager.Domain.Records;
 
-/// <summary>NotificationRule.ConfigurationJson knobs consumed by this module (spec 05 §7.4, §10, §14).</summary>
+/// <summary>NotificationRule.ConfigurationJson knobs consumed by this module.</summary>
 public sealed record RuleConfigurationModel
 {
     /// <summary>CommunicationLoss rules: minutes without a position before an alert (default 60).</summary>

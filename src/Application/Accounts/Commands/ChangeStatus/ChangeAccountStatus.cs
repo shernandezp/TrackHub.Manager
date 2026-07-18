@@ -20,7 +20,7 @@ using TrackHub.Manager.Domain.Constants;
 
 namespace TrackHub.Manager.Application.Accounts.Commands.ChangeStatus;
 
-// SuperAdministrator-only account lifecycle transition (spec 03 §7.2). [AllowSuspendedAccount] so a
+// SuperAdministrator-only account lifecycle transition. [AllowSuspendedAccount] so a
 // non-operational account can be reinstated/cancelled/archived.
 [Authorize(Resource = Resources.Administrative, Action = Actions.Write)]
 [AllowSuspendedAccount]

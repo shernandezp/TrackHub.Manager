@@ -8,7 +8,7 @@ using TrackHub.Manager.Domain.Models;
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Storage;
 
 /// <summary>
-/// S3-compatible object storage (spec 04 §14, §18.1) — AWS S3, MinIO, or any S3 API. Downloads use a
+/// S3-compatible object storage — AWS S3, MinIO, or any S3 API. Downloads use a
 /// short-lived presigned GET URL (the download endpoint 302-redirects the browser straight to S3, so the
 /// bytes never pass through the app). Works with any <see cref="IAmazonS3"/> (IAM role, keys, or S3-compatible
 /// service URL); the client is configured in <c>DependencyInjection</c> from the <c>DocumentStorage:S3</c> section.

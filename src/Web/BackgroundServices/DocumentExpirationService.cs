@@ -23,10 +23,10 @@ using TrackHub.Manager.Infrastructure.Entities;
 
 namespace TrackHub.Manager.Web.BackgroundServices;
 
-// Expiration scan (spec 04 §10, AC10): for Active documents crossing the 30/15/7-day thresholds, raise
+// Expiration scan: for Active documents crossing the 30/15/7-day thresholds, raise
 // exactly one DocumentExpiring per (document, threshold) — idempotency key {documentId}:{threshold} so a
 // threshold is never notified twice — and raise DocumentExpired past due. Runs host-internally against
-// the DB directly. Skips accounts without the `documents` feature (billing gate, spec 04 §10).
+// the DB directly. Skips accounts without the `documents` feature (billing gate).
 public sealed class DocumentExpirationService(
     IServiceScopeFactory scopeFactory,
     ILogger<DocumentExpirationService> logger) : BackgroundService
@@ -132,7 +132,7 @@ public sealed class DocumentExpirationService(
         context.BackgroundJobRuns.Add(new BackgroundJobRun(JobKey, accountId, documentId.ToString(), idempotencyKey, "Succeeded", 1, now) { CompletedAt = DateTimeOffset.UtcNow });
         await context.SaveChangesAsync(cancellationToken);
 
-        // Notification fan-out for the document alert (spec 05 §7.5); the evaluator swallows nothing —
+        // Notification fan-out for the document alert; the evaluator swallows nothing —
         // callers of this job treat evaluation failure as non-fatal via the outer cycle handler.
         await evaluator.EvaluateAsync(new AlertEventVm(alertEvent.AlertEventId, alertEvent.AccountId, alertEvent.EventType,
             alertEvent.Severity, alertEvent.SourceModule, alertEvent.ResourceType, alertEvent.ResourceId, alertEvent.Status,

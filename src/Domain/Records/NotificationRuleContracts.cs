@@ -20,7 +20,7 @@ using System.Text.RegularExpressions;
 namespace TrackHub.Manager.Domain.Records;
 
 /// <summary>
-/// Formalized JSON contracts for the NotificationRule columns (spec 05 §7.1). Existing rows written
+/// Formalized JSON contracts for the NotificationRule columns. Existing rows written
 /// as '' by the legacy portal dialog parse as empty (no channels / no recipients) — no migration.
 /// </summary>
 public static partial class NotificationRuleContracts

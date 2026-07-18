@@ -1,6 +1,6 @@
 namespace TrackHub.Manager.Domain.Models;
 
-// Version history view model (spec 04 §7.4). Storage keys are never exposed.
+// Version history view model. Storage keys are never exposed.
 public readonly record struct DocumentVersionVm(
     Guid DocumentVersionId,
     Guid DocumentId,

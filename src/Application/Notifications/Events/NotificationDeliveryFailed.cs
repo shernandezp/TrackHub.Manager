@@ -18,7 +18,7 @@ using Microsoft.Extensions.Logging;
 namespace TrackHub.Manager.Application.Notifications.Events;
 
 /// <summary>
-/// Published by the dispatcher when a delivery exhausts its retries (spec 05 §10). The
+/// Published by the dispatcher when a delivery exhausts its retries. The
 /// delivery-failure AlertEvent is recorded by the dispatcher itself (without rule evaluation —
 /// a failing channel must never notify itself into a loop); this event is the in-process signal.
 /// </summary>

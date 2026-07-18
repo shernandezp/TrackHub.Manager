@@ -27,13 +27,13 @@ using TrackHub.Manager.Infrastructure.ManagerDB.Notifications;
 
 namespace TrackHub.Manager.Web.BackgroundServices;
 
-// Delivery dispatcher (spec 05 §7.4, §10): scans Pending deliveries every 30 s and dispatches
+// Delivery dispatcher: scans Pending deliveries every 30 s and dispatches
 // through the INotificationChannelProvider implementations. Retries with exponential backoff
 // (1/5/15/60 min, max 5 attempts), then marks Failed with the provider error and raises a
 // NotificationDeliveryFailed alert event. A Sending in-flight status prevents double-send on
 // overlapping cycles; the delivery row itself is the idempotency record. Channel entitlements are
 // re-checked here: deliveries on a disabled billable channel are held (left Pending) so disabling
-// the feature stops sends immediately without deleting configuration (spec 05 AC7).
+// the feature stops sends immediately without deleting configuration.
 public sealed class NotificationDispatchService(
     IServiceScopeFactory scopeFactory,
     IConfiguration configuration,
@@ -91,7 +91,7 @@ public sealed class NotificationDispatchService(
             return;
         }
 
-        // Dispatch-time entitlement re-check (spec 05 §3, AC7, AC8): the base `notifications`
+        // Dispatch-time entitlement re-check: the base `notifications`
         // feature gates ALL dispatch for the account; Email/WhatsApp additionally need their
         // billable keys. Held deliveries stay Pending and resume when the feature is re-enabled.
         var accountIds = eligible.Select(d => d.AccountId).Distinct().ToList();
@@ -160,7 +160,7 @@ public sealed class NotificationDispatchService(
         }
     }
 
-    // Domain events per spec 05 §10; a publish failure must never disturb the dispatch loop.
+    // Domain events: a publish failure must never disturb the dispatch loop.
     private async Task PublishOutcomeAsync(IPublisher publisher, NotificationDelivery delivery, CancellationToken cancellationToken)
     {
         try
@@ -190,7 +190,7 @@ public sealed class NotificationDispatchService(
         if (delivery.Attempts >= MaxAttempts)
         {
             delivery.Status = DeliveryStatuses.Failed;
-            // Delivery-failure alert (spec 05 §10). Recorded directly (no rule evaluation) so a
+            // Delivery-failure alert. Recorded directly (no rule evaluation) so a
             // failing channel can never notify itself into a loop; it stays visible in the alert feed.
             context.AlertEvents.Add(new AlertEvent(
                 delivery.AccountId, AlertEventTypes.NotificationDeliveryFailed, AlertSeverities.Warning,
@@ -212,7 +212,7 @@ public sealed class NotificationDispatchService(
     {
         if (!providers.TryGetValue(delivery.Channel, out var provider))
         {
-            // No registered provider (e.g. Push before spec 10): fail terminally, no pointless retries.
+            // No registered provider (e.g. Push): fail terminally, no pointless retries.
             delivery.Attempts = MaxAttempts - 1;
             return new NotificationSendResult(false, null, $"No delivery provider is registered for channel '{delivery.Channel}'.");
         }
@@ -235,7 +235,7 @@ public sealed class NotificationDispatchService(
         var ruleConfiguration = NotificationRuleContracts.ParseConfiguration(rule?.ConfigurationJson);
 
         // In-app deliveries carry no server-rendered text: the portal localizes them from the
-        // event metadata through its own i18n layer (spec 05 audit decision).
+        // event metadata through its own i18n layer.
         if (delivery.Channel == NotificationChannels.InApp)
         {
             return new NotificationMessage(delivery.NotificationDeliveryId, delivery.AccountId, delivery.Recipient,

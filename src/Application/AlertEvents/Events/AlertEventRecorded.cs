@@ -18,9 +18,9 @@ using Microsoft.Extensions.Logging;
 namespace TrackHub.Manager.Application.AlertEvents.Events;
 
 /// <summary>
-/// Published after a recorded (or coalesced) alert event is persisted (spec 05 §7.4, §10). Rule
+/// Published after a recorded (or coalesced) alert event is persisted. Rule
 /// evaluation runs here and is strictly non-blocking: a failure is logged and never fails the
-/// originating recordAlertEvent (same rule as spec 02 audit forwarding).
+/// originating recordAlertEvent (same rule as the security audit forwarding).
 /// </summary>
 public sealed class AlertEventRecorded
 {

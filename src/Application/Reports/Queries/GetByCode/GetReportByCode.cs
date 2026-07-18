@@ -14,7 +14,7 @@
 
 namespace TrackHub.Manager.Application.Reports.Queries.GetByCode;
 
-// Metadata lookup consumed by the Reporting service at execution time (spec 06 §7.2/§7.3). Returns
+// Metadata lookup consumed by the Reporting service at execution time. Returns
 // the raw catalog row (including inactive rows) with no visibility filtering; Reporting enforces the
 // RequiredFeatureKey/ManagerOnly gates itself. Null for an unknown code.
 [Authorize(Resource = Resources.Reports, Action = Actions.Read)]

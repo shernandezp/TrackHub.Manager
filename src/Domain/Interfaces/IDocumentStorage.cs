@@ -1,7 +1,7 @@
 namespace TrackHub.Manager.Domain.Interfaces;
 
 /// <summary>
-/// Storage abstraction for document bytes (spec 04 §14, §18.1). S3-compatible object storage in
+/// Storage abstraction for document bytes. S3-compatible object storage in
 /// production (server-generated keys, short-lived presigned download URLs); local filesystem in
 /// development. The database stores metadata only; this interface is the only path to the bytes.
 /// </summary>

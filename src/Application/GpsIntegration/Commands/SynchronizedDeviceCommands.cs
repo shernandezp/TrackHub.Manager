@@ -90,7 +90,7 @@ public class SynchronizeOperatorDevicesCommandHandler(
 
         await operatorWriter.UpdateSyncSummaryAsync(request.OperatorId, finishedAt, triggerType, cancellationToken);
 
-        // Manager no longer records the sync run (spec 01.3 A6): it returns the counts and Router is
+        // Manager no longer records the sync run: it returns the counts and Router is
         // the single writer of sync-run telemetry, recording exactly one run per attempt (success or
         // failure) with identical field completeness. OperatorSyncRunId is left empty because this VM
         // is not persisted here.
@@ -208,7 +208,7 @@ public class SynchronizeOperatorDevicesCommandHandler(
 
             // Place every auto-provisioned transporter into the account's default group so plain
             // (group-scoped) users can see it on the live map. Manual group management can move it
-            // later; the sync never moves it again (spec 01.3 A1.1, root defect §2.1 / K2).
+            // later; the sync never moves it again.
             await transporterGroupWriter.CreateTransporterGroupAsync(
                 new TransporterGroupDto(transporter.TransporterId, defaultGroupId),
                 cancellationToken);

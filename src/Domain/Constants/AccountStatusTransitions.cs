@@ -16,7 +16,7 @@
 namespace TrackHub.Manager.Domain.Constants;
 
 /// <summary>
-/// The account lifecycle state machine (spec 03 §6.1). Enforced by the
+/// The account lifecycle state machine. Enforced by the
 /// <c>ChangeAccountStatusValidator</c>; a transition not present here is a validation error.
 /// </summary>
 public static class AccountStatusTransitions

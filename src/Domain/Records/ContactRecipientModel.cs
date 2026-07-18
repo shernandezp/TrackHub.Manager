@@ -15,7 +15,7 @@
 
 namespace TrackHub.Manager.Domain.Records;
 
-/// <summary>An explicit contact endpoint inside a recipient selector (spec 05 §7.1).</summary>
+/// <summary>An explicit contact endpoint inside a recipient selector.</summary>
 public sealed record ContactRecipientModel
 {
     public string Channel { get; init; } = string.Empty;

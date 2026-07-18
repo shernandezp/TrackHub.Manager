@@ -40,7 +40,7 @@ public sealed class AlertEventWriter(IApplicationDbContext context, ICurrentPrin
         await Context.SaveChangesAsync(cancellationToken);
     }
 
-    // The source resource must belong to the event's account (spec 05 §5). Resource types without a
+    // The source resource must belong to the event's account. Resource types without a
     // mapping in this context (e.g. Geofence, owned by the Geofencing service) pass through.
     private async Task RequireResourceInAccountAsync(Guid accountId, string resourceType, string resourceId, CancellationToken cancellationToken)
     {

@@ -18,8 +18,8 @@ using Microsoft.Extensions.Logging;
 namespace TrackHub.Manager.Application.Notifications.Events;
 
 /// <summary>
-/// Published by the dispatcher when a delivery is sent (spec 05 §10). Spec 22 hooks this (or the
-/// Sent delivery rows directly) for WhatsApp usage aggregation.
+/// Published by the dispatcher when a delivery is sent. Usage aggregation hooks this (or the
+/// Sent delivery rows directly) for WhatsApp billing.
 /// </summary>
 public sealed class NotificationDeliverySucceeded
 {

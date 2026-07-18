@@ -16,7 +16,7 @@
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Notifications;
 
 /// <summary>
-/// SMTP settings (spec 05 §14) — AppSettings:Smtp, env-overridable per the SVD-02 pattern.
+/// SMTP settings — AppSettings:Smtp, env-overridable in production.
 /// Dev points at a local capture container (e.g. smtp4dev); production needs a real relay.
 /// </summary>
 public sealed class SmtpOptions

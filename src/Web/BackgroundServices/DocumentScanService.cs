@@ -21,10 +21,10 @@ using TrackHub.Manager.Infrastructure.Entities;
 
 namespace TrackHub.Manager.Web.BackgroundServices;
 
-// Scan-result processing (spec 04 §10, AC6): finds Quarantined documents, runs the AV scanner, and
+// Scan-result processing: finds Quarantined documents, runs the AV scanner, and
 // transitions Quarantined → Clean (Active) / Infected / Failed. Infected files stay undownloadable and
 // raise a deduplicated alert. Runs host-internally against the DB directly (no per-account principal).
-// Security job — runs regardless of the `documents` feature (spec 04 §10).
+// Security job — runs regardless of the `documents` feature.
 public sealed class DocumentScanService(
     IServiceScopeFactory scopeFactory,
     ILogger<DocumentScanService> logger) : BackgroundService

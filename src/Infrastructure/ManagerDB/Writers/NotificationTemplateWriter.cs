@@ -10,7 +10,7 @@ public sealed class NotificationTemplateWriter(IApplicationDbContext context, IC
     public async Task<NotificationTemplateVm> CreateNotificationTemplateAsync(NotificationTemplateDto template, CancellationToken cancellationToken)
     {
         RequirePrivileged();
-        // Accounts create overrides only; platform defaults are resource-synthesized (spec 05 §7.2).
+        // Accounts create overrides only; platform defaults are resource-synthesized.
         if (!template.AccountId.HasValue)
         {
             throw new ForbiddenAccessException("Platform default templates are seed data and cannot be created through this surface.");
@@ -82,7 +82,7 @@ public sealed class NotificationTemplateWriter(IApplicationDbContext context, IC
         RequireAccountWriteAccess(entity.AccountId.Value);
     }
 
-    // Templates are an administrative surface (spec 05 §4); the Notifications action grants are
+    // Templates are an administrative surface; the Notifications action grants are
     // held by every portal role for the self-service surfaces, so admin-only is enforced here.
     private void RequirePrivileged()
     {

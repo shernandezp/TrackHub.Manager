@@ -94,8 +94,8 @@ public static class DependencyInjection
         services.AddScoped<IDocumentWriter, DocumentWriter>();
         services.AddScoped<IDocumentAccessPolicy, DocumentAccessPolicy>();
 
-        // Document storage provider selected by config (spec 04 §14, §18.1): LocalFileSystem (dev), S3, or
-        // AzureBlob. A real AV provider is a separate deployment blocker (§19); dev uses the no-op scanner.
+        // Document storage provider selected by config: LocalFileSystem (dev), S3, or
+        // AzureBlob. A real AV provider is a separate deployment blocker; dev uses the no-op scanner.
         AddDocumentStorage(services, configuration);
         services.AddSingleton<IDocumentScanner, NoOpDocumentScanner>();
         services.AddScoped<INotificationReader, NotificationReader>();
@@ -106,7 +106,7 @@ public static class DependencyInjection
         services.AddScoped<INotificationTemplateWriter, NotificationTemplateWriter>();
         services.AddScoped<IAlertRuleEvaluator, TrackHub.Manager.Infrastructure.ManagerDB.Services.AlertRuleEvaluator>();
 
-        // Notification channel providers (spec 05 §7.4, §14). Push is contract-only until spec 10.
+        // Notification channel providers. Push is contract-only for now.
         services.Configure<SmtpOptions>(configuration.GetSection(SmtpOptions.SectionName));
         services.Configure<WhatsAppOptions>(configuration.GetSection(WhatsAppOptions.SectionName));
         services.AddHttpClient(WebhookNotificationProvider.HttpClientName, client => client.Timeout = TimeSpan.FromSeconds(10));
@@ -138,7 +138,7 @@ public static class DependencyInjection
         services.AddMemoryCache();
         services.AddScoped<Common.Application.Interfaces.IFeatureFlagService, TrackHub.Manager.Infrastructure.ManagerDB.Services.FeatureFlagService>();
 
-        // Account lifecycle + branding (spec 03).
+        // Account lifecycle + branding.
         services.AddScoped<IAccountStatusWriter, AccountStatusWriter>();
         services.AddScoped<IAccountBrandingReader, AccountBrandingReader>();
         services.AddScoped<IAccountBrandingWriter, AccountBrandingWriter>();

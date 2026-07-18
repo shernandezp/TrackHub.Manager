@@ -77,7 +77,7 @@ public sealed class AlertSubscriptionWriter(IApplicationDbContext context, ICurr
         await Context.SaveChangesAsync(cancellationToken);
     }
 
-    // Admins manage any account principal; everyone else only themselves (spec 05 §7.2).
+    // Admins manage any account principal; everyone else only themselves.
     private void RequireSelfOrPrivileged(string principalType, Guid principalId)
     {
         if (IsPrivileged)
@@ -93,7 +93,7 @@ public sealed class AlertSubscriptionWriter(IApplicationDbContext context, ICurr
         }
     }
 
-    // Cross-account recipients are invalid (spec 05 §5).
+    // Cross-account recipients are invalid.
     private async Task RequirePrincipalInAccountAsync(Guid accountId, string principalType, Guid principalId, CancellationToken cancellationToken)
     {
         var belongs = principalType switch
@@ -108,7 +108,7 @@ public sealed class AlertSubscriptionWriter(IApplicationDbContext context, ICurr
         }
     }
 
-    // Driver subscriptions may default Contact from Driver.Phone (spec 05 §6).
+    // Driver subscriptions may default Contact from Driver.Phone.
     private async Task<string?> ResolveContactAsync(Guid accountId, AlertSubscriptionDto subscription, CancellationToken cancellationToken)
     {
         if (!string.IsNullOrWhiteSpace(subscription.Contact))

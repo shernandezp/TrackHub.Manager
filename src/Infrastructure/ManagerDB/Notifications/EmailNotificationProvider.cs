@@ -6,7 +6,7 @@ using TrackHub.Manager.Domain.Constants;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Notifications;
 
-/// <summary>Email channel over SMTP via MailKit (spec 05 §14).</summary>
+/// <summary>Email channel over SMTP via MailKit.</summary>
 public sealed class EmailNotificationProvider(IOptions<SmtpOptions> options) : INotificationChannelProvider
 {
     public string Channel => NotificationChannels.Email;

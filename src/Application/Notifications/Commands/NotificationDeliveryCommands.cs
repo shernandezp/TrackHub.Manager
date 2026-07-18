@@ -11,7 +11,7 @@ public class RetryNotificationDeliveryCommandHandler(INotificationWriter writer)
     public async Task Handle(RetryNotificationDeliveryCommand request, CancellationToken cancellationToken) => await writer.RetryNotificationDeliveryAsync(request.NotificationDeliveryId, cancellationToken);
 }
 
-// Receiving in-app notifications is not feature-gated (spec 05 §3): mark-read stays ungated.
+// Receiving in-app notifications is not feature-gated: mark-read stays ungated.
 [Authorize(Resource = Resources.Notifications, Action = Actions.Edit, PrincipalTypes = "User,Driver")]
 public readonly record struct MarkNotificationReadCommand(Guid NotificationDeliveryId) : IRequest;
 public class MarkNotificationReadCommandHandler(INotificationWriter writer) : IRequestHandler<MarkNotificationReadCommand>
@@ -20,7 +20,7 @@ public class MarkNotificationReadCommandHandler(INotificationWriter writer) : IR
 }
 
 /// <summary>
-/// Queues one test delivery through the normal dispatch pipeline (spec 05 §7.2); the dispatcher
+/// Queues one test delivery through the normal dispatch pipeline; the dispatcher
 /// renders the built-in TestNotification template. Backs the portal channel-setup UI.
 /// </summary>
 [Authorize(Resource = Resources.Notifications, Action = Actions.Custom)]

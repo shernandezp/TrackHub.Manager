@@ -16,7 +16,7 @@
 namespace TrackHub.Manager.Domain.Constants;
 
 /// <summary>
-/// Platform alert-event catalog (spec 05 §7.5). Emitters own raising these; kept in Manager until a
+/// Platform alert-event catalog. Emitters own raising these; kept in Manager until a
 /// second service needs them at compile time.
 /// </summary>
 public static class AlertEventTypes

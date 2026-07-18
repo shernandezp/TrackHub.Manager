@@ -19,7 +19,7 @@ using TrackHub.Manager.Domain.Constants;
 namespace TrackHub.Manager.Application.Notifications;
 
 /// <summary>
-/// Per-channel billable entitlements (spec 05 §3): Email and WhatsApp each require their own
+/// Per-channel billable entitlements: Email and WhatsApp each require their own
 /// feature key. Checked when a rule/subscription/test configures the channel and re-checked at
 /// dispatch time by the dispatcher.
 /// </summary>

@@ -34,7 +34,7 @@ public class Report(
     public short Type { get; set; } = type;
     public bool Active { get; set; } = active;
 
-    // Catalog governance metadata (spec 06 §6): grouping, feature/role gating and format support.
+    // Catalog governance metadata: grouping, feature/role gating and format support.
     public string Category { get; set; } = category;
     public string? RequiredFeatureKey { get; set; } = requiredFeatureKey;
     public bool ManagerOnly { get; set; } = managerOnly;

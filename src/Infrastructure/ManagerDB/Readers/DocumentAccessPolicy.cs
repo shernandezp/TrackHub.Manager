@@ -6,7 +6,7 @@ using TrackHub.Manager.Infrastructure.Interfaces;
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
 /// <summary>
-/// Maps <c>OwnerEntityType</c> to the correct visibility primitive (spec 04 §5, §18.4). Transporter
+/// Maps <c>OwnerEntityType</c> to the correct visibility primitive. Transporter
 /// owners use group visibility; Driver owners use assignment/default-transporter visibility; owner types
 /// without a registered resolver are deny-by-default. Also enforces the classification gate.
 /// </summary>
@@ -34,7 +34,7 @@ public sealed class DocumentAccessPolicy(
             return await CanAccessDriverOwnerAsync(scopedAccountId, ownerEntityId, cancellationToken);
         }
 
-        // Deny-by-default: owner type without a registered resolver (spec 04 §5, §11).
+        // Deny-by-default: owner type without a registered resolver.
         return false;
     }
 
@@ -69,7 +69,7 @@ public sealed class DocumentAccessPolicy(
             return false;
         }
 
-        // Driver principals are assignment-scoped and never receive group visibility (spec 04 §5).
+        // Driver principals are assignment-scoped and never receive group visibility.
         if (Principal.PrincipalType == PrincipalType.Driver)
         {
             return Principal.DriverId.HasValue
@@ -98,7 +98,7 @@ public sealed class DocumentAccessPolicy(
             return Principal.DriverId == driverId;
         }
 
-        // Users/service clients: account + group visibility of the driver's default transporter (spec 09).
+        // Users/service clients: account + group visibility of the driver's default transporter.
         var driver = await Context.Drivers
             .Where(d => d.DriverId == driverId && d.AccountId == accountId)
             .Select(d => new { d.DefaultTransporterId })

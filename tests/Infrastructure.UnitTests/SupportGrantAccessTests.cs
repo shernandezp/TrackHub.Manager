@@ -25,7 +25,7 @@ using TrackHub.Manager.Infrastructure.ManagerDB.Writers;
 
 namespace Infrastructure.UnitTests;
 
-// Spec 02 §7.4 / AC16: AccountSupportGrant.AccessLevel is enforced on mutation paths — a read-only
+// AccountSupportGrant.AccessLevel is enforced on mutation paths — a read-only
 // cross-account grant permits reads but every cross-account mutation is rejected. AC15: the mutating
 // driver writer emits an audit event. AC1: without any grant, cross-account access is forbidden.
 [TestFixture]

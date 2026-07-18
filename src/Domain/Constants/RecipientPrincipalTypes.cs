@@ -18,7 +18,7 @@ namespace TrackHub.Manager.Domain.Constants;
 /// <summary>
 /// Recipient principal types on NotificationDelivery/AlertSubscription. Role-addressed deliveries
 /// fan out at read time (feed matches the caller's token role within the account) — Manager stores
-/// no per-user role data, so role selectors never enumerate users (spec 05 §18.3 contact decision).
+/// no per-user role data, so role selectors never enumerate users.
 /// </summary>
 public static class RecipientPrincipalTypes
 {

@@ -19,7 +19,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                 nullable: false,
                 defaultValue: (short)0);
 
-            // Backfill lifecycle status from the legacy Active flag (spec 03 §6.1):
+            // Backfill lifecycle status from the legacy Active flag:
             // active = true  -> Active (2); active = false -> Suspended (3).
             migrationBuilder.Sql(
                 "UPDATE app.accounts SET status = CASE WHEN active THEN 2 ELSE 3 END;");

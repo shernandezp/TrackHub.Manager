@@ -4,8 +4,8 @@ using TrackHub.Manager.Domain.Interfaces;
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Storage;
 
 /// <summary>
-/// Development virus scanner (spec 04 §14, §18.5): marks every file Clean immediately. Production
-/// selects a real AV provider per deployment (external blocker, §19); until then quarantine-until-clean
+/// Development virus scanner: marks every file Clean immediately. Production
+/// selects a real AV provider per deployment; until then quarantine-until-clean
 /// is exercised end-to-end with this no-op returning Clean.
 /// </summary>
 public sealed class NoOpDocumentScanner : IDocumentScanner

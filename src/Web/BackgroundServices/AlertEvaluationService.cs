@@ -25,7 +25,7 @@ using TrackHub.Manager.Infrastructure.Entities;
 
 namespace TrackHub.Manager.Web.BackgroundServices;
 
-// Alert evaluation job (spec 05 §7.4, §10): every 5 minutes detects communication loss (stale
+// Alert evaluation job: every 5 minutes detects communication loss (stale
 // transporter positions) for accounts with an enabled CommunicationLoss rule, escalates
 // unacknowledged critical alerts once, and once a day emits GPS credential-expiry alerts
 // in-process (retiring the need for an external ServiceClient caller; the mutation remains for
@@ -129,7 +129,7 @@ public sealed class AlertEvaluationService(
         }
     }
 
-    // Single-step deterministic escalation (spec 05 §10, AC10): a critical alert unacknowledged past
+    // Single-step deterministic escalation: a critical alert unacknowledged past
     // the rule's escalateAfterMinutes gets exactly one role-addressed InApp delivery to administrators.
     private async Task EscalateUnacknowledgedCriticalAsync(ApplicationDbContext context, IReadOnlyCollection<Guid> accountIds, DateTimeOffset now, CancellationToken cancellationToken)
     {
@@ -195,7 +195,7 @@ public sealed class AlertEvaluationService(
         }
     }
 
-    // Daily in-process credential-expiry emission (spec 05 §7.4): mirrors
+    // Daily in-process credential-expiry emission: mirrors
     // EmitExpiringCredentialAlertsCommand (same dedup keys, so manual runs coalesce) for accounts
     // with gps.integration enabled.
     private async Task EmitCredentialExpiryDailyAsync(ApplicationDbContext context, IAlertRuleEvaluator evaluator, DateTimeOffset now, CancellationToken cancellationToken)
@@ -284,7 +284,7 @@ public sealed class AlertEvaluationService(
             .Where(f => f.FeatureKey == featureKey && f.Enabled
                 && (f.EffectiveFrom == null || f.EffectiveFrom <= now)
                 && (f.EffectiveTo == null || f.EffectiveTo >= now)
-                // Suspended accounts are skipped (spec 05 §7.4).
+                // Suspended accounts are skipped.
                 && context.Accounts.Any(a => a.AccountId == f.AccountId && a.Active))
             .Select(f => f.AccountId)
             .Distinct()

@@ -12,8 +12,8 @@ public sealed class AlertSubscriptionReader(IApplicationDbContext context, ICurr
     {
         var scopedAccountId = RequireAccountAccess(accountId);
 
-        // Non-privileged callers only see their own subscriptions (self-service filter, spec 05 §7.3).
-        // Full contact values are intentionally returned: this query backs the subscription editor (spec 05 §5).
+        // Non-privileged callers only see their own subscriptions (self-service filter).
+        // Full contact values are intentionally returned: this query backs the subscription editor.
         if (!IsPrivileged)
         {
             principalId = Principal.UserId ?? Principal.DriverId;

@@ -150,7 +150,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     table.PrimaryKey("PK_document_versions", x => x.id);
                 });
 
-            // Backfill existing rows (spec 04 §15): Category = "Other", a derived FileName, CurrentVersion = 1.
+            // Backfill existing rows: Category = "Other", a derived FileName, CurrentVersion = 1.
             migrationBuilder.Sql(
                 "UPDATE app.documents SET category = 'Other' WHERE category IS NULL OR category = '';");
             migrationBuilder.Sql(

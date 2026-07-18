@@ -7,9 +7,9 @@ using TrackHub.Manager.Domain.Constants;
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Notifications;
 
 /// <summary>
-/// WhatsApp channel — Meta WhatsApp Business Platform Cloud API, direct (spec 05 §14). Outbound,
+/// WhatsApp channel — Meta WhatsApp Business Platform Cloud API, direct. Outbound,
 /// template-based (utility category) only: the pre-approved template receives the rendered text as
-/// its single body parameter. Stores the provider message id for billing metering (spec 22).
+/// its single body parameter. Stores the provider message id for billing metering.
 /// </summary>
 public sealed class WhatsAppNotificationProvider(IHttpClientFactory httpClientFactory, IOptions<WhatsAppOptions> options) : INotificationChannelProvider
 {

@@ -22,7 +22,7 @@ public sealed class GroupVisibilityReader(IApplicationDbContext context, ICurren
 
         // Reuse the single visibility primitive so the replay check answers identically to the map
         // and its stored fallback — including the Administrator/Manager account-wide bypass
-        // (spec 01.3 A1.3, resolves K1).
+        //.
         var visibleTransporterIds = await visibleReader.GetVisibleTransporterIdsAsync(userId, scopedAccountId, cancellationToken);
         return visibleTransporterIds.Contains(parsedResourceId);
     }

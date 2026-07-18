@@ -59,7 +59,7 @@ public class EmitExpiringCredentialAlertsCommandHandler(
                     }),
                     DeduplicationKey: $"gps-credential-expiring:{credential.OperatorId:N}:{bucket}"),
                     cancellationToken);
-                // Notification fan-out (spec 05 §7.4); the event handler is non-blocking.
+                // Notification fan-out; the event handler is non-blocking.
                 await publisher.Publish(new AlertEventRecorded.Notification(alertEvent), cancellationToken);
                 emitted++;
             }

@@ -19,7 +19,7 @@ using Common.Domain.Enums;
 namespace TrackHub.Manager.Application.Accounts.Queries.GetContext;
 
 // Single bootstrap read for the current principal's account (status + branding + features).
-// [AllowSuspendedAccount] so portal/mobile can render a suspension state (spec 03 §7.3).
+// [AllowSuspendedAccount] so portal/mobile can render a suspension state.
 [Authorize(Resource = Resources.Accounts, Action = Actions.Read)]
 [AllowSuspendedAccount]
 public readonly record struct GetAccountContextQuery() : IRequest<AccountContextVm>;

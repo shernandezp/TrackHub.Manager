@@ -5,7 +5,7 @@ using TrackHub.Manager.Domain.Interfaces;
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Storage;
 
 /// <summary>
-/// Development storage provider (spec 04 §14, §18.1): persists document bytes on the local filesystem
+/// Development storage provider: persists document bytes on the local filesystem
 /// under a configured root. Streams downloads (no presigned URL). Storage keys are server-generated
 /// (<c>{accountId}/{ownerType}/{documentId}/{version}</c>) and map to nested directories.
 /// </summary>

@@ -18,8 +18,8 @@ using Microsoft.Extensions.Logging;
 
 namespace TrackHub.Manager.Application.Accounts.Events;
 
-// Raised on every account lifecycle transition (spec 03 §10). Delivery/notification is owned by
-// spec 05; this slice only guarantees the event exists carrying account/actor/correlation data.
+// Raised on every account lifecycle transition. Delivery/notification is owned by
+// the notifications pipeline; this event only carries account/actor/correlation data.
 public sealed class AccountStatusChanged
 {
     public readonly record struct Notification(

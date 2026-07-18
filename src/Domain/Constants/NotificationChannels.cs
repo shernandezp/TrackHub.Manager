@@ -15,7 +15,7 @@
 
 namespace TrackHub.Manager.Domain.Constants;
 
-/// <summary>Notification channels (spec 05 §7.1). Stored as strings in ChannelsJson and deliveries.</summary>
+/// <summary>Notification channels. Stored as strings in ChannelsJson and deliveries.</summary>
 public static class NotificationChannels
 {
     public const string InApp = nameof(InApp);

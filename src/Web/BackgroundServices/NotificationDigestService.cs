@@ -24,7 +24,7 @@ using TrackHub.Manager.Infrastructure.ManagerDB.Notifications;
 
 namespace TrackHub.Manager.Web.BackgroundServices;
 
-// Digest job (spec 05 §10): hourly, folds Deferred deliveries into one pre-rendered summary
+// Digest job: hourly, folds Deferred deliveries into one pre-rendered summary
 // delivery per (rule, recipient, channel) and marks the originals Digested. Rules with a Daily
 // cadence fold at most once per 24 h (tracked by the previous summary for the same group).
 public sealed class NotificationDigestService(
@@ -72,7 +72,7 @@ public sealed class NotificationDigestService(
             .Where(r => ruleIds.Contains(r.NotificationRuleId))
             .ToDictionaryAsync(r => r.NotificationRuleId, cancellationToken);
 
-        // Disabling `notifications` stops dispatch for the account (spec 05 AC8) — folding a digest
+        // Disabling `notifications` stops dispatch for the account — folding a digest
         // is dispatch preparation, so those groups are held until the feature is re-enabled.
         var digestAccountIds = deferred.Select(d => d.AccountId).Distinct().ToList();
         var enabledAccounts = await context.AccountFeatures

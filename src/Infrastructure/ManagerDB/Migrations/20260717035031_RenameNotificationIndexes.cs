@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TrackHub.Manager.Infrastructure.Migrations
 {
     /// <summary>
-    /// Gives the spec-05 indexes explicit names under PostgreSQL's 63-character identifier limit.
+    /// Gives the notification indexes explicit names under PostgreSQL's 63-character identifier limit.
     /// The original auto-generated names exceeded it, and existing databases may carry either
     /// spelling depending on how the schema was applied: EF's own truncation ("…re~") or
     /// PostgreSQL's plain truncation ("…rea"). Raw SQL with IF EXISTS covers both.

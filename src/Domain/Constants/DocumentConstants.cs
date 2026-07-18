@@ -15,7 +15,7 @@
 
 namespace TrackHub.Manager.Domain.Constants;
 
-/// <summary>Document lifecycle status values (spec 04 §6.1). Stored as strings.</summary>
+/// <summary>Document lifecycle status values. Stored as strings.</summary>
 public static class DocumentStatuses
 {
     public const string Pending = nameof(Pending);
@@ -32,7 +32,7 @@ public static class DocumentStatuses
     public static bool IsValid(string? value) => value != null && All.Contains(value);
 }
 
-/// <summary>Virus/malware scan status values (spec 04 §6.1). Stored as strings.</summary>
+/// <summary>Virus/malware scan status values. Stored as strings.</summary>
 public static class DocumentScanStatuses
 {
     public const string Pending = nameof(Pending);
@@ -47,7 +47,7 @@ public static class DocumentScanStatuses
     public static bool IsValid(string? value) => value != null && All.Contains(value);
 }
 
-/// <summary>Sensitivity classification values (spec 04 §6.1). Stored as strings.</summary>
+/// <summary>Sensitivity classification values. Stored as strings.</summary>
 public static class DocumentClassifications
 {
     public const string Public = nameof(Public);
@@ -61,7 +61,7 @@ public static class DocumentClassifications
     public static bool IsValid(string? value) => value != null && All.Contains(value);
 
     /// <summary>
-    /// Confidential/Legal require an explicit clearance beyond plain Documents/Read (spec 04 §5).
+    /// Confidential/Legal require an explicit clearance beyond plain Documents/Read.
     /// </summary>
     public static bool IsSensitive(string? classification)
         => string.Equals(classification, Confidential, StringComparison.OrdinalIgnoreCase)
@@ -69,7 +69,7 @@ public static class DocumentClassifications
 }
 
 /// <summary>
-/// Owner entity types with a registered visibility resolver (spec 04 §5, §11). Owner types not listed
+/// Owner entity types with a registered visibility resolver. Owner types not listed
 /// here are deny-by-default until their module ships a resolver.
 /// </summary>
 public static class DocumentOwnerTypes
@@ -83,19 +83,19 @@ public static class DocumentOwnerTypes
            || string.Equals(ownerEntityType, Driver, StringComparison.OrdinalIgnoreCase);
 }
 
-/// <summary>Document sharing constants — reuses PublicLinkGrant (spec 04 §6.4).</summary>
+/// <summary>Document sharing constants — reuses PublicLinkGrant.</summary>
 public static class DocumentSharing
 {
     public const string ResourceType = "Document";
     public const string ReadScope = "document.read";
 }
 
-/// <summary>Platform file-size ceilings (spec 04 §18.7). Modules may lower, never exceed.</summary>
+/// <summary>Platform file-size ceilings. Modules may lower, never exceed.</summary>
 public static class DocumentLimits
 {
     public const long DefaultMaxBytes = 25L * 1024 * 1024;          // 25 MB per photo/document
     public const long ImportExportMaxBytes = 100L * 1024 * 1024;    // 100 MB import/export/generated
 
-    /// <summary>Expiration alert thresholds in days (spec 04 §10).</summary>
+    /// <summary>Expiration alert thresholds in days.</summary>
     public static readonly IReadOnlyCollection<int> ExpirationThresholdsDays = [30, 15, 7];
 }

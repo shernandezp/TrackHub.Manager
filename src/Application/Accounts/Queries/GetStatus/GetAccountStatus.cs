@@ -17,7 +17,7 @@ using Common.Application.Interfaces;
 
 namespace TrackHub.Manager.Application.Accounts.Queries.GetStatus;
 
-// Lightweight cross-service status read (spec 03 §7.4). Mirrors validateFeatureEnabled: no
+// Lightweight cross-service status read. Mirrors validateFeatureEnabled: no
 // [Authorize] gate (service clients read it during their own status enforcement), and
 // [AllowSuspendedAccount] so a suspended account's own status is still readable — otherwise the
 // cross-service status check would deadlock against itself. Returns 0 for an unknown account.

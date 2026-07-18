@@ -1,9 +1,9 @@
 namespace TrackHub.Manager.Domain.Interfaces;
 
 /// <summary>
-/// Channel delivery provider contract (spec 05 §7.4, §9). Implementations: InApp, Email (MailKit),
-/// Webhook (HMAC-signed), WhatsApp (Meta Cloud API). Push is contract-only in this slice — the FCM
-/// implementation, unmasked-token query, and credentials ship with spec 10.
+/// Channel delivery provider contract. Implementations: InApp, Email (MailKit),
+/// Webhook (HMAC-signed), WhatsApp (Meta Cloud API). Push is contract-only — the FCM
+/// implementation, unmasked-token query, and credentials are not yet implemented.
 /// </summary>
 public interface INotificationChannelProvider
 {

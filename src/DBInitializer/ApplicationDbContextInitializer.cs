@@ -25,10 +25,10 @@ namespace DBInitializer;
 
 internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextInitializer> logger, ApplicationDbContext context)
 {
-    // Canonical catalog of all backend factory reports with their spec 06 §6/§13 governance metadata.
+    // Canonical catalog of all backend factory reports with their governance metadata.
     // Category grouping, RequiredFeatureKey gating (null = global), ManagerOnly role gating and
     // SupportsPdf format support. Common report-code constants where they exist; the Reporting-local
-    // document/admin codes are string literals (they never became Common constants — spec 06 §15).
+    // document/admin codes are string literals (they never became Common constants).
     private static readonly (string Code, string Description, string Category, string? RequiredFeatureKey, bool ManagerOnly, bool SupportsPdf, int SortOrder)[] ReportCatalog =
     [
         // Operations (global + geofencing-gated)
@@ -49,7 +49,7 @@ internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextIniti
         (Reports.GpsLatestPositionFreshness, "GPS Latest Position Freshness", "Gps", FeatureKeys.GpsIntegration, false, false, 90),
         (Reports.GpsPositionHistory, "GPS Position History", "Gps", FeatureKeys.GpsPositionHistory, false, false, 100),
 
-        // Documents (spec 04/06 §13) — Reporting-local codes
+        // Documents — Reporting-local codes
         ("documents-expiring", "Documents expiring within a window", "Documents", FeatureKeys.Documents, false, true, 10),
         ("documents-missing-required", "Transporters missing required documents", "Documents", FeatureKeys.Documents, false, true, 20),
         ("documents-share-activity", "Document share activity", "Documents", FeatureKeys.Documents, false, false, 30),
@@ -90,7 +90,7 @@ internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextIniti
     public async Task TrySeedAsync()
     {
         // Default data
-        // Report catalog (spec 06 §6, §15): idempotent per-code upsert that runs every start. New rows are
+        // Report catalog: idempotent per-code upsert that runs every start. New rows are
         // inserted Active; existing rows get their Description + governance metadata refreshed in place,
         // but Active and Type are never overwritten (admins may have disabled a report).
         //
@@ -173,7 +173,7 @@ internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextIniti
             await context.SaveChangesAsync();
         }
 
-        // Platform default notification templates are NOT seeded (spec 05 audit decision): localized
+        // Platform default notification templates are NOT seeded: localized
         // text never lives in the database. Defaults come from the NotificationDefaultMessages
         // resources at render time; the templates table holds account-authored overrides only.
         // Remove rows an earlier initializer version may have seeded.
@@ -184,7 +184,7 @@ internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextIniti
             await context.SaveChangesAsync();
         }
 
-        // One-time gating backfill (spec 05 §15): rule CRUD is now gated by the `notifications`
+        // One-time gating backfill: rule CRUD is now gated by the `notifications`
         // feature, so every account that already has NotificationRule rows gets an enabled feature
         // row. Idempotent; runs through the entity writer path, never raw SQL.
         var ruleAccounts = await context.NotificationRules.Select(r => r.AccountId).Distinct().ToListAsync();

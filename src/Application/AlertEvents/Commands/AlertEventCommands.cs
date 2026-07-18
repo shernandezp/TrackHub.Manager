@@ -9,7 +9,7 @@ public class RecordAlertEventCommandHandler(IAlertEventWriter writer, IPublisher
     public async Task<AlertEventVm> Handle(RecordAlertEventCommand request, CancellationToken cancellationToken)
     {
         var alertEvent = await writer.RecordAlertEventAsync(request.AlertEvent, cancellationToken);
-        // Rule evaluation is non-blocking: the event handler swallows its own failures (spec 05 §7.4).
+        // Rule evaluation is non-blocking: the event handler swallows its own failures.
         await publisher.Publish(new AlertEventRecorded.Notification(alertEvent), cancellationToken);
         return alertEvent;
     }

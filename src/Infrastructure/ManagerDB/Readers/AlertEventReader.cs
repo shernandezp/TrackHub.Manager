@@ -14,7 +14,7 @@ public sealed class AlertEventReader(IApplicationDbContext context, ICurrentPrin
         var query = Context.AlertEvents
             .Where(x => x.AccountId == scopedAccountId && (!from.HasValue || x.LastSeenAt >= from) && (!to.HasValue || x.LastSeenAt <= to));
 
-        // Alert-feed visibility follows the source resource (spec 05 §5): non-privileged users see
+        // Alert-feed visibility follows the source resource: non-privileged users see
         // transporter-mapped events for their group-visible transporters only; events without a
         // group-mappable resource (account-level events such as credential expiry) stay visible to
         // administrators/managers only.

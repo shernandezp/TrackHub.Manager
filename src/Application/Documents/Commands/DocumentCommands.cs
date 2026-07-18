@@ -2,7 +2,7 @@ using TrackHub.Manager.Domain.Constants;
 
 namespace TrackHub.Manager.Application.Documents.Commands;
 
-// Low-level metadata primitive stays ungated so embedded module panels keep working (spec 04 §15, §18.2).
+// Low-level metadata primitive stays ungated so embedded module panels keep working.
 [Authorize(Resource = Resources.Documents, Action = Actions.Write)]
 public readonly record struct CreateDocumentMetadataCommand(DocumentDto Document) : IRequest<DocumentVm>;
 public class CreateDocumentMetadataCommandHandler(IDocumentWriter writer) : IRequestHandler<CreateDocumentMetadataCommand, DocumentVm>
@@ -23,7 +23,7 @@ public class CreateDocumentMetadataCommandValidator : AbstractValidator<CreateDo
     }
 }
 
-// Completes the upload endpoint (spec 04 §7.3): bytes already streamed to storage under a
+// Completes the upload endpoint: bytes already streamed to storage under a
 // server-generated key. Allowed for User and Driver principals; ungated (embedded module panels).
 [Authorize(Resource = Resources.Documents, Action = Actions.Write, PrincipalTypes = "User,Driver")]
 public readonly record struct RegisterUploadedDocumentCommand(Guid DocumentId, DocumentDto Document) : IRequest<DocumentVm>;
@@ -43,7 +43,7 @@ public class MarkDocumentUploadedCommandValidator : AbstractValidator<MarkDocume
     public MarkDocumentUploadedCommandValidator() => RuleFor(x => x.Status).Must(DocumentStatuses.IsValid).WithMessage("Invalid document status.");
 }
 
-// Called by the scan-result processing job under a scoped service identity (spec 04 §10).
+// Called by the scan-result processing job under a scoped service identity.
 [Authorize(Resource = Resources.Documents, Action = Actions.Edit)]
 public readonly record struct MarkDocumentScanResultCommand(Guid DocumentId, string ScanStatus) : IRequest;
 public class MarkDocumentScanResultCommandHandler(IDocumentWriter writer) : IRequestHandler<MarkDocumentScanResultCommand>
@@ -69,7 +69,7 @@ public class DeleteDocumentReferenceCommandHandler(IDocumentWriter writer) : IRe
     public async Task Handle(DeleteDocumentReferenceCommand request, CancellationToken cancellationToken) => await writer.DeleteDocumentReferenceAsync(request.DocumentId, cancellationToken);
 }
 
-// Bytes arrive via the upload endpoint (spec 04 §7.3); the command completes the version re-point.
+// Bytes arrive via the upload endpoint; the command completes the version re-point.
 [Authorize(Resource = Resources.Documents, Action = Actions.Edit)]
 public readonly record struct ReplaceDocumentVersionCommand(Guid DocumentId, DocumentVersionDto NewVersion) : IRequest<DocumentVm>;
 public class ReplaceDocumentVersionCommandHandler(IDocumentWriter writer) : IRequestHandler<ReplaceDocumentVersionCommand, DocumentVm>
@@ -114,7 +114,7 @@ public class SignDocumentCommandValidator : AbstractValidator<SignDocumentComman
     }
 }
 
-// Standalone document-type configuration is gated by the `documents` feature (spec 04 §7.1).
+// Standalone document-type configuration is gated by the `documents` feature.
 [Authorize(Resource = Resources.Documents, Action = Actions.Write)]
 [RequireFeature(FeatureKeys.Documents)]
 public readonly record struct ConfigureDocumentTypeCommand(DocumentTypeDto DocumentType) : IRequest<DocumentTypeVm>;

@@ -7,7 +7,7 @@ using TrackHub.Manager.Infrastructure.Interfaces;
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Services;
 
 /// <summary>
-/// Rule evaluation for recorded alert events (spec 05 §7.4). Runs post-commit inside the
+/// Rule evaluation for recorded alert events. Runs post-commit inside the
 /// recordAlertEvent pipeline via the AlertEventRecorded notification; per-rule failures are logged
 /// and never propagate. Channel entitlements are checked here (skip creating what could never send)
 /// and re-checked at dispatch time.
@@ -28,7 +28,7 @@ public sealed class AlertRuleEvaluator(IApplicationDbContext context, ILogger<Al
         }
 
         // Suspended accounts still record baseline alert events but get no notification fan-out
-        // (spec 05 §7.4). A missing account row (in-memory tests) is not treated as suspended.
+        //. A missing account row (in-memory tests) is not treated as suspended.
         if (await context.Accounts.AnyAsync(a => a.AccountId == alertEvent.AccountId && !a.Active, cancellationToken))
         {
             return 0;
@@ -134,7 +134,7 @@ public sealed class AlertRuleEvaluator(IApplicationDbContext context, ILogger<Al
                     recipients.Add((NotificationChannels.Webhook, RecipientPrincipalTypes.Rule, configuration.WebhookUrl!));
                     break;
                 case NotificationChannels.Push:
-                    // Provider contract only in this slice; the push implementation ships with spec 10 (§9).
+                    // Provider contract only; the push implementation is not yet available.
                     break;
             }
         }

@@ -4,7 +4,7 @@ namespace TrackHub.Manager.Infrastructure.ManagerDB.Notifications;
 
 /// <summary>
 /// In-app channel: the delivery row itself is the notification (surfaced by getMyNotifications);
-/// sending is marking it Sent (spec 05 §7.4).
+/// sending is marking it Sent.
 /// </summary>
 public sealed class InAppNotificationProvider : INotificationChannelProvider
 {

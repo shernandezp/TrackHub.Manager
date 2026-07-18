@@ -23,7 +23,7 @@ using TrackHub.Manager.Infrastructure.ManagerDB.Writers;
 
 namespace Infrastructure.UnitTests;
 
-// Spec 02 §7.4 / AC16: separation of duties — a support grant may not be approved by the principal
+// Separation of duties: a support grant may not be approved by the principal
 // that created it.
 [TestFixture]
 public class AccountSupportGrantWriterTests

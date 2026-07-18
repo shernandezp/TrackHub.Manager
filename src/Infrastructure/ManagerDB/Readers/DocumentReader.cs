@@ -13,14 +13,14 @@ public sealed class DocumentReader(IApplicationDbContext context, ICurrentPrinci
     private static int PageSize(int take) => Math.Clamp(take <= 0 ? 50 : take, 1, 500);
     private static int Offset(int skip) => Math.Max(0, skip);
 
-    // Confidential/Legal are visible only to a cleared principal (spec 04 §5).
+    // Confidential/Legal are visible only to a cleared principal.
     private bool CanSeeSensitive => accessPolicy.IsClearedForClassification(DocumentClassifications.Confidential);
 
     public async Task<IReadOnlyCollection<DocumentVm>> GetDocumentsForOwnerAsync(Guid accountId, string ownerEntityType, string ownerEntityId, DateTimeOffset? from, DateTimeOffset? to, int skip, int take, CancellationToken cancellationToken)
     {
         var scopedAccountId = RequireAccountAccess(accountId);
 
-        // Owner group/assignment visibility (spec 04 §5) — a change from the previous tenant-only behavior.
+        // Owner group/assignment visibility — a change from the previous tenant-only behavior.
         if (!await accessPolicy.CanAccessOwnerAsync(scopedAccountId, ownerEntityType, ownerEntityId, forWrite: false, cancellationToken))
         {
             throw new ForbiddenAccessException("Insufficient permissions to read documents for this owner.");
@@ -132,7 +132,7 @@ public sealed class DocumentReader(IApplicationDbContext context, ICurrentPrinci
 
         var query = Context.Documents.Where(x => x.AccountId == accountId && x.Status != DocumentStatuses.Deleted);
 
-        // Group scoping for non-admins: restrict to visible Transporter owners (spec 04 §7.2, §13).
+        // Group scoping for non-admins: restrict to visible Transporter owners.
         if (!accessPolicy.IsPrivilegedPrincipal)
         {
             var visible = (await accessPolicy.GetVisibleTransporterIdsAsync(accountId, cancellationToken))
@@ -257,7 +257,7 @@ public sealed class DocumentReader(IApplicationDbContext context, ICurrentPrinci
     }
 
     // Loads a document and enforces the full read authorization chain: account scope, owner visibility,
-    // then classification clearance. Non-disclosable failures surface as 404 (spec 04 §7.5).
+    // then classification clearance. Non-disclosable failures surface as 404.
     private async Task<Document> LoadAuthorizedDocumentAsync(Guid documentId, CancellationToken cancellationToken)
     {
         var entity = await Context.Documents.FirstOrDefaultAsync(x => x.DocumentId == documentId, cancellationToken)
@@ -271,7 +271,7 @@ public sealed class DocumentReader(IApplicationDbContext context, ICurrentPrinci
         }
 
         // Non-disclosure: an uncleared sensitive document is hidden exactly like the listing paths
-        // (filtered out / null), so a direct read must 404 rather than confirm existence via 403 (§5, §7.5).
+        // (filtered out / null), so a direct read must 404 rather than confirm existence via 403.
         if (!accessPolicy.IsClearedForClassification(entity.Classification))
         {
             throw new NotFoundException(nameof(Document), documentId.ToString());
@@ -282,7 +282,7 @@ public sealed class DocumentReader(IApplicationDbContext context, ICurrentPrinci
 
     private DocumentVm ToVm(Document x)
     {
-        // DownloadUrl is populated only after authorization + ScanStatus == Clean (spec 04 §7.4).
+        // DownloadUrl is populated only after authorization + ScanStatus == Clean.
         var downloadUrl = string.Equals(x.ScanStatus, DocumentScanStatuses.Clean, StringComparison.OrdinalIgnoreCase)
             ? $"/documents/{x.DocumentId}/download"
             : null;

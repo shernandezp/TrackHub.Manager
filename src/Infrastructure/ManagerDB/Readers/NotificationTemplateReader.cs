@@ -9,7 +9,7 @@ public sealed class NotificationTemplateReader(IApplicationDbContext context, IC
 {
     // The key-addressed built-in defaults surfaced read-only in the templates panel. Localized
     // text never lives in the database: these rows are synthesized from the
-    // NotificationDefaultMessages resources at query time (spec 05 audit decision). Event-type
+    // NotificationDefaultMessages resources at query time. Event-type
     // messages use the generic renderer fallback and have no key-addressed default.
     private static readonly (string TemplateKey, string SubjectKey, string BodyKey)[] BuiltInKeys =
     [
@@ -35,7 +35,7 @@ public sealed class NotificationTemplateReader(IApplicationDbContext context, IC
                 NotificationDefaultMessages.Get(entry.BodyKey, locale),
                 true, default);
 
-        // Merged view: account overrides win over the built-in default for the same key (spec 05 §7.3).
+        // Merged view: account overrides win over the built-in default for the same key.
         var overriddenKeys = overrides.Select(x => (x.TemplateKey, x.Channel, x.Locale)).ToHashSet();
         return overrides
             .Concat(builtIns.Where(x => !overriddenKeys.Contains((x.TemplateKey, x.Channel, x.Locale))))

@@ -16,7 +16,7 @@
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Notifications;
 
 /// <summary>
-/// Meta WhatsApp Business Platform Cloud API settings (spec 05 §14) — AppSettings:WhatsApp.
+/// Meta WhatsApp Business Platform Cloud API settings — AppSettings:WhatsApp.
 /// Outbound utility-template sends only; the per-language pre-approved template owns the
 /// localization framing and receives the rendered text as its single body parameter.
 /// </summary>

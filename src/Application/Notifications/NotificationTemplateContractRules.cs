@@ -17,12 +17,12 @@ using TrackHub.Manager.Domain.Constants;
 
 namespace TrackHub.Manager.Application.Notifications;
 
-/// <summary>Shared validation for the create/update template commands (spec 05 §7.2).</summary>
+/// <summary>Shared validation for the create/update template commands.</summary>
 public static class NotificationTemplateContractRules
 {
     public static void Apply<T>(AbstractValidator<T> validator, Func<T, NotificationTemplateDto> selector)
     {
-        // Account overrides only through this surface; platform defaults are resource-synthesized (spec 05 §7.2).
+        // Account overrides only through this surface; platform defaults are resource-synthesized.
         validator.RuleFor(x => selector(x).AccountId).NotNull().OverridePropertyName("AccountId")
             .WithMessage("Templates created through this surface are account overrides and require an accountId.");
         validator.RuleFor(x => selector(x).TemplateKey).NotEmpty().MaximumLength(255).OverridePropertyName("TemplateKey");

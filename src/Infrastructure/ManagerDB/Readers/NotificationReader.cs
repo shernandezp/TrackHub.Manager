@@ -48,7 +48,7 @@ public sealed class NotificationReader(IApplicationDbContext context, ICurrentPr
             .Skip(Offset(skip)).Take(PageSize(take))
             .ToListAsync(cancellationToken);
 
-        // Contact endpoints are personal data: list VMs mask them (spec 05 §5).
+        // Contact endpoints are personal data: list VMs mask them.
         return rows
             .Select(x => new NotificationDeliveryVm(x.NotificationDeliveryId, x.AccountId, x.NotificationRuleId, x.AlertEventId, x.Channel, x.RecipientPrincipalType, MaskRecipient(x.Channel, x.Recipient), x.Status, x.Attempts, x.ProviderMessageId, x.Error, x.SentAt, x.ReadAt, x.LastModified))
             .ToList();
@@ -67,12 +67,12 @@ public sealed class NotificationReader(IApplicationDbContext context, ICurrentPr
             var accountId = ResolveAccountScope(null)
                 ?? throw new ForbiddenAccessException("Insufficient permissions. Required account access: current principal must resolve an account id.");
             // Role-addressed deliveries fan out at read time: any user holding the role in the
-            // account sees the (single) delivery row (spec 05 role-recipient decision).
+            // account sees the (single) delivery row.
             query = query.Where(x =>
                 (x.RecipientPrincipalType == RecipientPrincipalTypes.User && x.Recipient == userKey)
                 || (x.RecipientPrincipalType == RecipientPrincipalTypes.Role && x.Recipient == role && x.AccountId == accountId));
 
-            // Group visibility follows the source resource (spec 05 §5, AC4): non-privileged users
+            // Group visibility follows the source resource: non-privileged users
             // never see notifications for transporters outside their groups. The subscriber's role
             // is unknown at evaluation time, so the filter is applied here where the token is.
             if (!IsPrivileged)

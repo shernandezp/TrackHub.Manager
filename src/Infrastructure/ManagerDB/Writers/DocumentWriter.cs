@@ -51,7 +51,7 @@ public sealed class DocumentWriter(IApplicationDbContext context, ICurrentPrinci
         => await UpdateDocumentAsync(documentId, "MarkDocumentScanResult", x =>
         {
             x.ScanStatus = scanStatus;
-            // Clean bytes graduate a still-quarantined document to Active (spec 04 §6.1 lifecycle).
+            // Clean bytes graduate a still-quarantined document to Active.
             if (string.Equals(scanStatus, DocumentScanStatuses.Clean, StringComparison.OrdinalIgnoreCase) && x.Status == DocumentStatuses.Uploaded)
             {
                 x.Status = DocumentStatuses.Active;
@@ -78,7 +78,7 @@ public sealed class DocumentWriter(IApplicationDbContext context, ICurrentPrinci
         var version = new DocumentVersion(entity.DocumentId, entity.AccountId, nextVersion, newVersion.StorageProvider, newVersion.StorageKey, newVersion.Sha256Hash, newVersion.SizeBytes, newVersion.ContentType, newVersion.FileName, DocumentScanStatuses.Quarantined, Principal.PrincipalType.ToString(), ActorId(), newVersion.Reason, DateTimeOffset.UtcNow);
         await Context.DocumentVersions.AddAsync(version, cancellationToken);
 
-        // Re-point the active version; new bytes must be re-scanned before download (spec 04 §7.1).
+        // Re-point the active version; new bytes must be re-scanned before download.
         entity.CurrentVersion = nextVersion;
         entity.StorageProvider = newVersion.StorageProvider;
         entity.StorageKey = newVersion.StorageKey;
@@ -179,7 +179,7 @@ public sealed class DocumentWriter(IApplicationDbContext context, ICurrentPrinci
     {
         // The owner resolver validates existence + account match + visibility/assignment. It must run for
         // EVERYONE on registered owner types so a cross-account owner reference is rejected even for
-        // admins/managers (spec 04 §5, AC1).
+        // admins/managers.
         if (await accessPolicy.CanAccessOwnerAsync(accountId, ownerEntityType, ownerEntityId, forWrite: true, cancellationToken))
         {
             return;

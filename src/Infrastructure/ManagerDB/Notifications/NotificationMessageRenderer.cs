@@ -21,10 +21,10 @@ using TrackHub.Manager.Infrastructure.Interfaces;
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Notifications;
 
 /// <summary>
-/// Key-addressed template resolution and token substitution (spec 05 §6, §18.7).
+/// Key-addressed template resolution and token substitution.
 /// Resolution order: account override → platform default (AccountId = null) → built-in fallback.
 /// Channel-safe content rule: bodies carry a short summary and a portal link, never file contents
-/// or secrets (spec 05 §12).
+/// or secrets.
 /// </summary>
 public static class NotificationMessageRenderer
 {

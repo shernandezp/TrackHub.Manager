@@ -1,7 +1,7 @@
 namespace TrackHub.Manager.Domain.Interfaces;
 
 /// <summary>
-/// Maps a document's <c>OwnerEntityType</c> to the correct visibility primitive (spec 04 §5, §18.4):
+/// Maps a document's <c>OwnerEntityType</c> to the correct visibility primitive:
 /// Transporter → group visibility, Driver → assignment/default-transporter visibility, and
 /// deny-by-default for owner types without a registered resolver. Also enforces the classification gate.
 /// </summary>

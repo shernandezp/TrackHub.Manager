@@ -24,7 +24,7 @@ public class NotificationDeliveryConfiguration : IEntityTypeConfiguration<Notifi
         builder.Property(x => x.ReadAt).HasColumnName("readat");
         builder.Property(x => x.PayloadJson).HasColumnName("payloadjson").HasColumnType(ColumnMetadata.TextField);
         builder.HasIndex(x => new { x.AccountId, x.Status, x.Channel });
-        // Dispatcher scan and in-app feed access paths (spec 05 §6). Explicit names keep the
+        // Dispatcher scan and in-app feed access paths. Explicit names keep the
         // identifiers under PostgreSQL's 63-character limit (the defaults were truncated).
         builder.HasIndex(x => new { x.AccountId, x.Status, x.Created })
             .HasDatabaseName("ix_notification_deliveries_account_status_created");

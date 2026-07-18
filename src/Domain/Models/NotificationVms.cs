@@ -8,8 +8,8 @@ public readonly record struct NotificationTemplateVm(Guid NotificationTemplateId
 
 public readonly record struct AlertSubscriptionVm(Guid AlertSubscriptionId, Guid AccountId, string PrincipalType, Guid PrincipalId, string? EventTypeFilter, string Channel, string? Contact, bool Enabled, DateTimeOffset LastModified);
 
-/// <summary>In-app feed item for the current principal (spec 05 §7.3 getMyNotifications).</summary>
+/// <summary>In-app feed item for the current principal.</summary>
 public readonly record struct MyNotificationVm(Guid NotificationDeliveryId, Guid? AlertEventId, string? EventType, string? Severity, string? SourceModule, string? ResourceType, string? ResourceId, string? PayloadJson, DateTimeOffset CreatedAt, DateTimeOffset? ReadAt);
 
-/// <summary>Channel/status aggregate for the delivery-health tiles (spec 05 §7.3).</summary>
+/// <summary>Channel/status aggregate for the delivery-health tiles.</summary>
 public readonly record struct DeliveryHealthVm(string Channel, string Status, int Count, double AverageAttempts);

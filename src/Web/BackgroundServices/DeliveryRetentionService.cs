@@ -20,9 +20,9 @@ using TrackHub.Manager.Infrastructure.Entities;
 
 namespace TrackHub.Manager.Web.BackgroundServices;
 
-// Delivery retention (spec 05 §10): daily, deletes delivered/failed/digested rows older than
+// Delivery retention: daily, deletes delivered/failed/digested rows older than
 // AppSettings:NotificationDeliveryRetentionDays (default 90). This cleanup keeps running for
-// feature-disabled accounts (spec 05 AC8).
+// feature-disabled accounts.
 public sealed class DeliveryRetentionService(
     IServiceScopeFactory scopeFactory,
     IConfiguration configuration,

@@ -9,7 +9,7 @@ public class CreateNotificationRuleCommandHandler(INotificationWriter writer, IF
 {
     public async Task<NotificationRuleVm> Handle(CreateNotificationRuleCommand request, CancellationToken cancellationToken)
     {
-        // Email/WhatsApp are per-account billable channels; configuring them requires the entitlement (spec 05 §3).
+        // Email/WhatsApp are per-account billable channels; configuring them requires the entitlement.
         await NotificationChannelEntitlements.RequireConfiguredChannelsAsync(featureFlags, request.NotificationRule.AccountId,
             NotificationRuleContracts.ParseChannels(request.NotificationRule.ChannelsJson), cancellationToken);
         return await writer.CreateNotificationRuleAsync(request.NotificationRule, cancellationToken);

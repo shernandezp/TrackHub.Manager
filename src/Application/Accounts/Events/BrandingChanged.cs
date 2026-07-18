@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging;
 
 namespace TrackHub.Manager.Application.Accounts.Events;
 
-// Raised when account branding changes (spec 03 §10). Delivery is owned by spec 05.
+// Raised when account branding changes. Delivery is owned by the notifications pipeline.
 public sealed class BrandingChanged
 {
     public readonly record struct Notification(

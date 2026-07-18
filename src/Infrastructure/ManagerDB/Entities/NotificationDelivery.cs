@@ -19,7 +19,7 @@ public sealed class NotificationDelivery(Guid accountId, Guid? notificationRuleI
     public DateTimeOffset? ReadAt { get; set; }
     /// <summary>
     /// Optional pre-rendered content ({"subject","body"}) that overrides template rendering at
-    /// dispatch time; used by digest summary deliveries (spec 05 §10).
+    /// dispatch time; used by digest summary deliveries.
     /// </summary>
     public string? PayloadJson { get; set; }
 }

@@ -1,9 +1,9 @@
 namespace TrackHub.Manager.Domain.Interfaces;
 
 /// <summary>
-/// Virus/malware scanning abstraction (spec 04 §14, §18.5). Uploaded files are Quarantined until an
+/// Virus/malware scanning abstraction. Uploaded files are Quarantined until an
 /// async scan returns Clean. The dev/no-op scanner marks Clean immediately; production selects a real
-/// AV provider per deployment (external blocker, §19).
+/// AV provider per deployment.
 /// </summary>
 public interface IDocumentScanner
 {
