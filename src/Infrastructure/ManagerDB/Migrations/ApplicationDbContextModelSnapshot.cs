@@ -18,7 +18,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.9")
+                .HasAnnotation("ProductVersion", "10.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -381,6 +381,70 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     b.HasIndex("AccountId", "Status", "LastSeenAt");
 
                     b.ToTable("alert_events", "app");
+                });
+
+            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.AlertSubscription", b =>
+                {
+                    b.Property<Guid>("AlertSubscriptionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("accountid");
+
+                    b.Property<string>("Channel")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("channel");
+
+                    b.Property<string>("Contact")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("contact");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("boolean")
+                        .HasColumnName("enabled");
+
+                    b.Property<string>("EventTypeFilter")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("eventtypefilter");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("PrincipalId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("principalid");
+
+                    b.Property<string>("PrincipalType")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("principaltype");
+
+                    b.HasKey("AlertSubscriptionId");
+
+                    b.HasIndex("AccountId", "EventTypeFilter", "Enabled");
+
+                    b.HasIndex("AccountId", "PrincipalType", "PrincipalId", "EventTypeFilter", "Channel")
+                        .IsUnique()
+                        .HasDatabaseName("ix_alert_subscriptions_principal_filter_channel");
+
+                    b.ToTable("alert_subscriptions", "app");
                 });
 
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.AuditEvent", b =>
@@ -1342,6 +1406,10 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("notificationruleid");
 
+                    b.Property<string>("PayloadJson")
+                        .HasColumnType("text")
+                        .HasColumnName("payloadjson");
+
                     b.Property<string>("ProviderMessageId")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
@@ -1376,6 +1444,12 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     b.HasKey("NotificationDeliveryId");
 
                     b.HasIndex("AccountId", "Status", "Channel");
+
+                    b.HasIndex("AccountId", "Status", "Created")
+                        .HasDatabaseName("ix_notification_deliveries_account_status_created");
+
+                    b.HasIndex("RecipientPrincipalType", "Recipient", "ReadAt")
+                        .HasDatabaseName("ix_notification_deliveries_recipient_readat");
 
                     b.ToTable("notification_deliveries", "app");
                 });
@@ -1449,6 +1523,69 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("notification_rules", "app");
+                });
+
+            modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.NotificationTemplate", b =>
+                {
+                    b.Property<Guid>("NotificationTemplateId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("accountid");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean")
+                        .HasColumnName("active");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("body");
+
+                    b.Property<string>("Channel")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("channel");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Locale")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("locale");
+
+                    b.Property<string>("Subject")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("subject");
+
+                    b.Property<string>("TemplateKey")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("templatekey");
+
+                    b.HasKey("NotificationTemplateId");
+
+                    b.HasIndex("AccountId", "TemplateKey", "Channel", "Locale")
+                        .IsUnique();
+
+                    b.ToTable("notification_templates", "app");
                 });
 
             modelBuilder.Entity("TrackHub.Manager.Infrastructure.Entities.Operator", b =>
@@ -1863,6 +2000,12 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("active");
 
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("category");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("text")
@@ -1885,6 +2028,23 @@ namespace TrackHub.Manager.Infrastructure.Migrations
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text");
+
+                    b.Property<bool>("ManagerOnly")
+                        .HasColumnType("boolean")
+                        .HasColumnName("manageronly");
+
+                    b.Property<string>("RequiredFeatureKey")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("requiredfeaturekey");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sortorder");
+
+                    b.Property<bool>("SupportsPdf")
+                        .HasColumnType("boolean")
+                        .HasColumnName("supportspdf");
 
                     b.Property<short>("Type")
                         .HasColumnType("smallint")

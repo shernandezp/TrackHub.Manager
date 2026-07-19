@@ -2,7 +2,7 @@ using Common.Infrastructure;
 
 namespace TrackHub.Manager.Infrastructure.Entities;
 
-// Account-configurable document type (Category) with required/expiring flags (spec 04 §7.1). Drives
+// Account-configurable document type (Category) with required/expiring flags. Drives
 // the type-config UI and the "missing required documents" report.
 public sealed class DocumentType(Guid accountId, string category, string? displayName, bool required, bool expiring, int? defaultValidityDays, bool enabled, DateTimeOffset createdAt) : BaseEntity
 {

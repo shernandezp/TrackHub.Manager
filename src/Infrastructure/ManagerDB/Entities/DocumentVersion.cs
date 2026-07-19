@@ -2,7 +2,7 @@ using Common.Infrastructure;
 
 namespace TrackHub.Manager.Infrastructure.Entities;
 
-// A point-in-time snapshot of a document's bytes (spec 04 §6.2). Replacing a document creates a new
+// A point-in-time snapshot of a document's bytes. Replacing a document creates a new
 // version and re-points Document.CurrentVersion; prior versions are retained for history and marked
 // for byte cleanup after the retention window.
 public sealed class DocumentVersion(Guid documentId, Guid accountId, int versionNumber, string storageProvider, string storageKey, string sha256Hash, long sizeBytes, string contentType, string fileName, string scanStatus, string? replacedByPrincipalType, string? replacedByPrincipalId, string? reason, DateTimeOffset createdAt) : BaseEntity
@@ -23,7 +23,7 @@ public sealed class DocumentVersion(Guid documentId, Guid accountId, int version
     public string? Reason { get; set; } = reason;
     public DateTimeOffset CreatedAt { get; set; } = createdAt;
 
-    // Stamped by the byte-retention cleanup job (spec 04 §10) when the stored bytes are deleted after the
+    // Stamped by the byte-retention cleanup job when the stored bytes are deleted after the
     // retention window; the metadata row is retained for audit. Null = bytes still present.
     public DateTimeOffset? BytesPurgedAt { get; set; }
 }

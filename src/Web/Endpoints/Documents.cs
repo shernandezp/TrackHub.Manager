@@ -13,7 +13,7 @@ using TrackHub.Manager.Infrastructure.ManagerDB.Storage;
 
 namespace TrackHub.Manager.Web.Endpoints;
 
-// File-byte surfaces for documents (spec 04 §7.3). Metadata still flows through GraphQL; these REST
+// File-byte surfaces for documents. Metadata still flows through GraphQL; these REST
 // endpoints stream/redirect bytes. Authorization is enforced by the dispatched commands/queries
 // (User/Driver/ServiceClient) except the anonymous token-validated public download.
 public sealed class Documents : Common.Web.Infrastructure.EndpointGroupBase
@@ -153,7 +153,7 @@ public sealed class Documents : Common.Web.Infrastructure.EndpointGroupBase
 
         if (!string.Equals(vm.ScanStatus, DocumentScanStatuses.Clean, StringComparison.OrdinalIgnoreCase))
         {
-            // Non-Clean files are undownloadable (spec 04 §6, AC6). Admin quarantine access is out of slice.
+            // Non-Clean files are undownloadable. Admin quarantine access is out of slice.
             return Results.StatusCode(StatusCodes.Status403Forbidden);
         }
 
@@ -163,7 +163,7 @@ public sealed class Documents : Common.Web.Infrastructure.EndpointGroupBase
             return Results.NotFound();
         }
 
-        // Sensitive-classification downloads are audited (spec 04 §7.3, AC12).
+        // Sensitive-classification downloads are audited.
         if (DocumentClassifications.IsSensitive(vm.Classification))
         {
             context.AuditEvents.Add(new AuditEvent(vm.AccountId, user.PrincipalType.ToString(), ActorId(user), "DownloadDocument", "Document", documentId.ToString(), "Succeeded", null, $$"""{"classification":"{{vm.Classification}}"}""", null, null, null, user.CorrelationId));
@@ -180,7 +180,7 @@ public sealed class Documents : Common.Web.Infrastructure.EndpointGroupBase
         return Results.File(stream, vm.ContentType, vm.FileName);
     }
 
-    // GET ~/documents/public/{grantId}?token=… — anonymous, token-validated share (spec 04 §7.3).
+    // GET ~/documents/public/{grantId}?token=… — anonymous, token-validated share.
     public static async Task<IResult> PublicDownload(Guid publicLinkGrantId, Guid accountId, string resourceId, string token, ApplicationDbContext context, IDocumentStorage storage, CancellationToken cancellationToken)
     {
         if (accountId == Guid.Empty || string.IsNullOrWhiteSpace(resourceId) || string.IsNullOrWhiteSpace(token))

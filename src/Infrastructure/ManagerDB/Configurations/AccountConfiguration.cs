@@ -42,7 +42,7 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             .HasMaxLength(ColumnMetadata.DefaultDescriptionLength)
             .IsRequired();
 
-        // Lifecycle reports/filtering (spec 03 §6.2) and the DM-05 secondary-index gap.
+        // Lifecycle reports/filtering and the DM-05 secondary-index gap.
         builder.HasIndex(x => x.Status);
         builder.HasIndex(x => x.Name);
 

@@ -22,14 +22,14 @@ using TrackHub.Manager.Infrastructure.Entities;
 
 namespace TrackHub.Manager.Web.BackgroundServices;
 
-// Byte-retention cleanup (spec 04 §10, §18.6, AC9). Deletes the stored bytes for document versions that
+// Byte-retention cleanup. Deletes the stored bytes for document versions that
 // are superseded (VersionNumber < CurrentVersion) or belong to a Voided/Deleted document, once the
 // retention window has passed. Metadata rows are retained for audit; the current bytes of an Active
 // document are never touched. Runs host-internally against the DB directly.
 //
 // Retention ENFORCEMENT policy, legal holds, and legal/regulatory export packaging are owned by
 // specs/24; this job only reclaims storage and honors the legal-hold hook. This is a security/cleanup
-// job, so it runs regardless of the `documents` feature (spec 04 §10).
+// job, so it runs regardless of the `documents` feature.
 public sealed class DocumentRetentionCleanupService(
     IServiceScopeFactory scopeFactory,
     IConfiguration configuration,
@@ -40,7 +40,7 @@ public sealed class DocumentRetentionCleanupService(
     private static readonly TimeSpan Interval = TimeSpan.FromHours(24);
     private static readonly TimeSpan StartupDelay = TimeSpan.FromMinutes(10);
 
-    // Default 5-year operational retention (spec 04 §18.6); overridable per deployment.
+    // Default 5-year operational retention; overridable per deployment.
     private int RetentionDays => configuration.GetValue<int?>("DocumentStorage:RetentionDays") ?? 1825;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -86,7 +86,7 @@ public sealed class DocumentRetentionCleanupService(
         var purged = 0;
         foreach (var version in eligible)
         {
-            // Legal-hold hook (spec 24). No holds exist until that module ships → nothing is retained here.
+            // Legal-hold hook. No holds exist until that module ships → nothing is retained here.
             if (await HasLegalHoldAsync(context, version.DocumentId, cancellationToken))
             {
                 continue;
@@ -116,7 +116,7 @@ public sealed class DocumentRetentionCleanupService(
         }
     }
 
-    // Placeholder for the spec-24 legal-hold model; no holds exist yet, so nothing is withheld.
+    // Placeholder for a future legal-hold model; no holds exist yet, so nothing is withheld.
     private static Task<bool> HasLegalHoldAsync(ApplicationDbContext context, Guid documentId, CancellationToken cancellationToken)
         => Task.FromResult(false);
 }

@@ -26,5 +26,8 @@ public sealed class UpdateReportValidator : AbstractValidator<UpdateReportComman
 
         RuleFor(v => v.Report.TypeId)
             .NotEmpty();
+
+        RuleFor(v => v.Report.Category)
+            .NotEmpty();
     }
 }

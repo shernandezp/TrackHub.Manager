@@ -23,7 +23,7 @@ using TrackHub.Manager.Infrastructure.Entities;
 
 namespace TrackHub.Manager.Web.BackgroundServices;
 
-// Trial-expiration enforcement (spec 03 §10, AC11): once per cycle, transitions Trial accounts past
+// Trial-expiration enforcement: once per cycle, transitions Trial accounts past
 // their trial-end to Suspended, records a BackgroundJobRun, and raises AccountStatusChanged. Bounded,
 // idempotent (unique {JobKey, IdempotencyKey}), and a no-op when no trial-end data exists. Trial-end
 // is read from AccountFeature configuration (`trialEndsAt`) or a trial-tier feature's EffectiveTo.

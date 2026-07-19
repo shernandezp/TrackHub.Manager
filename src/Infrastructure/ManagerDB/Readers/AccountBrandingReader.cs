@@ -24,7 +24,7 @@ public sealed class AccountBrandingReader(IApplicationDbContext context, ICurren
     // Platform-default primary color used when an account has no branding row.
     public const string DefaultPrimaryColor = "#1A73E8";
 
-    // Owner-entity type of the branding logo document (spec 03 §11).
+    // Owner-entity type of the branding logo document.
     public const string BrandingDocumentOwnerType = "AccountBranding";
 
     public async Task<AccountBrandingVm> GetBrandingAsync(Guid accountId, CancellationToken cancellationToken)
@@ -41,7 +41,7 @@ public sealed class AccountBrandingReader(IApplicationDbContext context, ICurren
                 entity.PrimaryColor, entity.ReportHeader, entity.LastModified);
         }
 
-        // Absent row ⇒ platform default branding (spec 03 §6.2, §7.6). Default the display name to the
+        // Absent row ⇒ platform default branding. Default the display name to the
         // account name so portal/mobile/reports always have a sensible label.
         var name = await Context.Accounts
             .Where(a => a.AccountId == scopedAccountId)

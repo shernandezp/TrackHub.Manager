@@ -19,7 +19,7 @@ using TrackHub.Manager.Infrastructure.Interfaces;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
-// Per-service implementation (spec 03 §7.2) of the Common port that backs the cached
+// Per-service implementation of the Common port that backs the cached
 // IAccountOperationalStatusService used by AccountStatusBehavior. Not account-scoped: it is an
 // internal status lookup for any account id (the pipeline resolves the account to check).
 public sealed class AccountOperationalStatusReader(IApplicationDbContext context) : IAccountOperationalStatusReader

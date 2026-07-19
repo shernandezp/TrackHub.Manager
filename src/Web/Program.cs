@@ -37,14 +37,22 @@ builder.Services.AddAppSecurityContext();
 builder.Services.AddAppRouterContext(builder.Configuration);
 builder.Services.AddWebServices();
 
-// Trial-expiration enforcement job (spec 03 §10).
+// Trial-expiration enforcement job.
 builder.Services.AddHostedService<TrialExpirationService>();
 
-// Document jobs (spec 04 §10): scan-result processing (quarantine → clean/infected) and the
+// Document jobs: scan-result processing (quarantine → clean/infected) and the
 // 30/15/7-day expiration scan.
 builder.Services.AddHostedService<DocumentScanService>();
 builder.Services.AddHostedService<DocumentExpirationService>();
 builder.Services.AddHostedService<DocumentRetentionCleanupService>();
+
+// Alerts/notifications jobs: 30 s delivery dispatch, 5 min alert evaluation
+// (communication loss + escalation + daily credential-expiry emission), hourly digest fold, and
+// daily delivery retention.
+builder.Services.AddHostedService<NotificationDispatchService>();
+builder.Services.AddHostedService<AlertEvaluationService>();
+builder.Services.AddHostedService<NotificationDigestService>();
+builder.Services.AddHostedService<DeliveryRetentionService>();
 
 // Add HealthChecks
 builder.Services.AddHealthChecks()

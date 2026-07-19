@@ -25,6 +25,7 @@ using Npgsql;
 using TrackHub.Manager.Domain.Interfaces;
 using TrackHub.Manager.Infrastructure;
 using TrackHub.Manager.Infrastructure.Interfaces;
+using TrackHub.Manager.Infrastructure.ManagerDB.Notifications;
 using TrackHub.Manager.Infrastructure.ManagerDB.Storage;
 using TrackHub.Manager.Infrastructure.Readers;
 using TrackHub.Manager.Infrastructure.Writers;
@@ -93,12 +94,27 @@ public static class DependencyInjection
         services.AddScoped<IDocumentWriter, DocumentWriter>();
         services.AddScoped<IDocumentAccessPolicy, DocumentAccessPolicy>();
 
-        // Document storage provider selected by config (spec 04 §14, §18.1): LocalFileSystem (dev), S3, or
-        // AzureBlob. A real AV provider is a separate deployment blocker (§19); dev uses the no-op scanner.
+        // Document storage provider selected by config: LocalFileSystem (dev), S3, or
+        // AzureBlob. A real AV provider is a separate deployment blocker; dev uses the no-op scanner.
         AddDocumentStorage(services, configuration);
         services.AddSingleton<IDocumentScanner, NoOpDocumentScanner>();
         services.AddScoped<INotificationReader, NotificationReader>();
         services.AddScoped<INotificationWriter, NotificationWriter>();
+        services.AddScoped<IAlertSubscriptionReader, AlertSubscriptionReader>();
+        services.AddScoped<IAlertSubscriptionWriter, AlertSubscriptionWriter>();
+        services.AddScoped<INotificationTemplateReader, NotificationTemplateReader>();
+        services.AddScoped<INotificationTemplateWriter, NotificationTemplateWriter>();
+        services.AddScoped<IAlertRuleEvaluator, TrackHub.Manager.Infrastructure.ManagerDB.Services.AlertRuleEvaluator>();
+
+        // Notification channel providers. Push is contract-only for now.
+        services.Configure<SmtpOptions>(configuration.GetSection(SmtpOptions.SectionName));
+        services.Configure<WhatsAppOptions>(configuration.GetSection(WhatsAppOptions.SectionName));
+        services.AddHttpClient(WebhookNotificationProvider.HttpClientName, client => client.Timeout = TimeSpan.FromSeconds(10));
+        services.AddHttpClient(WhatsAppNotificationProvider.HttpClientName, client => client.Timeout = TimeSpan.FromSeconds(30));
+        services.AddScoped<INotificationChannelProvider, InAppNotificationProvider>();
+        services.AddScoped<INotificationChannelProvider, EmailNotificationProvider>();
+        services.AddScoped<INotificationChannelProvider, WebhookNotificationProvider>();
+        services.AddScoped<INotificationChannelProvider, WhatsAppNotificationProvider>();
         services.AddScoped<IAlertEventReader, AlertEventReader>();
         services.AddScoped<IAlertEventWriter, AlertEventWriter>();
         services.AddScoped<IBackgroundJobRunReader, BackgroundJobRunReader>();
@@ -122,7 +138,7 @@ public static class DependencyInjection
         services.AddMemoryCache();
         services.AddScoped<Common.Application.Interfaces.IFeatureFlagService, TrackHub.Manager.Infrastructure.ManagerDB.Services.FeatureFlagService>();
 
-        // Account lifecycle + branding (spec 03).
+        // Account lifecycle + branding.
         services.AddScoped<IAccountStatusWriter, AccountStatusWriter>();
         services.AddScoped<IAccountBrandingReader, AccountBrandingReader>();
         services.AddScoped<IAccountBrandingWriter, AccountBrandingWriter>();
@@ -162,8 +178,12 @@ public static class DependencyInjection
 
     private static Func<IServiceProvider, IDocumentStorage> BuildS3Storage(IConfiguration configuration)
     {
-        var bucket = configuration.GetValue<string>("DocumentStorage:S3:BucketName")
-            ?? throw new InvalidOperationException("DocumentStorage:S3:BucketName is required when Provider = S3.");
+        // Blank is treated as absent: container orchestration supplies unset keys as empty strings.
+        var bucket = configuration.GetValue<string>("DocumentStorage:S3:BucketName");
+        if (string.IsNullOrWhiteSpace(bucket))
+        {
+            throw new InvalidOperationException("DocumentStorage:S3:BucketName is required when Provider = S3.");
+        }
         var region = configuration.GetValue<string>("DocumentStorage:S3:Region");
         var serviceUrl = configuration.GetValue<string>("DocumentStorage:S3:ServiceUrl");
         var accessKey = configuration.GetValue<string>("DocumentStorage:S3:AccessKey");
@@ -191,10 +211,18 @@ public static class DependencyInjection
 
     private static Func<IServiceProvider, IDocumentStorage> BuildAzureStorage(IConfiguration configuration)
     {
-        var containerName = configuration.GetValue<string>("DocumentStorage:AzureBlob:ContainerName")
-            ?? throw new InvalidOperationException("DocumentStorage:AzureBlob:ContainerName is required when Provider = AzureBlob.");
-        var connectionString = configuration.GetValue<string>("DocumentStorage:AzureBlob:ConnectionString")
-            ?? throw new InvalidOperationException("DocumentStorage:AzureBlob:ConnectionString is required when Provider = AzureBlob.");
+        // Blank is treated as absent: container orchestration supplies unset keys as empty strings.
+        var containerName = configuration.GetValue<string>("DocumentStorage:AzureBlob:ContainerName");
+        if (string.IsNullOrWhiteSpace(containerName))
+        {
+            throw new InvalidOperationException("DocumentStorage:AzureBlob:ContainerName is required when Provider = AzureBlob.");
+        }
+
+        var connectionString = configuration.GetValue<string>("DocumentStorage:AzureBlob:ConnectionString");
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidOperationException("DocumentStorage:AzureBlob:ConnectionString is required when Provider = AzureBlob.");
+        }
         var ttl = TimeSpan.FromMinutes(configuration.GetValue<int?>("DocumentStorage:AzureBlob:SasExpiryMinutes") ?? 5);
 
         var container = new BlobContainerClient(connectionString, containerName);

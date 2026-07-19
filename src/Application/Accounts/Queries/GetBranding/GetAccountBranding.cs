@@ -16,7 +16,7 @@
 namespace TrackHub.Manager.Application.Accounts.Queries.GetBranding;
 
 // Account-scoped branding read. [AllowSuspendedAccount] so the portal/mobile can render a branded
-// suspension screen (spec 03 §7.3).
+// suspension screen.
 [Authorize(Resource = Resources.Accounts, Action = Actions.Read)]
 [AllowSuspendedAccount]
 public readonly record struct GetAccountBrandingQuery(Guid AccountId) : IRequest<AccountBrandingVm>;

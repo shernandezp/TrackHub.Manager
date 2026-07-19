@@ -6,7 +6,7 @@ namespace TrackHub.Manager.Infrastructure.Configurations;
 
 public class DocumentVersionConfiguration : IEntityTypeConfiguration<DocumentVersion>
 {
-    // Table name is a literal (no TrackHubCommon repack, per spec 04 §15).
+    // Table name is a literal (no TrackHubCommon repack).
     private const string TableName = "document_versions";
 
     public void Configure(EntityTypeBuilder<DocumentVersion> builder)

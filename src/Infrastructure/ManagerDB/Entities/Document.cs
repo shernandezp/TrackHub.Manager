@@ -5,7 +5,7 @@ namespace TrackHub.Manager.Infrastructure.Entities;
 public sealed class Document(Guid accountId, string ownerEntityType, string ownerEntityId, string uploadedByPrincipalType, string uploadedByPrincipalId, string storageProvider, string storageKey, string contentType, long sizeBytes, string sha256Hash, string classification, string status, DateTimeOffset? expiresAt, string visibilityScope, string scanStatus, string fileName = "", string category = "", string? title = null, string? description = null) : BaseAuditableEntity
 {
     // DocumentId is normally server-generated; the upload path sets it before persist so the storage
-    // key can be computed from it (spec 04 §6.5). internal setter keeps it write-only within the assembly.
+    // key can be computed from it. internal setter keeps it write-only within the assembly.
     public Guid DocumentId { get; internal set; } = Guid.NewGuid();
     public Guid AccountId { get; set; } = accountId;
     public string OwnerEntityType { get; set; } = ownerEntityType;
@@ -23,7 +23,7 @@ public sealed class Document(Guid accountId, string ownerEntityType, string owne
     public string VisibilityScope { get; set; } = visibilityScope;
     public string ScanStatus { get; set; } = scanStatus;
 
-    // Spec 04 §6.1 additions.
+    // Document-library columns.
     public string FileName { get; set; } = fileName;
     public string Category { get; set; } = category;
     public string? Title { get; set; } = title;

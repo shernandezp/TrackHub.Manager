@@ -2,7 +2,7 @@ using Common.Infrastructure;
 
 namespace TrackHub.Manager.Infrastructure.Entities;
 
-// Tamper-evident record that a signature/consent occurred (spec 04 §6.3). Evidence only — not a legal
+// Tamper-evident record that a signature/consent occurred. Evidence only — not a legal
 // e-signature workflow or third-party provider integration.
 public sealed class DocumentSignature(Guid documentId, Guid accountId, string signerPrincipalType, string signerPrincipalId, string signerName, Guid? signatureImageDocumentId, string legalTextAccepted, double? latitude, double? longitude, DateTimeOffset signedAt, DateTimeOffset createdAt) : BaseEntity
 {

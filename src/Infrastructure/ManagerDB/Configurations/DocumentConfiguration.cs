@@ -26,7 +26,7 @@ public class DocumentConfiguration : IEntityTypeConfiguration<Document>
         builder.Property(x => x.VisibilityScope).HasColumnName("visibilityscope").HasMaxLength(ColumnMetadata.DefaultNameLength).IsRequired();
         builder.Property(x => x.ScanStatus).HasColumnName("scanstatus").HasMaxLength(ColumnMetadata.DefaultNameLength).IsRequired();
 
-        // Spec 04 §6.1 additions.
+        // Document-library columns.
         builder.Property(x => x.FileName).HasColumnName("filename").HasMaxLength(ColumnMetadata.DefaultNameLength).IsRequired();
         builder.Property(x => x.Category).HasColumnName("category").HasMaxLength(ColumnMetadata.DefaultNameLength).IsRequired();
         builder.Property(x => x.Title).HasColumnName("title").HasMaxLength(ColumnMetadata.DefaultNameLength);
@@ -39,7 +39,7 @@ public class DocumentConfiguration : IEntityTypeConfiguration<Document>
 
         builder.HasIndex(x => new { x.AccountId, x.OwnerEntityType, x.OwnerEntityId });
         builder.HasIndex(x => x.Sha256Hash);
-        // Spec 04 §6.1: expiration scan + per-owner active-type lookup.
+        // Indexes for the expiration scan + per-owner active-type lookup.
         builder.HasIndex(x => new { x.AccountId, x.ExpiresAt, x.Status });
         builder.HasIndex(x => new { x.AccountId, x.OwnerEntityType, x.OwnerEntityId, x.Category, x.Status });
     }

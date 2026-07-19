@@ -19,7 +19,7 @@ using TrackHub.Manager.Infrastructure.Interfaces;
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
 /// <summary>
-/// The single transporter-visibility primitive (spec 01.3 A1.3).
+/// The single transporter-visibility primitive.
 /// </summary>
 public sealed class VisibleTransporterReader(IApplicationDbContext context, ICurrentPrincipal principal)
     : AccountScopedDataAccess(context, principal), IVisibleTransporterReader

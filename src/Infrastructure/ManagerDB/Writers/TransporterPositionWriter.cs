@@ -17,7 +17,7 @@ using TrackHub.Manager.Infrastructure.Interfaces;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Writers;
 
-// The latest-position projection is owned by the TrackHub.Telemetry service (spec 01.3). Manager only
+// The latest-position projection is owned by the TrackHub.Telemetry service. Manager only
 // removes a transporter's latest position when the transporter itself is deleted (lifecycle cleanup).
 public sealed class TransporterPositionWriter(IApplicationDbContext context) : ITransporterPositionWriter
 {

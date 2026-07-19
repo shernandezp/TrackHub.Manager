@@ -19,7 +19,7 @@ using TrackHub.Manager.Application.Accounts.Events;
 
 namespace TrackHub.Manager.Application.Accounts.Commands.UpdateBranding;
 
-// Account-Administrator own-account branding upsert (spec 03 §7.3).
+// Account-Administrator own-account branding upsert.
 [Authorize(Resource = Resources.Accounts, Action = Actions.Edit)]
 public readonly record struct UpdateAccountBrandingCommand(AccountBrandingDto Branding)
     : IRequest<AccountBrandingVm>;

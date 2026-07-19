@@ -1,6 +1,6 @@
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Storage;
 
-// Server-generated storage key layout (spec 04 §6.5): {accountId}/{ownerType}/{documentId}/{version}.
+// Server-generated storage key layout: {accountId}/{ownerType}/{documentId}/{version}.
 // Never exposed in any read model.
 public static class DocumentStorageKey
 {

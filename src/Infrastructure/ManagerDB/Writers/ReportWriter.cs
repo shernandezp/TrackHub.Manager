@@ -37,6 +37,11 @@ public sealed class ReportWriter(IApplicationDbContext context) : IReportWriter
         report.Description = reportDto.Description;
         report.Type = reportDto.TypeId;
         report.Active = reportDto.Active;
+        report.Category = reportDto.Category;
+        report.RequiredFeatureKey = reportDto.RequiredFeatureKey;
+        report.ManagerOnly = reportDto.ManagerOnly;
+        report.SupportsPdf = reportDto.SupportsPdf;
+        report.SortOrder = reportDto.SortOrder;
 
         await context.SaveChangesAsync(cancellationToken);
     }

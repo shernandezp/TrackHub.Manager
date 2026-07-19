@@ -1,7 +1,7 @@
 namespace TrackHub.Manager.Application.Documents.Queries;
 
 // Per-owner document panel (ungated — gated by the owning module's feature). Now applies owner group
-// visibility + classification filtering, not tenant scope alone (spec 04 §7.2, §15 behavior change).
+// visibility + classification filtering, not tenant scope alone.
 [Authorize(Resource = Resources.Documents, Action = Actions.Read)]
 public readonly record struct GetDocumentsForOwnerQuery(Guid AccountId, string OwnerEntityType, string OwnerEntityId, DateTimeOffset? From = null, DateTimeOffset? To = null, int Skip = 0, int Take = 50) : IRequest<IReadOnlyCollection<DocumentVm>>;
 public class GetDocumentsForOwnerQueryHandler(IDocumentReader reader) : IRequestHandler<GetDocumentsForOwnerQuery, IReadOnlyCollection<DocumentVm>>
@@ -38,7 +38,7 @@ public class GetDocumentSignaturesQueryHandler(IDocumentReader reader) : IReques
     public async Task<IReadOnlyCollection<DocumentSignatureVm>> Handle(GetDocumentSignaturesQuery request, CancellationToken cancellationToken) => await reader.GetDocumentSignaturesAsync(request.DocumentId, cancellationToken);
 }
 
-// Standalone Document Management surfaces are gated by the `documents` feature (spec 04 §7.2, §18.2).
+// Standalone Document Management surfaces are gated by the `documents` feature.
 [Authorize(Resource = Resources.Documents, Action = Actions.Read)]
 [RequireFeature(FeatureKeys.Documents)]
 public readonly record struct SearchDocumentsQuery(DocumentSearchFilter Filter, int Skip = 0, int Take = 50) : IRequest<IReadOnlyCollection<DocumentVm>>;

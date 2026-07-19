@@ -18,5 +18,10 @@ public readonly record struct UpdateReportDto(
     Guid ReportId,
     string? Description,
     short TypeId,
-    bool Active
+    bool Active,
+    string Category,
+    string? RequiredFeatureKey,
+    bool ManagerOnly,
+    bool SupportsPdf,
+    int SortOrder
     );

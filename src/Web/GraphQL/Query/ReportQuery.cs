@@ -14,6 +14,7 @@
 //
 
 using TrackHub.Manager.Application.Reports.Queries.GetAll;
+using TrackHub.Manager.Application.Reports.Queries.GetByCode;
 
 namespace TrackHub.Manager.Web.GraphQL.Query;
 
@@ -22,5 +23,8 @@ public partial class Query
 
     public async Task<IReadOnlyCollection<ReportVm>> GetReports([Service] ISender sender)
         => await sender.Send(new GetReportsQuery());
+
+    public async Task<ReportVm?> GetReportByCode([Service] ISender sender, string code)
+        => await sender.Send(new GetReportByCodeQuery(code));
 
 }

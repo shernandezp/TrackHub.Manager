@@ -25,6 +25,42 @@ namespace DBInitializer;
 
 internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextInitializer> logger, ApplicationDbContext context)
 {
+    // Canonical catalog of all backend factory reports with their governance metadata.
+    // Category grouping, RequiredFeatureKey gating (null = global), ManagerOnly role gating and
+    // SupportsPdf format support. Common report-code constants where they exist; the Reporting-local
+    // document/admin codes are string literals (they never became Common constants).
+    private static readonly (string Code, string Description, string Category, string? RequiredFeatureKey, bool ManagerOnly, bool SupportsPdf, int SortOrder)[] ReportCatalog =
+    [
+        // Operations (global + geofencing-gated)
+        (Reports.LiveReport, "Live Report", "Operations", null, false, false, 10),
+        (Reports.PositionRecord, "Position Record", "Operations", null, false, false, 20),
+        (Reports.TransportersInGeofence, "Transporters In Geofence", "Operations", FeatureKeys.Geofencing, false, false, 30),
+        (Reports.GeofenceEvents, "Geofence Events", "Operations", FeatureKeys.Geofencing, false, false, 40),
+
+        // GPS integration
+        (Reports.GpsProviderHealthSummary, "GPS Provider Health Summary", "Gps", FeatureKeys.GpsIntegration, true, true, 10),
+        (Reports.GpsProviderSyncHistory, "GPS Provider Sync History", "Gps", FeatureKeys.GpsIntegration, false, false, 20),
+        (Reports.GpsSyncStatistics, "GPS Sync Statistics", "Gps", FeatureKeys.GpsIntegration, false, false, 30),
+        (Reports.GpsSynchronizedDeviceInventory, "GPS Synchronized Device Inventory", "Gps", FeatureKeys.GpsIntegration, false, false, 40),
+        (Reports.GpsRecentlyAddedDevices, "GPS Recently Added Devices", "Gps", FeatureKeys.GpsIntegration, false, false, 50),
+        (Reports.GpsUnassignedDevices, "GPS Unassigned Devices", "Gps", FeatureKeys.GpsIntegration, false, false, 60),
+        (Reports.GpsIgnoredDevices, "GPS Ignored Devices", "Gps", FeatureKeys.GpsIntegration, false, false, 70),
+        (Reports.GpsAssignmentHistory, "GPS Assignment History", "Gps", FeatureKeys.GpsIntegration, false, false, 80),
+        (Reports.GpsLatestPositionFreshness, "GPS Latest Position Freshness", "Gps", FeatureKeys.GpsIntegration, false, false, 90),
+        (Reports.GpsPositionHistory, "GPS Position History", "Gps", FeatureKeys.GpsPositionHistory, false, false, 100),
+
+        // Documents — Reporting-local codes
+        ("documents-expiring", "Documents expiring within a window", "Documents", FeatureKeys.Documents, false, true, 10),
+        ("documents-missing-required", "Transporters missing required documents", "Documents", FeatureKeys.Documents, false, true, 20),
+        ("documents-share-activity", "Document share activity", "Documents", FeatureKeys.Documents, false, false, 30),
+        ("documents-upload-volume", "Document upload volume", "Documents", FeatureKeys.Documents, false, false, 40),
+
+        // Administration (global + manager-only) — Reporting-local codes
+        ("accounts-by-status", "Accounts by lifecycle status", "Administration", null, true, true, 10),
+        ("feature-enablement-matrix", "Feature enablement matrix across accounts", "Administration", null, true, true, 20),
+        ("group-membership-export", "Group membership export", "Administration", null, true, false, 30),
+    ];
+
     public async Task InitializeAsync()
     {
         try
@@ -54,26 +90,36 @@ internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextIniti
     public async Task TrySeedAsync()
     {
         // Default data
-        // Seed, if necessary
-        if (!context.Reports.Any())
+        // Report catalog: idempotent per-code upsert that runs every start. New rows are
+        // inserted Active; existing rows get their Description + governance metadata refreshed in place,
+        // but Active and Type are never overwritten (admins may have disabled a report).
+        //
+        // DESIGN NOTE — code is the source of truth for seeded catalog metadata. Because this refresh runs
+        // on every start, a SuperAdministrator's UpdateReportCommand edits to the seeded fields
+        // (Description/Category/RequiredFeatureKey/ManagerOnly/SupportsPdf/SortOrder) are TRANSIENT: they
+        // revert to these code values on the next restart. Only Active (enable/disable a report) persists
+        // across restarts. This is intentional — the governed catalog's shape ships with the deployment;
+        // UpdateReport is for toggling availability, not for permanently re-authoring seeded metadata.
+        var reportType = (short)ReportType.Basic;
+        var existingReports = await context.Reports.AsTracking().ToListAsync();
+        var reportsByCode = existingReports.ToDictionary(r => r.Code, StringComparer.Ordinal);
+        foreach (var (code, description, category, requiredFeatureKey, managerOnly, supportsPdf, sortOrder) in ReportCatalog)
         {
-            var reportType = (short)ReportType.Basic;
-            context.Reports.Add(new Report(Reports.TransportersInGeofence, "Transporters In Geofence", reportType, true));
-            context.Reports.Add(new Report(Reports.PositionRecord, "Position Record", reportType, true));
-            context.Reports.Add(new Report(Reports.LiveReport, "Live Report", reportType, true));
-            context.Reports.Add(new Report(Reports.GeofenceEvents, "Geofence Events", reportType, true));
-            context.Reports.Add(new Report(Reports.GpsProviderHealthSummary, "GPS Provider Health Summary", reportType, true));
-            context.Reports.Add(new Report(Reports.GpsProviderSyncHistory, "GPS Provider Sync History", reportType, true));
-            context.Reports.Add(new Report(Reports.GpsSyncStatistics, "GPS Sync Statistics", reportType, true));
-            context.Reports.Add(new Report(Reports.GpsSynchronizedDeviceInventory, "GPS Synchronized Device Inventory", reportType, true));
-            context.Reports.Add(new Report(Reports.GpsRecentlyAddedDevices, "GPS Recently Added Devices", reportType, true));
-            context.Reports.Add(new Report(Reports.GpsUnassignedDevices, "GPS Unassigned Devices", reportType, true));
-            context.Reports.Add(new Report(Reports.GpsIgnoredDevices, "GPS Ignored Devices", reportType, true));
-            context.Reports.Add(new Report(Reports.GpsAssignmentHistory, "GPS Assignment History", reportType, true));
-            context.Reports.Add(new Report(Reports.GpsLatestPositionFreshness, "GPS Latest Position Freshness", reportType, true));
-            context.Reports.Add(new Report(Reports.GpsPositionHistory, "GPS Position History", reportType, true));
-            await context.SaveChangesAsync();
+            if (reportsByCode.TryGetValue(code, out var report))
+            {
+                report.Description = description;
+                report.Category = category;
+                report.RequiredFeatureKey = requiredFeatureKey;
+                report.ManagerOnly = managerOnly;
+                report.SupportsPdf = supportsPdf;
+                report.SortOrder = sortOrder;
+            }
+            else
+            {
+                context.Reports.Add(new Report(code, description, reportType, true, category, requiredFeatureKey, managerOnly, supportsPdf, sortOrder));
+            }
         }
+        await context.SaveChangesAsync();
         if (!context.TransporterTypes.Any())
         {
             context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Aircraft, false, 10, 10, 120));
@@ -124,6 +170,36 @@ internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextIniti
         {
             var user = await context.Users.FirstAsync();
             context.UserSettings.Add(new UserSettings(user.UserId));
+            await context.SaveChangesAsync();
+        }
+
+        // Platform default notification templates are NOT seeded: localized
+        // text never lives in the database. Defaults come from the NotificationDefaultMessages
+        // resources at render time; the templates table holds account-authored overrides only.
+        // Remove rows an earlier initializer version may have seeded.
+        var seededDefaults = await context.NotificationTemplates.Where(t => t.AccountId == null).ToListAsync();
+        if (seededDefaults.Count > 0)
+        {
+            context.NotificationTemplates.RemoveRange(seededDefaults);
+            await context.SaveChangesAsync();
+        }
+
+        // One-time gating backfill: rule CRUD is now gated by the `notifications`
+        // feature, so every account that already has NotificationRule rows gets an enabled feature
+        // row. Idempotent; runs through the entity writer path, never raw SQL.
+        var ruleAccounts = await context.NotificationRules.Select(r => r.AccountId).Distinct().ToListAsync();
+        var gatedAccounts = await context.AccountFeatures
+            .Where(f => f.FeatureKey == FeatureKeys.Notifications)
+            .Select(f => f.AccountId)
+            .Distinct()
+            .ToListAsync();
+        var missing = ruleAccounts.Except(gatedAccounts).ToList();
+        if (missing.Count > 0)
+        {
+            foreach (var accountId in missing)
+            {
+                context.AccountFeatures.Add(new AccountFeature(accountId, FeatureKeys.Notifications, true, "standard", "migration", null, null, null));
+            }
             await context.SaveChangesAsync();
         }
     }

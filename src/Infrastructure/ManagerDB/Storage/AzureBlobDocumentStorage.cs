@@ -9,7 +9,7 @@ using TrackHub.Manager.Domain.Models;
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Storage;
 
 /// <summary>
-/// Azure Blob Storage provider (spec 04 §14, §18.1). Downloads use a short-lived read-only SAS URL (the
+/// Azure Blob Storage provider. Downloads use a short-lived read-only SAS URL (the
 /// download endpoint 302-redirects the browser straight to the blob). SAS generation requires the client
 /// to hold a shared key (connection string); when it doesn't (e.g. managed identity), this returns null and
 /// the endpoint streams the bytes instead. Configured from the <c>DocumentStorage:AzureBlob</c> section.

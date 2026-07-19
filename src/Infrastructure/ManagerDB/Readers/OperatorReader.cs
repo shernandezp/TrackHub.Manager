@@ -12,7 +12,7 @@ public sealed class OperatorReader(
     IIdentityService identityService) : IOperatorReader
 {
     // The operator health/failure/position-sync summary is DERIVED from the telemetry tables at read
-    // time (spec 01.3 Slice B): after the extraction those rows are written by the Router into the
+    // time: after the extraction those rows are written by the Router into the
     // telemetry-owned operator_health_checks / operator_sync_runs, and the denormalized operator
     // columns are no longer maintained. The device-sync and manual-sync timestamps
     // (LastSuccessfulSyncAt, LastDeviceSyncAt, LastManualSyncAt) remain Manager-owned bookkeeping.
