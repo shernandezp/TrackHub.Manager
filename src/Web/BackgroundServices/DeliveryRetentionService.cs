@@ -13,6 +13,7 @@
 //  limitations under the License.
 //
 
+using Common.Domain.Constants;
 using Microsoft.EntityFrameworkCore;
 using TrackHub.Manager.Domain.Constants;
 using TrackHub.Manager.Infrastructure;
@@ -28,7 +29,7 @@ public sealed class DeliveryRetentionService(
     IConfiguration configuration,
     ILogger<DeliveryRetentionService> logger) : BackgroundService
 {
-    private const string JobKey = "delivery-retention";
+    private const string JobKey = BackgroundJobKeys.DeliveryRetention;
     private const int DefaultRetentionDays = 90;
     private static readonly TimeSpan Interval = TimeSpan.FromHours(24);
     private static readonly TimeSpan StartupDelay = TimeSpan.FromMinutes(10);

@@ -16,9 +16,13 @@
 using Ardalis.GuardClauses;
 using Common.Application;
 using Common.Web.Infrastructure;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Reflection;
+using System.Threading.RateLimiting;
 using TrackHub.Manager.Infrastructure;
 using TrackHub.Manager.Web.BackgroundServices;
+using TrackHub.Manager.Web.Endpoints;
 using TrackHub.Manager.Web.GraphQL.Mutation;
 using TrackHub.Manager.Web.GraphQL.Query;
 
@@ -60,6 +64,26 @@ builder.Services.AddHealthChecks()
 
 builder.Services.AddTrackHubGraphQLServer<Query, Mutation>(builder.Environment.IsDevelopment());
 
+// Anonymous platform-status announcements endpoint (spec 28 ST-09): named policies, applied per
+// endpoint so nothing else in the pipeline changes behavior.
+builder.Services.AddOutputCache(options =>
+    options.AddPolicy(PlatformStatus.CachePolicy, policy => policy.Expire(TimeSpan.FromSeconds(60))));
+
+// Partitioned PER CLIENT IP, not a single global bucket: AddFixedWindowLimiter would share one
+// 60/minute budget across every caller, so the endpoint would start rejecting once a few dozen
+// portal sessions polled it — i.e. it would fail hardest during the incident it exists to report.
+builder.Services.AddRateLimiter(options =>
+    options.AddPolicy(PlatformStatus.RateLimitPolicy, httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            // Requires UseForwardedHeaders (below) to see the real client rather than nginx.
+            httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 60,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+            })));
+
 builder.Services.AddCors(options => options
     .AddPolicy("AllowFrontend",
         builder => builder
@@ -77,6 +101,17 @@ builder.Services.AddHsts(options =>
 });
 
 var app = builder.Build();
+
+// Behind nginx every request otherwise appears to come from the proxy's container IP, which would
+// collapse the per-IP rate-limit partition above into a single shared bucket. Mirrors the
+// AuthorityServer configuration.
+var forwardedHeadersOptions = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+};
+forwardedHeadersOptions.KnownIPNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+app.UseForwardedHeaders(forwardedHeadersOptions);
 
 app.UseHeaderPropagation();
 
@@ -99,6 +134,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseExceptionHandler(options => { });
+
+app.UseRateLimiter();
+app.UseOutputCache();
 
 app.MapEndpoints(Assembly.GetExecutingAssembly());
 app.MapGraphQL();

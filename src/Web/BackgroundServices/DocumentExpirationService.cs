@@ -31,7 +31,7 @@ public sealed class DocumentExpirationService(
     IServiceScopeFactory scopeFactory,
     ILogger<DocumentExpirationService> logger) : BackgroundService
 {
-    private const string JobKey = "document-expiration";
+    private const string JobKey = BackgroundJobKeys.DocumentExpiration;
     private static readonly TimeSpan Interval = TimeSpan.FromHours(12);
     private static readonly TimeSpan StartupDelay = TimeSpan.FromMinutes(2);
 

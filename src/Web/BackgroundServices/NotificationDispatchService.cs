@@ -39,7 +39,7 @@ public sealed class NotificationDispatchService(
     IConfiguration configuration,
     ILogger<NotificationDispatchService> logger) : BackgroundService
 {
-    private const string JobKey = "notification-dispatch";
+    private const string JobKey = BackgroundJobKeys.NotificationDispatch;
     private const int MaxAttempts = 5;
     private const int BatchSize = 100;
     private static readonly TimeSpan Interval = TimeSpan.FromSeconds(30);

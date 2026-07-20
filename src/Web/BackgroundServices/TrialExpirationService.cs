@@ -13,6 +13,7 @@
 //  limitations under the License.
 //
 
+using Common.Domain.Constants;
 using System.Text.Json;
 using Common.Domain.Enums;
 using Common.Mediator;
@@ -32,7 +33,7 @@ public sealed class TrialExpirationService(
     IServiceScopeFactory scopeFactory,
     ILogger<TrialExpirationService> logger) : BackgroundService
 {
-    private const string JobKey = "trial-expiration";
+    private const string JobKey = BackgroundJobKeys.TrialExpiration;
     private const string TrialTier = "trial";
     private static readonly TimeSpan Interval = TimeSpan.FromHours(6);
     private static readonly TimeSpan StartupDelay = TimeSpan.FromMinutes(5);
