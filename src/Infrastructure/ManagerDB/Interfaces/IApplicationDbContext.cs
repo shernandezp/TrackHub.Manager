@@ -28,6 +28,7 @@ public interface IApplicationDbContext
     DbSet<AlertSubscription> AlertSubscriptions { get; set; }
     DbSet<AuditEvent> AuditEvents { get; set; }
     DbSet<BackgroundJobRun> BackgroundJobRuns { get; set; }
+    DbSet<PlatformAnnouncement> PlatformAnnouncements { get; set; }
     DbSet<Credential> Credentials { get; set; }
     DbSet<Document> Documents { get; set; }
     DbSet<DocumentVersion> DocumentVersions { get; set; }

@@ -13,6 +13,7 @@
 //  limitations under the License.
 //
 
+using Common.Domain.Constants;
 using Microsoft.EntityFrameworkCore;
 using TrackHub.Manager.Domain.Constants;
 using TrackHub.Manager.Domain.Interfaces;
@@ -29,7 +30,7 @@ public sealed class DocumentScanService(
     IServiceScopeFactory scopeFactory,
     ILogger<DocumentScanService> logger) : BackgroundService
 {
-    private const string JobKey = "document-scan";
+    private const string JobKey = BackgroundJobKeys.DocumentScan;
     private const int BatchSize = 100;
     private static readonly TimeSpan Interval = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan StartupDelay = TimeSpan.FromSeconds(10);

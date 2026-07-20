@@ -35,7 +35,7 @@ public sealed class AlertEvaluationService(
     IServiceScopeFactory scopeFactory,
     ILogger<AlertEvaluationService> logger) : BackgroundService
 {
-    private const string JobKey = "alert-evaluation";
+    private const string JobKey = BackgroundJobKeys.AlertEvaluation;
     private const int DefaultCommunicationLossThresholdMinutes = 60;
     private const int CredentialExpiryWithinDays = 7;
     private static readonly TimeSpan Interval = TimeSpan.FromMinutes(5);

@@ -118,6 +118,9 @@ public static class DependencyInjection
         services.AddScoped<IAlertEventReader, AlertEventReader>();
         services.AddScoped<IAlertEventWriter, AlertEventWriter>();
         services.AddScoped<IBackgroundJobRunReader, BackgroundJobRunReader>();
+        services.AddScoped<IBackgroundJobStatusReader, BackgroundJobStatusReader>();
+        services.AddScoped<IPlatformAnnouncementReader, PlatformAnnouncementReader>();
+        services.AddScoped<IPlatformAnnouncementWriter, PlatformAnnouncementWriter>();
         services.AddScoped<IBackgroundJobRunWriter, BackgroundJobRunWriter>();
         services.AddScoped<IPublicLinkGrantReader, PublicLinkGrantReader>();
         services.AddScoped<IPublicLinkGrantWriter, PublicLinkGrantWriter>();

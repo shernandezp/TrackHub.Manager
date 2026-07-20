@@ -31,6 +31,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<AlertSubscription> AlertSubscriptions { get; set; }
     public DbSet<AuditEvent> AuditEvents { get; set; }
     public DbSet<BackgroundJobRun> BackgroundJobRuns { get; set; }
+    public DbSet<PlatformAnnouncement> PlatformAnnouncements { get; set; }
     public DbSet<Credential> Credentials { get; set; }
     public DbSet<Document> Documents { get; set; }
     public DbSet<DocumentVersion> DocumentVersions { get; set; }

@@ -13,6 +13,7 @@
 //  limitations under the License.
 //
 
+using Common.Domain.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using TrackHub.Manager.Domain.Constants;
@@ -35,7 +36,7 @@ public sealed class DocumentRetentionCleanupService(
     IConfiguration configuration,
     ILogger<DocumentRetentionCleanupService> logger) : BackgroundService
 {
-    private const string JobKey = "document-retention-cleanup";
+    private const string JobKey = BackgroundJobKeys.DocumentRetentionCleanup;
     private const int BatchSize = 200;
     private static readonly TimeSpan Interval = TimeSpan.FromHours(24);
     private static readonly TimeSpan StartupDelay = TimeSpan.FromMinutes(10);

@@ -32,7 +32,7 @@ public sealed class NotificationDigestService(
     IConfiguration configuration,
     ILogger<NotificationDigestService> logger) : BackgroundService
 {
-    private const string JobKey = "notification-digest";
+    private const string JobKey = BackgroundJobKeys.NotificationDigest;
     private static readonly TimeSpan Interval = TimeSpan.FromHours(1);
     private static readonly TimeSpan StartupDelay = TimeSpan.FromMinutes(5);
 
