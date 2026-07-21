@@ -30,11 +30,13 @@ public static class AlertEventTypes
     public const string DocumentExpiring = nameof(DocumentExpiring);
     public const string DocumentExpired = nameof(DocumentExpired);
     public const string NotificationDeliveryFailed = nameof(NotificationDeliveryFailed);
+    public const string DriverQualificationExpiring = nameof(DriverQualificationExpiring);
+    public const string DriverQualificationExpired = nameof(DriverQualificationExpired);
 
     public static readonly IReadOnlyCollection<string> All =
     [
         GeofenceEntered, GeofenceExited, GeofenceDwellExceeded, CommunicationLoss,
         GpsCredentialExpiring, GpsOperatorPositionSyncFailed, DocumentExpiring, DocumentExpired,
-        NotificationDeliveryFailed
+        NotificationDeliveryFailed, DriverQualificationExpiring, DriverQualificationExpired
     ];
 }

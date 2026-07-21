@@ -55,24 +55,16 @@ internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextIniti
         ("documents-share-activity", "Document share activity", "Documents", FeatureKeys.Documents, false, false, 30),
         ("documents-upload-volume", "Document upload volume", "Documents", FeatureKeys.Documents, false, false, 40),
 
-        // Administration (global + manager-only) — Reporting-local codes
+        // Workforce — Reporting-local codes. Driver personal data, so gated on the `workforce` key.
+    ("workforce-driver-registry", "Driver registry export", "Workforce", FeatureKeys.Workforce, false, false, 10),
+    ("workforce-qualification-expirations", "Driver qualifications expiring within a window", "Workforce", FeatureKeys.Workforce, false, true, 20),
+    ("workforce-assignment-history", "Driver to transporter assignment history", "Workforce", FeatureKeys.Workforce, false, false, 30),
+
+    // Administration (global + manager-only) — Reporting-local codes
         ("accounts-by-status", "Accounts by lifecycle status", "Administration", null, true, true, 10),
         ("feature-enablement-matrix", "Feature enablement matrix across accounts", "Administration", null, true, true, 20),
         ("group-membership-export", "Group membership export", "Administration", null, true, false, 30),
     ];
-
-    public async Task InitializeAsync()
-    {
-        try
-        {
-            await context.Database.MigrateAsync();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occurred while initializing the database.");
-            throw;
-        }
-    }
 
     public async Task SeedAsync()
     {
@@ -122,36 +114,21 @@ internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextIniti
         await context.SaveChangesAsync();
         if (!context.TransporterTypes.Any())
         {
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Aircraft, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Asset, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Bicycle, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Boat, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Car, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.CargoContainer, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Child, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.ConstructionVehicle, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.DeliveryVan, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Drone, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.ElderlyPerson, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.FleetVehicle, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.HeavyEquipment, true, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Livestock, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Motorcycle, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Package, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Person, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Pet, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.SchoolBus, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Scooter, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Taxi, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Tool, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Tractor, false, 10, 10, 120));
-            context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType((short)TransporterType.Truck, false, 10, 10, 120));
+            // Seed every TransporterType enum value with identical defaults
+            // (not custom, small icon 10x10, 120s expiration). HeavyEquipment is the only
+            // type flagged custom (second ctor arg true).
+            foreach (var transporterType in Enum.GetValues<TransporterType>())
+            {
+                var isCustom = transporterType == TransporterType.HeavyEquipment;
+                context.TransporterTypes.Add(new TrackHub.Manager.Infrastructure.Entities.TransporterType(
+                    (short)transporterType, isCustom, 10, 10, 120));
+            }
             await context.SaveChangesAsync();
         }
         if (!context.Accounts.Any())
         {
             var accountType = (short)AccountType.Personal;
-            context.Accounts.Add(new Account("Master Acccount", "Master Account Description", accountType, true));
+            context.Accounts.Add(new Account("Master Account", "Master Account Description", accountType, true));
             await context.SaveChangesAsync();
         }
         if (!context.AccountSettings.Any())
@@ -173,7 +150,8 @@ internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextIniti
             await context.SaveChangesAsync();
         }
 
-        // Platform default notification templates are NOT seeded: localized
+        // One-time backfill (idempotent; kept for not-yet-migrated environments):
+        // platform default notification templates are NOT seeded: localized
         // text never lives in the database. Defaults come from the NotificationDefaultMessages
         // resources at render time; the templates table holds account-authored overrides only.
         // Remove rows an earlier initializer version may have seeded.
@@ -184,9 +162,10 @@ internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextIniti
             await context.SaveChangesAsync();
         }
 
-        // One-time gating backfill: rule CRUD is now gated by the `notifications`
-        // feature, so every account that already has NotificationRule rows gets an enabled feature
-        // row. Idempotent; runs through the entity writer path, never raw SQL.
+        // One-time backfill (idempotent; kept for not-yet-migrated environments):
+        // rule CRUD is now gated by the `notifications` feature, so every account that already has
+        // NotificationRule rows gets an enabled feature row. Runs through the entity writer path,
+        // never raw SQL.
         var ruleAccounts = await context.NotificationRules.Select(r => r.AccountId).Distinct().ToListAsync();
         var gatedAccounts = await context.AccountFeatures
             .Where(f => f.FeatureKey == FeatureKeys.Notifications)

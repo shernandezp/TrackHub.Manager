@@ -82,6 +82,10 @@ public static class DependencyInjection
         services.AddScoped<IReportReader, ReportReader>();
         services.AddScoped<IDriverReader, DriverReader>();
         services.AddScoped<IDriverWriter, DriverWriter>();
+        services.AddScoped<IDriverQualificationReader, DriverQualificationReader>();
+        services.AddScoped<IDriverQualificationWriter, DriverQualificationWriter>();
+        services.AddScoped<IDriverAssignmentReader, DriverAssignmentReader>();
+        services.AddScoped<IDriverAssignmentWriter, DriverAssignmentWriter>();
         services.AddScoped<IGroupVisibilityReader, GroupVisibilityReader>();
         services.AddScoped<IVisibleTransporterReader, VisibleTransporterReader>();
         services.AddScoped<IAccountFeatureReader, AccountFeatureReader>();
