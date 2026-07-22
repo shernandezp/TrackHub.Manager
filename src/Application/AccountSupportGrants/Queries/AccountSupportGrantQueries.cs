@@ -8,6 +8,7 @@ public class GetSupportGrantStatusQueryHandler(IAccountSupportGrantReader reader
 }
 
 [Authorize(Resource = Resources.SupportGrants, Action = Actions.Read)]
+[AllowCrossAccount("Platform support administration console: the whole purpose is to list support grants ACROSS accounts (AccountId is an optional filter, null = all). Gated by the SupportGrants/Read platform permission.")]
 public readonly record struct GetAccountSupportGrantsQuery(Guid? AccountId = null, int Skip = 0, int Take = 50) : IRequest<IReadOnlyCollection<AccountSupportGrantVm>>;
 public class GetAccountSupportGrantsQueryHandler(IAccountSupportGrantReader reader) : IRequestHandler<GetAccountSupportGrantsQuery, IReadOnlyCollection<AccountSupportGrantVm>>
 {

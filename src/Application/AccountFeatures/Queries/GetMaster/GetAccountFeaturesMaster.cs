@@ -1,6 +1,7 @@
 namespace TrackHub.Manager.Application.AccountFeatures.Queries.GetMaster;
 
 [Authorize(Resource = Resources.AccountFeaturesMaster, Action = Actions.Read)]
+[AllowCrossAccount("Master/platform administration surface: an operator holding AccountFeaturesMaster/Read provisions the feature matrix OF another account, so the target account is necessarily not their own.")]
 public readonly record struct GetAccountFeaturesMasterQuery(Guid AccountId) : IRequest<IReadOnlyCollection<AccountFeatureVm>>;
 
 public class GetAccountFeaturesMasterQueryHandler(IAccountFeatureMasterReader reader) : IRequestHandler<GetAccountFeaturesMasterQuery, IReadOnlyCollection<AccountFeatureVm>>

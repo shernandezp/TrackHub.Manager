@@ -128,6 +128,7 @@ public static class DependencyInjection
         services.AddScoped<IBackgroundJobRunWriter, BackgroundJobRunWriter>();
         services.AddScoped<IPublicLinkGrantReader, PublicLinkGrantReader>();
         services.AddScoped<IPublicLinkGrantWriter, PublicLinkGrantWriter>();
+        services.AddScoped<IPublicLinkGrantResolver, PublicLinkGrantResolver>();
         services.AddScoped<IAccountSupportGrantReader, AccountSupportGrantReader>();
         services.AddScoped<IAccountSupportGrantWriter, AccountSupportGrantWriter>();
         services.AddScoped<IUserWriter, UserWriter>();

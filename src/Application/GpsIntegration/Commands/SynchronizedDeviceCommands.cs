@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 namespace TrackHub.Manager.Application.GpsIntegration.Commands;
 
 [Authorize(Resource = Resources.SynchronizedDevices, Action = Actions.Write, PrincipalTypes = "User,ServiceClient")]
+[AllowCrossAccount("SyncWorker's device-sync loop enumerates every account via accountSettingsMaster and pushes the synchronized device catalog per account under one global router_client/syncworker_client identity.")]
 public readonly record struct SynchronizeOperatorDevicesCommand(
     Guid AccountId,
     Guid OperatorId,

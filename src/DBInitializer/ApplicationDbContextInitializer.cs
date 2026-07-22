@@ -60,6 +60,14 @@ internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextIniti
     ("workforce-qualification-expirations", "Driver qualifications expiring within a window", "Workforce", FeatureKeys.Workforce, false, true, 20),
     ("workforce-assignment-history", "Driver to transporter assignment history", "Workforce", FeatureKeys.Workforce, false, false, 30),
 
+        // Trips — Reporting-local codes. Dispatch execution data, gated on the `trip-management` key.
+        ("trip-summary", "Trip summary by period", "Trips", FeatureKeys.TripManagement, false, false, 10),
+        ("trip-detail", "Trip stop-level detail", "Trips", FeatureKeys.TripManagement, false, false, 20),
+        ("trip-on-time-performance", "Trip on-time performance", "Trips", FeatureKeys.TripManagement, false, true, 30),
+        ("trip-stop-dwell", "Trip stop dwell distribution", "Trips", FeatureKeys.TripManagement, false, false, 40),
+        ("trip-toll-cost", "Estimated toll cost by trip", "Trips", FeatureKeys.TripManagement, false, true, 50),
+        ("trip-pod-export", "Proof-of-delivery register", "Trips", FeatureKeys.TripManagement, false, false, 60),
+
     // Administration (global + manager-only) — Reporting-local codes
         ("accounts-by-status", "Accounts by lifecycle status", "Administration", null, true, true, 10),
         ("feature-enablement-matrix", "Feature enablement matrix across accounts", "Administration", null, true, true, 20),
