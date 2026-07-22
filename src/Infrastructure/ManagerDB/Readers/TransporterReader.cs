@@ -13,29 +13,43 @@
 //  limitations under the License.
 //
 
+using Common.Application.Interfaces;
 using TrackHub.Manager.Infrastructure.Interfaces;
 using TransporterType = Common.Domain.Enums.TransporterType;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
 // TransporterReader class for reading transporter information
-public sealed class TransporterReader(IApplicationDbContext context) : ITransporterReader
+// Tenant scoping: TransporterVm deliberately does not expose AccountId, so the owning account is
+// read alongside the projection and authorized before the row is returned. See the note on
+// UserReader for why this cannot be left to AccountScopeBehavior.
+public sealed class TransporterReader(IApplicationDbContext context, ICurrentPrincipal principal)
+    : AccountScopedDataAccess(context, principal), ITransporterReader
 {
     /// <summary>
-    /// GetTransporterAsync method retrieves a transporter by its ID 
+    /// GetTransporterAsync method retrieves a transporter by its ID
     /// </summary>
     /// <param name="id">The ID of the transporter</param>
     /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the TransporterVm object.</returns>
     public async Task<TransporterVm> GetTransporterAsync(Guid id, CancellationToken cancellationToken)
-        => await context.Transporters
+    {
+        var row = await Context.Transporters
             .Where(d => d.TransporterId.Equals(id))
-            .Select(d => new TransporterVm(
-                d.TransporterId,
-                d.Name,
-                (TransporterType)d.TransporterTypeId,
-                d.TransporterTypeId))
+            .Select(d => new
+            {
+                d.AccountId,
+                Vm = new TransporterVm(
+                    d.TransporterId,
+                    d.Name,
+                    (TransporterType)d.TransporterTypeId,
+                    d.TransporterTypeId)
+            })
             .FirstAsync(cancellationToken);
+
+        RequireAccountAccess(row.AccountId);
+        return row.Vm;
+    }
 
     /// <summary>
     /// GetTransporterAsync method retrieves a transporter by its name
@@ -44,7 +58,7 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
     /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the TransporterVm object.</returns>
     public async Task<TransporterVm> GetTransporterAsync(string name, CancellationToken cancellationToken)
-        => await context.Transporters
+        => await Context.Transporters
             .Where(d => d.Name.Equals(name))
             .Select(d => new TransporterVm(
                 d.TransporterId,
@@ -60,7 +74,21 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
     /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a collection of TransporterVm objects.</returns>
     public async Task<IReadOnlyCollection<TransporterVm>> GetTransportersByGroupAsync(long groupId, CancellationToken cancellationToken)
-        => await context.Groups
+    {
+        // Sequential bigint key — see UserReader.GetUsersByGroupAsync.
+        var groupAccountId = await Context.Groups
+            .Where(g => g.GroupId == groupId)
+            .Select(g => (Guid?)g.AccountId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (!groupAccountId.HasValue)
+        {
+            return [];
+        }
+
+        RequireAccountAccess(groupAccountId.Value);
+
+        return await Context.Groups
             .Where(g => g.GroupId == groupId)
             .SelectMany(g => g.Transporters)
             .Select(d => new
@@ -77,6 +105,7 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
                 (TransporterType)d.TransporterTypeId,
                 d.TransporterTypeId))
             .ToListAsync(cancellationToken);
+    }
 
     /// <summary>
     /// GetTransportersByUserAsync method retrieves transporters by user ID
@@ -85,7 +114,20 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
     /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a collection of TransporterVm objects.</returns>
     public async Task<IReadOnlyCollection<TransporterVm>> GetTransportersByUserAsync(Guid userId, CancellationToken cancellationToken)
-        => await context.Users
+    {
+        var subjectAccountId = await Context.Users
+            .Where(u => u.UserId == userId)
+            .Select(u => (Guid?)u.AccountId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (!subjectAccountId.HasValue)
+        {
+            return [];
+        }
+
+        RequireAccountAccess(subjectAccountId.Value);
+
+        return await Context.Users
             .Where(u => u.UserId == userId)
             .SelectMany(u => u.Groups)
             .SelectMany(g => g.Transporters)
@@ -96,6 +138,7 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
                 (TransporterType)d.TransporterTypeId,
                 d.TransporterTypeId))
             .ToListAsync(cancellationToken);
+    }
 
     /// <summary>
     /// GetTransportersByAccountAsync method retrieves transporters by account ID
@@ -104,7 +147,7 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
     /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a collection of TransporterVm objects.</returns>
     public async Task<IReadOnlyCollection<TransporterVm>> GetTransportersByAccountAsync(Guid accountId, CancellationToken cancellationToken)
-        => await context.Transporters
+        => await Context.Transporters
             .Where(t => t.AccountId == accountId)
             .OrderBy(t => t.Name)
             .Select(t => new TransporterVm(
@@ -119,7 +162,7 @@ public sealed class TransporterReader(IApplicationDbContext context) : ITranspor
     /// Used by handlers that need account scope without leaking the EF context to Application.
     /// </summary>
     public async Task<Guid?> GetAccountIdAsync(Guid transporterId, CancellationToken cancellationToken)
-        => await context.Transporters
+        => await Context.Transporters
             .Where(t => t.TransporterId == transporterId)
             .Select(t => (Guid?)t.AccountId)
             .FirstOrDefaultAsync(cancellationToken);

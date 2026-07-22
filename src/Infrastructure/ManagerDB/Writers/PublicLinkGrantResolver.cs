@@ -76,6 +76,9 @@ public sealed class PublicLinkGrantResolver(IApplicationDbContext context) : IPu
             return new PublicLinkGrantResolutionResult(PublicLinkResolution.Expired, null);
         }
 
+        // ApplicationDbContext is configured NoTracking, so the grant comes back untracked and must be
+        // attached for these writes to reach the same SaveChanges as the audit row below.
+        context.PublicLinkGrants.Attach(grant);
         grant.AccessCount++;
         grant.LastAccessedAt = DateTimeOffset.UtcNow;
         context.AuditEvents.Add(new AuditEvent(

@@ -9,7 +9,8 @@ namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 public sealed class OperatorReader(
     IApplicationDbContext context,
     ICurrentPrincipal principal,
-    IIdentityService identityService) : IOperatorReader
+    IIdentityService identityService)
+    : AccountScopedDataAccess(context, principal), IOperatorReader
 {
     // The operator health/failure/position-sync summary is DERIVED from the telemetry tables at read
     // time: after the extraction those rows are written by the Router into the
@@ -75,7 +76,7 @@ public sealed class OperatorReader(
         }
 
         // Latest health check per operator -> status, latency, timestamp.
-        var latestCheckTimes = await context.OperatorHealthChecks
+        var latestCheckTimes = await Context.OperatorHealthChecks
             .Where(c => operatorIds.Contains(c.OperatorId))
             .GroupBy(c => c.OperatorId)
             .Select(g => new { OperatorId = g.Key, Ts = g.Max(x => x.StartedAt) })
@@ -83,14 +84,14 @@ public sealed class OperatorReader(
         var latestCheckTsSet = latestCheckTimes.Select(x => x.Ts).Distinct().ToList();
         var latestCheckRows = latestCheckTsSet.Count == 0
             ? []
-            : await context.OperatorHealthChecks
+            : await Context.OperatorHealthChecks
                 .Where(c => operatorIds.Contains(c.OperatorId) && latestCheckTsSet.Contains(c.StartedAt))
                 .Select(c => new { c.OperatorId, c.StartedAt, c.Status, c.LatencyMs })
                 .ToListAsync(cancellationToken);
 
         // Latest degraded/offline health check per operator -> failure code/message/time.
         var failStatuses = new[] { (int)OperatorHealthStatus.Degraded, (int)OperatorHealthStatus.Offline };
-        var latestFailTimes = await context.OperatorHealthChecks
+        var latestFailTimes = await Context.OperatorHealthChecks
             .Where(c => operatorIds.Contains(c.OperatorId) && failStatuses.Contains(c.Status))
             .GroupBy(c => c.OperatorId)
             .Select(g => new { OperatorId = g.Key, Ts = g.Max(x => x.StartedAt) })
@@ -98,18 +99,18 @@ public sealed class OperatorReader(
         var latestFailTsSet = latestFailTimes.Select(x => x.Ts).Distinct().ToList();
         var latestFailRows = latestFailTsSet.Count == 0
             ? []
-            : await context.OperatorHealthChecks
+            : await Context.OperatorHealthChecks
                 .Where(c => operatorIds.Contains(c.OperatorId) && latestFailTsSet.Contains(c.StartedAt) && failStatuses.Contains(c.Status))
                 .Select(c => new { c.OperatorId, c.StartedAt, c.CompletedAt, c.ErrorCode, c.ErrorMessage })
                 .ToListAsync(cancellationToken);
 
         // Sync-run timestamps: last failed run and last position sync (Router-recorded).
-        var lastFailedRun = await context.OperatorSyncRuns
+        var lastFailedRun = await Context.OperatorSyncRuns
             .Where(r => operatorIds.Contains(r.OperatorId) && r.Result == (int)OperatorSyncResult.Failed)
             .GroupBy(r => r.OperatorId)
             .Select(g => new { OperatorId = g.Key, At = g.Max(x => x.StartedAt) })
             .ToDictionaryAsync(x => x.OperatorId, x => (DateTimeOffset?)x.At, cancellationToken);
-        var lastPositionSync = await context.OperatorSyncRuns
+        var lastPositionSync = await Context.OperatorSyncRuns
             .Where(r => operatorIds.Contains(r.OperatorId) && r.PositionsRead > 0)
             .GroupBy(r => r.OperatorId)
             .Select(g => new { OperatorId = g.Key, At = g.Max(x => x.StartedAt) })
@@ -143,17 +144,17 @@ public sealed class OperatorReader(
 
     private async Task<bool> CanIncludeCredentialsAsync(CancellationToken cancellationToken)
     {
-        if (principal.PrincipalType == PrincipalType.ServiceClient)
+        if (Principal.PrincipalType == PrincipalType.ServiceClient)
         {
             return true;
         }
 
-        if (principal.PrincipalType != PrincipalType.User || !principal.UserId.HasValue)
+        if (Principal.PrincipalType != PrincipalType.User || !Principal.UserId.HasValue)
         {
             return false;
         }
 
-        var userId = principal.UserId.Value;
+        var userId = Principal.UserId.Value;
         // Single combined role+policy decision (cached in Common's IdentityService) instead of
         // two sequential Security round trips per operator read.
         return await identityService.AuthorizeUserAsync(userId, Resources.Credentials, Actions.Custom, cancellationToken);
@@ -161,10 +162,16 @@ public sealed class OperatorReader(
 
     public async Task<OperatorVm> GetOperatorAsync(Guid id, CancellationToken cancellationToken)
     {
-        var op = await context.Operators
+        var op = await Context.Operators
             .Include(o => o.Credential)
             .FirstOrDefaultAsync(o => o.OperatorId == id, cancellationToken)
             ?? throw new NotFoundException(nameof(Entities.Operator), id.ToString());
+
+        // This read can carry decrypted credential material (see CanIncludeCredentialsAsync) and the
+        // query carries no top-level AccountId, so it is bound to the caller's tenant here. A global
+        // service client — the Router's sync, replay and provider flows — still satisfies this.
+        RequireAccountAccess(op.AccountId);
+
         var summary = await DeriveSummaryAsync(id, cancellationToken);
         var includeCredentials = await CanIncludeCredentialsAsync(cancellationToken);
         return Map(op, includeCredentials, summary);
@@ -175,7 +182,7 @@ public sealed class OperatorReader(
     // credential gating and the derived telemetry summary behave exactly like the by-id read.
     public async Task<OperatorVm> GetOperatorByTransporterAsync(Guid transporterId, CancellationToken cancellationToken)
     {
-        var operatorId = await context.TransporterDeviceAssignments
+        var operatorId = await Context.TransporterDeviceAssignments
             .Where(a => a.TransporterId == transporterId && a.Status == (int)AssignmentStatus.Active)
             .OrderByDescending(a => a.IsPrimary)
             .ThenBy(a => a.Priority)
@@ -188,7 +195,7 @@ public sealed class OperatorReader(
 
     public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsAsync(Filters filters, CancellationToken cancellationToken)
     {
-        var query = context.Operators.Include(o => o.Credential).AsQueryable();
+        var query = Context.Operators.Include(o => o.Credential).AsQueryable();
         query = filters.Apply(query);
         var items = await query.ToListAsync(cancellationToken);
         var summaries = await DeriveSummariesAsync(items.Select(o => o.OperatorId).ToList(), cancellationToken);
@@ -198,12 +205,12 @@ public sealed class OperatorReader(
 
     public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsByUserAsync(Guid userId, CancellationToken cancellationToken)
     {
-        var accountId = await context.Users
+        var accountId = await Context.Users
             .Where(u => u.UserId == userId)
             .Select(u => u.AccountId)
             .FirstAsync(cancellationToken);
 
-        var items = await context.Operators
+        var items = await Context.Operators
             .Include(o => o.Credential)
             .Where(o => o.AccountId == accountId)
             .ToListAsync(cancellationToken);

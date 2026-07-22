@@ -32,7 +32,10 @@ public class RegisterUploadedDocumentCommandHandler(IDocumentWriter writer) : IR
     public async Task<DocumentVm> Handle(RegisterUploadedDocumentCommand request, CancellationToken cancellationToken) => await writer.RegisterUploadedDocumentAsync(request.DocumentId, request.Document, cancellationToken);
 }
 
-[Authorize(Resource = Resources.Documents, Action = Actions.Edit)]
+// Upload-completion bookkeeping driven by the ingestion pipeline, not a user-editable field.
+// ServiceClient-only, so the register → scan → activate sequence that the upload endpoint and
+// DocumentScanService implement remains the only way a document's lifecycle status advances.
+[Authorize(Resource = Resources.Documents, Action = Actions.Edit, PrincipalTypes = "ServiceClient")]
 public readonly record struct MarkDocumentUploadedCommand(Guid DocumentId, string Status) : IRequest;
 public class MarkDocumentUploadedCommandHandler(IDocumentWriter writer) : IRequestHandler<MarkDocumentUploadedCommand>
 {
@@ -44,7 +47,12 @@ public class MarkDocumentUploadedCommandValidator : AbstractValidator<MarkDocume
 }
 
 // Called by the scan-result processing job under a scoped service identity.
-[Authorize(Resource = Resources.Documents, Action = Actions.Edit)]
+//
+// ServiceClient-only, and this is a SECURITY boundary rather than bookkeeping: the malware verdict is
+// what stands between an infected upload and the download endpoints, which serve bytes only for a
+// Clean scan status. DocumentScanService re-scans rows still marked Quarantined, so a verdict written
+// here is final until the version is replaced.
+[Authorize(Resource = Resources.Documents, Action = Actions.Edit, PrincipalTypes = "ServiceClient")]
 public readonly record struct MarkDocumentScanResultCommand(Guid DocumentId, string ScanStatus) : IRequest;
 public class MarkDocumentScanResultCommandHandler(IDocumentWriter writer) : IRequestHandler<MarkDocumentScanResultCommand>
 {

@@ -13,12 +13,20 @@
 //  limitations under the License.
 //
 
+using Common.Application.Interfaces;
 using TrackHub.Manager.Infrastructure.Interfaces;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
 // This class represents a reader for retrieving user data from the database.
-public sealed class UserReader(IApplicationDbContext context) : IUserReader
+//
+// Tenant scoping: the by-id and by-group reads take a caller-supplied key, and their queries carry no
+// top-level AccountId, so AccountScopeBehavior has no account to compare and this DbContext has no
+// global query filter. Scoping happens here, where the row's owning account first becomes known.
+// RequireAccountAccess admits a global service client and an active support grant, so internal and
+// support flows are unaffected.
+public sealed class UserReader(IApplicationDbContext context, ICurrentPrincipal principal)
+    : AccountScopedDataAccess(context, principal), IUserReader
 {
     /// <summary>
     /// Retrieves a user by their ID.
@@ -27,7 +35,8 @@ public sealed class UserReader(IApplicationDbContext context) : IUserReader
     /// <param name="cancellationToken"></param>
     /// <returns>A UserVm object representing the retrieved user.</returns>
     public async Task<UserVm> GetUserAsync(Guid id, CancellationToken cancellationToken)
-        => await context.Users
+    {
+        var user = await Context.Users
             .Where(u => u.UserId.Equals(id))
             .Select(u => new UserVm(
                 u.UserId,
@@ -35,6 +44,10 @@ public sealed class UserReader(IApplicationDbContext context) : IUserReader
                 u.Active,
                 u.AccountId))
             .FirstAsync(cancellationToken);
+
+        RequireAccountAccess(user.AccountId);
+        return user;
+    }
 
     /// <summary>
     /// Retrieves a collection of users by their account ID.
@@ -45,7 +58,7 @@ public sealed class UserReader(IApplicationDbContext context) : IUserReader
     /// An IReadOnlyCollection<UserVm> representing the retrieved users.
     /// </returns>
     public async Task<IReadOnlyCollection<UserVm>> GetUsersByAccountAsync(Guid accountId, CancellationToken cancellationToken)
-        => await context.Users
+        => await Context.Users
             .Where(u => u.AccountId == accountId)
             .Select(u => new UserVm(
                 u.UserId,
@@ -64,7 +77,22 @@ public sealed class UserReader(IApplicationDbContext context) : IUserReader
     /// An IReadOnlyCollection<UserVm> representing the retrieved users.
     /// </returns>
     public async Task<IReadOnlyCollection<UserVm>> GetUsersByGroupAsync(long groupId, CancellationToken cancellationToken)
-        => await context.Groups
+    {
+        // GroupId is a sequential bigint and therefore directly enumerable, so the group's owning
+        // account is resolved first and authorized before any user row is projected.
+        var groupAccountId = await Context.Groups
+            .Where(g => g.GroupId == groupId)
+            .Select(g => (Guid?)g.AccountId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (!groupAccountId.HasValue)
+        {
+            return [];
+        }
+
+        RequireAccountAccess(groupAccountId.Value);
+
+        return await Context.Groups
             .Where(g => g.GroupId == groupId)
             .SelectMany(g => g.Users)
             .Select(u => new UserVm(
@@ -74,4 +102,5 @@ public sealed class UserReader(IApplicationDbContext context) : IUserReader
                 u.AccountId))
             .Distinct()
             .ToListAsync(cancellationToken);
+    }
 }

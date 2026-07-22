@@ -13,12 +13,17 @@
 //  limitations under the License.
 //
 
+using Common.Application.Interfaces;
 using TrackHub.Manager.Infrastructure.Interfaces;
 
 namespace TrackHub.Manager.Infrastructure.ManagerDB.Readers;
 
 // This class represents a reader for retrieving group information from the database.
-public sealed class GroupReader(IApplicationDbContext context) : IGroupReader
+//
+// Tenant scoping: GroupId is a sequential bigint and GetGroupQuery carries no top-level AccountId,
+// so nothing upstream binds the key to the caller's tenant. See the note on UserReader.
+public sealed class GroupReader(IApplicationDbContext context, ICurrentPrincipal principal)
+    : AccountScopedDataAccess(context, principal), IGroupReader
 {
     // Retrieves a specific group by its ID.
     // Parameters:
@@ -27,7 +32,8 @@ public sealed class GroupReader(IApplicationDbContext context) : IGroupReader
     // Returns:
     //   A Task that represents the asynchronous operation. The task result contains the GroupVm object.
     public async Task<GroupVm> GetGroupAsync(long id, CancellationToken cancellationToken)
-        => await context.Groups
+    {
+        var group = await Context.Groups
             .Where(d => d.GroupId.Equals(id))
             .Select(d => new GroupVm(
                 d.GroupId,
@@ -37,6 +43,10 @@ public sealed class GroupReader(IApplicationDbContext context) : IGroupReader
                 d.AccountId))
             .FirstAsync(cancellationToken);
 
+        RequireAccountAccess(group.AccountId);
+        return group;
+    }
+
     // Retrieves all groups associated with a specific user.
     // Parameters:
     //   userId: The ID of the user.
@@ -44,7 +54,21 @@ public sealed class GroupReader(IApplicationDbContext context) : IGroupReader
     // Returns:
     //   A Task that represents the asynchronous operation. The task result contains a collection of GroupVm objects.
     public async Task<IReadOnlyCollection<GroupVm>> GetGroupsByUserAsync(Guid userId, CancellationToken cancellationToken)
-        => await context.Users
+    {
+        // Authorize against the subject user's account before returning their group membership.
+        var subjectAccountId = await Context.Users
+            .Where(u => u.UserId == userId)
+            .Select(u => (Guid?)u.AccountId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (!subjectAccountId.HasValue)
+        {
+            return [];
+        }
+
+        RequireAccountAccess(subjectAccountId.Value);
+
+        return await Context.Users
             .Where(u => u.UserId == userId)
             .SelectMany(u => u.Groups)
             .Distinct()
@@ -55,6 +79,7 @@ public sealed class GroupReader(IApplicationDbContext context) : IGroupReader
                 d.Active,
                 d.AccountId))
             .ToListAsync(cancellationToken);
+    }
 
     // Retrieves all groups associated with a specific account.
     // Parameters:
@@ -63,7 +88,7 @@ public sealed class GroupReader(IApplicationDbContext context) : IGroupReader
     // Returns:
     //   A Task that represents the asynchronous operation. The task result contains a collection of GroupVm objects.
     public async Task<IReadOnlyCollection<GroupVm>> GetGroupsByAccountAsync(Guid accountId, CancellationToken cancellationToken)
-        => await context.Accounts
+        => await Context.Accounts
             .Where(a => a.AccountId == accountId)
             .SelectMany(a => a.Groups)
             .Distinct()
