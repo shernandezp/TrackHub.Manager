@@ -20,6 +20,9 @@ public class RecordAlertEventCommandHandler(IAlertEventWriter writer, IPublisher
 }
 
 [Authorize(Resource = Resources.Alerts, Action = Actions.Edit)]
+// Enforcement: the reader/writer this handler delegates to extends AccountScopedDataAccess and
+// checks the loaded row's owning account (RequireAccountAccess) or filters on the caller's scope.
+[AccountScopeEnforcedInHandler]
 public readonly record struct AcknowledgeAlertEventCommand(Guid AlertEventId) : IRequest;
 public class AcknowledgeAlertEventCommandHandler(IAlertEventWriter writer) : IRequestHandler<AcknowledgeAlertEventCommand>
 {
@@ -27,6 +30,9 @@ public class AcknowledgeAlertEventCommandHandler(IAlertEventWriter writer) : IRe
 }
 
 [Authorize(Resource = Resources.Alerts, Action = Actions.Edit)]
+// Enforcement: the reader/writer this handler delegates to extends AccountScopedDataAccess and
+// checks the loaded row's owning account (RequireAccountAccess) or filters on the caller's scope.
+[AccountScopeEnforcedInHandler]
 public readonly record struct ResolveAlertEventCommand(Guid AlertEventId) : IRequest;
 public class ResolveAlertEventCommandHandler(IAlertEventWriter writer) : IRequestHandler<ResolveAlertEventCommand>
 {

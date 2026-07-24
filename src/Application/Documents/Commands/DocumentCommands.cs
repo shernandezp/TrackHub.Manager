@@ -36,6 +36,9 @@ public class RegisterUploadedDocumentCommandHandler(IDocumentWriter writer) : IR
 // ServiceClient-only, so the register → scan → activate sequence that the upload endpoint and
 // DocumentScanService implement remains the only way a document's lifecycle status advances.
 [Authorize(Resource = Resources.Documents, Action = Actions.Edit, PrincipalTypes = "ServiceClient")]
+// Enforcement: the reader/writer this handler delegates to extends AccountScopedDataAccess and
+// checks the loaded row's owning account (RequireAccountAccess) or filters on the caller's scope.
+[AccountScopeEnforcedInHandler]
 public readonly record struct MarkDocumentUploadedCommand(Guid DocumentId, string Status) : IRequest;
 public class MarkDocumentUploadedCommandHandler(IDocumentWriter writer) : IRequestHandler<MarkDocumentUploadedCommand>
 {
@@ -53,6 +56,9 @@ public class MarkDocumentUploadedCommandValidator : AbstractValidator<MarkDocume
 // Clean scan status. DocumentScanService re-scans rows still marked Quarantined, so a verdict written
 // here is final until the version is replaced.
 [Authorize(Resource = Resources.Documents, Action = Actions.Edit, PrincipalTypes = "ServiceClient")]
+// Enforcement: the reader/writer this handler delegates to extends AccountScopedDataAccess and
+// checks the loaded row's owning account (RequireAccountAccess) or filters on the caller's scope.
+[AccountScopeEnforcedInHandler]
 public readonly record struct MarkDocumentScanResultCommand(Guid DocumentId, string ScanStatus) : IRequest;
 public class MarkDocumentScanResultCommandHandler(IDocumentWriter writer) : IRequestHandler<MarkDocumentScanResultCommand>
 {
@@ -64,6 +70,9 @@ public class MarkDocumentScanResultCommandValidator : AbstractValidator<MarkDocu
 }
 
 [Authorize(Resource = Resources.Documents, Action = Actions.Edit)]
+// Enforcement: the reader/writer this handler delegates to extends AccountScopedDataAccess and
+// checks the loaded row's owning account (RequireAccountAccess) or filters on the caller's scope.
+[AccountScopeEnforcedInHandler]
 public readonly record struct ExpireDocumentCommand(Guid DocumentId, DateTimeOffset ExpiresAt) : IRequest;
 public class ExpireDocumentCommandHandler(IDocumentWriter writer) : IRequestHandler<ExpireDocumentCommand>
 {
@@ -71,6 +80,9 @@ public class ExpireDocumentCommandHandler(IDocumentWriter writer) : IRequestHand
 }
 
 [Authorize(Resource = Resources.Documents, Action = Actions.Delete)]
+// Enforcement: the reader/writer this handler delegates to extends AccountScopedDataAccess and
+// checks the loaded row's owning account (RequireAccountAccess) or filters on the caller's scope.
+[AccountScopeEnforcedInHandler]
 public readonly record struct DeleteDocumentReferenceCommand(Guid DocumentId) : IRequest;
 public class DeleteDocumentReferenceCommandHandler(IDocumentWriter writer) : IRequestHandler<DeleteDocumentReferenceCommand>
 {
@@ -79,6 +91,9 @@ public class DeleteDocumentReferenceCommandHandler(IDocumentWriter writer) : IRe
 
 // Bytes arrive via the upload endpoint; the command completes the version re-point.
 [Authorize(Resource = Resources.Documents, Action = Actions.Edit)]
+// Enforcement: the reader/writer this handler delegates to extends AccountScopedDataAccess and
+// checks the loaded row's owning account (RequireAccountAccess) or filters on the caller's scope.
+[AccountScopeEnforcedInHandler]
 public readonly record struct ReplaceDocumentVersionCommand(Guid DocumentId, DocumentVersionDto NewVersion) : IRequest<DocumentVm>;
 public class ReplaceDocumentVersionCommandHandler(IDocumentWriter writer) : IRequestHandler<ReplaceDocumentVersionCommand, DocumentVm>
 {
@@ -96,6 +111,9 @@ public class ReplaceDocumentVersionCommandValidator : AbstractValidator<ReplaceD
 }
 
 [Authorize(Resource = Resources.Documents, Action = Actions.Edit)]
+// Enforcement: the reader/writer this handler delegates to extends AccountScopedDataAccess and
+// checks the loaded row's owning account (RequireAccountAccess) or filters on the caller's scope.
+[AccountScopeEnforcedInHandler]
 public readonly record struct VoidDocumentCommand(Guid DocumentId, string Reason) : IRequest;
 public class VoidDocumentCommandHandler(IDocumentWriter writer) : IRequestHandler<VoidDocumentCommand>
 {
@@ -107,6 +125,9 @@ public class VoidDocumentCommandValidator : AbstractValidator<VoidDocumentComman
 }
 
 [Authorize(Resource = Resources.Documents, Action = Actions.Edit)]
+// Enforcement: the reader/writer this handler delegates to extends AccountScopedDataAccess and
+// checks the loaded row's owning account (RequireAccountAccess) or filters on the caller's scope.
+[AccountScopeEnforcedInHandler]
 public readonly record struct SignDocumentCommand(DocumentSignatureDto Signature) : IRequest<DocumentSignatureVm>;
 public class SignDocumentCommandHandler(IDocumentWriter writer) : IRequestHandler<SignDocumentCommand, DocumentSignatureVm>
 {
@@ -137,6 +158,9 @@ public class ConfigureDocumentTypeCommandValidator : AbstractValidator<Configure
 
 [Authorize(Resource = Resources.Documents, Action = Actions.Write)]
 [RequireFeature(FeatureKeys.Documents)]
+// Enforcement: the reader/writer this handler delegates to extends AccountScopedDataAccess and
+// checks the loaded row's owning account (RequireAccountAccess) or filters on the caller's scope.
+[AccountScopeEnforcedInHandler]
 public readonly record struct DisableDocumentTypeCommand(Guid DocumentTypeId) : IRequest;
 public class DisableDocumentTypeCommandHandler(IDocumentWriter writer) : IRequestHandler<DisableDocumentTypeCommand>
 {

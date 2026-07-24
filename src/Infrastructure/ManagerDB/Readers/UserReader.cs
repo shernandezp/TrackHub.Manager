@@ -50,33 +50,17 @@ public sealed class UserReader(IApplicationDbContext context, ICurrentPrincipal 
     }
 
     /// <summary>
-    /// Retrieves a collection of users by their account ID.
-    /// </summary>
-    /// <param name="accountId"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>
-    /// An IReadOnlyCollection<UserVm> representing the retrieved users.
-    /// </returns>
-    public async Task<IReadOnlyCollection<UserVm>> GetUsersByAccountAsync(Guid accountId, CancellationToken cancellationToken)
-        => await Context.Users
-            .Where(u => u.AccountId == accountId)
-            .Select(u => new UserVm(
-                u.UserId,
-                u.Username,
-                u.Active,
-                u.AccountId))
-            .Distinct()
-            .ToListAsync(cancellationToken);
-
-    /// <summary>
-    /// Retrieves a collection of users by their group ID.
+    /// Retrieves a page of the users in a group.
     /// </summary>
     /// <param name="groupId"></param>
+    /// <param name="skip"></param>
+    /// <param name="take"></param>
+    /// <param name="search"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>
-    /// An IReadOnlyCollection<UserVm> representing the retrieved users.
+    /// A UsersPageVm carrying the requested window and the unpaged total.
     /// </returns>
-    public async Task<IReadOnlyCollection<UserVm>> GetUsersByGroupAsync(long groupId, CancellationToken cancellationToken)
+    public async Task<UsersPageVm> GetUsersByGroupAsync(long groupId, int skip, int take, string? search, CancellationToken cancellationToken)
     {
         // GroupId is a sequential bigint and therefore directly enumerable, so the group's owning
         // account is resolved first and authorized before any user row is projected.
@@ -87,20 +71,53 @@ public sealed class UserReader(IApplicationDbContext context, ICurrentPrincipal 
 
         if (!groupAccountId.HasValue)
         {
-            return [];
+            return new UsersPageVm([], 0);
         }
 
         RequireAccountAccess(groupAccountId.Value);
 
-        return await Context.Groups
-            .Where(g => g.GroupId == groupId)
-            .SelectMany(g => g.Users)
-            .Select(u => new UserVm(
-                u.UserId,
-                u.Username,
-                u.Active,
-                u.AccountId))
-            .Distinct()
+        var query = ApplySearch(
+            Context.Groups
+                .Where(g => g.GroupId == groupId)
+                .SelectMany(g => g.Users)
+                .Select(u => new UserVm(
+                    u.UserId,
+                    u.Username,
+                    u.Active,
+                    u.AccountId))
+                .Distinct(),
+            search);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        // UserId is the tiebreaker: usernames are unique per account today, but the page window must
+        // not depend on that invariant holding across accounts sharing a group.
+        var items = await query
+            .OrderBy(u => u.Username)
+            .ThenBy(u => u.UserId)
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync(cancellationToken);
+
+        return new UsersPageVm(items, totalCount);
+    }
+
+    /// <summary>
+    /// Minimal user projection for select controls: unpaged, capped by the caller.
+    /// </summary>
+    public async Task<IReadOnlyCollection<UserLookupVm>> GetUserLookupByAccountAsync(Guid accountId, int fetchSize, CancellationToken cancellationToken)
+    {
+        var scoped = RequireAccountAccess(accountId);
+        return await Context.Users
+            .Where(u => u.AccountId == scoped)
+            .OrderBy(u => u.Username)
+            .ThenBy(u => u.UserId)
+            .Take(fetchSize)
+            .Select(u => new UserLookupVm(u.UserId, u.Username))
             .ToListAsync(cancellationToken);
     }
+
+    private static IQueryable<UserVm> ApplySearch(IQueryable<UserVm> query, string? search)
+        => string.IsNullOrWhiteSpace(search)
+            ? query
+            : query.Where(u => EF.Functions.ILike(u.Username, SearchPattern.Contains(search), SearchPattern.Escape));
 }

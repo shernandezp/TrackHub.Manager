@@ -1,6 +1,9 @@
 namespace TrackHub.Manager.Application.AccountSupportGrants.Queries;
 
 [Authorize(Resource = Resources.SupportGrants, Action = Actions.Read)]
+// Enforcement: the reader/writer this handler delegates to extends AccountScopedDataAccess and
+// checks the loaded row's owning account (RequireAccountAccess) or filters on the caller's scope.
+[AccountScopeEnforcedInHandler]
 public readonly record struct GetSupportGrantStatusQuery(Guid AccountSupportGrantId) : IRequest<AccountSupportGrantVm>;
 public class GetSupportGrantStatusQueryHandler(IAccountSupportGrantReader reader) : IRequestHandler<GetSupportGrantStatusQuery, AccountSupportGrantVm>
 {

@@ -15,6 +15,7 @@ public class GetAccountFeaturesMasterQueryHandler(IAccountFeatureMasterReader re
 /// and cross-account reports use instead of one accountFeaturesMaster call per account.
 /// </summary>
 [Authorize(Resource = Resources.AccountFeaturesMaster, Action = Actions.Read)]
+[AllowCrossAccount("Cross-account feature snapshot for the SyncWorker device-sync loop and cross-account reports, called under global service identities with no account claim. The AccountFeaturesMaster resource gates access.")]
 public readonly record struct GetAllAccountFeaturesMasterQuery() : IRequest<IReadOnlyCollection<AccountFeatureVm>>;
 
 public class GetAllAccountFeaturesMasterQueryHandler(IAccountFeatureMasterReader reader) : IRequestHandler<GetAllAccountFeaturesMasterQuery, IReadOnlyCollection<AccountFeatureVm>>

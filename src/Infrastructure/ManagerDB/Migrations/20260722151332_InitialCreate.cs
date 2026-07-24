@@ -57,10 +57,10 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    type = table.Column<short>(type: "smallint", nullable: false),
-                    active = table.Column<bool>(type: "boolean", nullable: false),
-                    status = table.Column<short>(type: "smallint", nullable: false),
-                    statuschangedat = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    type = table.Column<short>(type: "smallint", nullable: false, comment: "Commercial classification of the tenant. Values: 1=Personal, 2=Business, 3=Associate."),
+                    active = table.Column<bool>(type: "boolean", nullable: false, comment: "Legacy on/off flag derived from status; true exactly when status is Trial or Active."),
+                    status = table.Column<short>(type: "smallint", nullable: false, comment: "Authoritative operational state of the tenant. Values: 1=Trial, 2=Active, 3=Suspended, 4=Cancelled, 5=Archived."),
+                    statuschangedat = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true, comment: "Timestamp of the last status transition; null until the first transition."),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -69,6 +69,8 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_accounts", x => x.id);
+                    table.CheckConstraint("ck_accounts_status", "status in (1, 2, 3, 4, 5)");
+                    table.CheckConstraint("ck_accounts_type", "type in (1, 2, 3)");
                 });
 
             migrationBuilder.CreateTable(
@@ -280,13 +282,64 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "driver_qualifications",
+                schema: "app",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    accountid = table.Column<Guid>(type: "uuid", nullable: false),
+                    driverid = table.Column<Guid>(type: "uuid", nullable: false),
+                    qualificationtype = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    category = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    number = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    issuedat = table.Column<DateOnly>(type: "date", nullable: true),
+                    expiresat = table.Column<DateOnly>(type: "date", nullable: true),
+                    issuingauthority = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    status = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    documentid = table.Column<Guid>(type: "uuid", nullable: true),
+                    notes = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_driver_qualifications", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "driver_transporter_assignments",
+                schema: "app",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    accountid = table.Column<Guid>(type: "uuid", nullable: false),
+                    driverid = table.Column<Guid>(type: "uuid", nullable: false),
+                    transporterid = table.Column<Guid>(type: "uuid", nullable: false),
+                    startsat = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    endsat = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    assignmenttype = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    status = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    createdbyprincipal = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_driver_transporter_assignments", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "geocoding_providers",
                 schema: "map",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    type = table.Column<short>(type: "smallint", nullable: false),
+                    type = table.Column<short>(type: "smallint", nullable: false, comment: "Geocoding backend this provider row configures. Values: 1=Nominatim, 2=OpenRouteService, 3=Google."),
                     endpointuri = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     apikey = table.Column<string>(type: "text", nullable: true),
                     salt = table.Column<string>(type: "text", nullable: true),
@@ -302,6 +355,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_geocoding_providers", x => x.id);
+                    table.CheckConstraint("ck_geocoding_providers_type", "type in (1, 2, 3)");
                 });
 
             migrationBuilder.CreateTable(
@@ -441,7 +495,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     messageen = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     messagees = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    severity = table.Column<int>(type: "integer", nullable: false),
+                    severity = table.Column<int>(type: "integer", nullable: false, comment: "Display severity of the announcement. Values: 0=Info, 1=Warning, 2=Critical."),
                     startsat = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     endsat = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     active = table.Column<bool>(type: "boolean", nullable: false),
@@ -453,6 +507,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_platform_announcements", x => x.id);
+                    table.CheckConstraint("ck_platform_announcements_severity", "severity in (0, 1, 2)");
                 });
 
             migrationBuilder.CreateTable(
@@ -491,7 +546,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     code = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    type = table.Column<short>(type: "smallint", nullable: false),
+                    type = table.Column<short>(type: "smallint", nullable: false, comment: "Provenance of the report definition. Values: 1=Basic, 2=Custom, 3=External."),
                     active = table.Column<bool>(type: "boolean", nullable: false),
                     category = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     requiredfeaturekey = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
@@ -506,6 +561,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_reports", x => x.id);
+                    table.CheckConstraint("ck_reports_type", "type in (1, 2, 3)");
                 });
 
             migrationBuilder.CreateTable(
@@ -626,7 +682,11 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     mapskey = table.Column<string>(type: "text", nullable: true),
                     onlineinterval = table.Column<int>(type: "integer", nullable: false),
                     refreshmap = table.Column<bool>(type: "boolean", nullable: false),
-                    refreshmapinterval = table.Column<int>(type: "integer", nullable: false)
+                    refreshmapinterval = table.Column<int>(type: "integer", nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -712,7 +772,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     emailaddress = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     address = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: true),
                     contactname = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    protocoltype = table.Column<int>(type: "integer", nullable: false),
+                    protocoltype = table.Column<int>(type: "integer", nullable: false, comment: "Telematics protocol this operator speaks; selects the Router provider client. Values: 1=CommandTrack, 2=Traccar, 3=Flespi, 4=GeoTab, 5=GpsGate, 6=Navixy, 7=Samsara, 8=Wialon, 9=Protrack, 10=Mettax."),
                     accountid = table.Column<Guid>(type: "uuid", nullable: false),
                     enabled = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     syncintervalminutes = table.Column<int>(type: "integer", nullable: false, defaultValue: 60),
@@ -727,6 +787,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_operators", x => x.id);
+                    table.CheckConstraint("ck_operators_protocoltype", "protocoltype in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)");
                     table.ForeignKey(
                         name: "FK_operators_accounts_accountid",
                         column: x => x.accountid,
@@ -798,7 +859,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    type = table.Column<short>(type: "smallint", nullable: false),
+                    type = table.Column<short>(type: "smallint", nullable: false, comment: "Category of the point of interest. Values: 1=ClientSite, 2=Warehouse, 3=FuelStation, 4=TollBooth, 5=RestArea, 6=Workshop, 7=Port, 8=Other."),
                     latitude = table.Column<double>(type: "double precision", nullable: false),
                     longitude = table.Column<double>(type: "double precision", nullable: false),
                     address = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
@@ -814,6 +875,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_points_of_interest", x => x.id);
+                    table.CheckConstraint("ck_pointsofinterest_type", "type in (1, 2, 3, 4, 5, 6, 7, 8)");
                     table.ForeignKey(
                         name: "FK_points_of_interest_accounts_accountid",
                         column: x => x.accountid,
@@ -838,8 +900,8 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     uri = table.Column<string>(type: "text", nullable: false),
                     username = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     password = table.Column<string>(type: "text", nullable: false),
-                    key = table.Column<string>(type: "text", nullable: true),
-                    key2 = table.Column<string>(type: "text", nullable: true),
+                    key = table.Column<string>(type: "text", nullable: true, comment: "Provider-specific auxiliary credential field 1. GpsGate: application id. Unused by every other protocol."),
+                    key2 = table.Column<string>(type: "text", nullable: true, comment: "Provider-specific auxiliary credential field 2. GpsGate: user id, consumed only by TrackHubRouter GpsGateReaderBase.Init. Unused by every other protocol."),
                     salt = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     token = table.Column<string>(type: "text", nullable: true),
                     tokenexpiration = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
@@ -875,7 +937,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     identifier = table.Column<int>(type: "integer", nullable: false),
                     serial = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    devicetypeid = table.Column<short>(type: "smallint", nullable: false),
+                    devicetypeid = table.Column<short>(type: "smallint", nullable: false, comment: "Hardware class of the tracked device. Values: 1=Aviation, 2=Camera, 3=Cycling, 4=Cellular, 5=Drones, 6=EmergencyLocator, 7=Fitness, 8=Handheld, 9=Marine, 10=OBDScanner, 11=PetTracking, 12=Phone, 13=Satellite, 14=Smartwatch, 15=Wearable."),
                     description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     providerdisplayname = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     providermetadatahash = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
@@ -896,6 +958,7 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_devices", x => x.id);
+                    table.CheckConstraint("ck_devices_devicetypeid", "devicetypeid in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)");
                     table.ForeignKey(
                         name: "FK_devices_accounts_accountid",
                         column: x => x.accountid,
@@ -947,7 +1010,11 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     language = table.Column<string>(type: "text", nullable: false),
                     style = table.Column<string>(type: "text", nullable: false),
-                    navbar = table.Column<string>(type: "text", nullable: false)
+                    navbar = table.Column<string>(type: "text", nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1034,8 +1101,11 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                     isprimary = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     status = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     assignmentreason = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    createdbyprincipaltype = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    createdbyprincipalid = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
+                    createdbyprincipaltype = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false, comment: "Kind of principal that created the assignment; the principal identity is in CreatedBy."),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1218,6 +1288,30 @@ namespace TrackHub.Manager.Infrastructure.Migrations
                 schema: "app",
                 table: "documents",
                 column: "sha256hash");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_driver_qualifications_accountid_driverid",
+                schema: "app",
+                table: "driver_qualifications",
+                columns: new[] { "accountid", "driverid" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_driver_qualifications_accountid_expiresat",
+                schema: "app",
+                table: "driver_qualifications",
+                columns: new[] { "accountid", "expiresat" });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_driver_assignments_account_driver_status",
+                schema: "app",
+                table: "driver_transporter_assignments",
+                columns: new[] { "accountid", "driverid", "status" });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_driver_assignments_account_transporter_status",
+                schema: "app",
+                table: "driver_transporter_assignments",
+                columns: new[] { "accountid", "transporterid", "status" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_drivers_accountid_documentnumber",
@@ -1475,6 +1569,14 @@ namespace TrackHub.Manager.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "documents",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "driver_qualifications",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "driver_transporter_assignments",
                 schema: "app");
 
             migrationBuilder.DropTable(

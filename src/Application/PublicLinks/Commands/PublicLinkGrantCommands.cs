@@ -36,6 +36,7 @@ public class CreatePublicLinkGrantCommandHandler(IPublicLinkGrantWriter writer, 
 }
 
 [Authorize(Resource = Resources.PublicLinks, Action = Actions.Delete)]
+[AllowCrossAccount("TripManagement relays a user's trip-share revocation here under the global trip_client identity with no account claim (same hop as CreatePublicLinkGrantCommand above). Tenant callers are NOT unguarded by this: PublicLinkGrantWriter.RevokePublicLinkGrantAsync loads the grant and RequireAccountWriteAccess checks its owning account.")]
 public readonly record struct RevokePublicLinkGrantCommand(Guid PublicLinkGrantId, string RevokedBy) : IRequest;
 public class RevokePublicLinkGrantCommandHandler(IPublicLinkGrantWriter writer) : IRequestHandler<RevokePublicLinkGrantCommand>
 {

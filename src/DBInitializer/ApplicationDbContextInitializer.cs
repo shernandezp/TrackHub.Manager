@@ -55,12 +55,17 @@ internal class ApplicationDbContextInitializer(ILogger<ApplicationDbContextIniti
         ("documents-share-activity", "Document share activity", "Documents", FeatureKeys.Documents, false, false, 30),
         ("documents-upload-volume", "Document upload volume", "Documents", FeatureKeys.Documents, false, false, 40),
 
-        // Workforce — Reporting-local codes. Driver personal data, so gated on the `workforce` key.
-    ("workforce-driver-registry", "Driver registry export", "Workforce", FeatureKeys.Workforce, false, false, 10),
-    ("workforce-qualification-expirations", "Driver qualifications expiring within a window", "Workforce", FeatureKeys.Workforce, false, true, 20),
-    ("workforce-assignment-history", "Driver to transporter assignment history", "Workforce", FeatureKeys.Workforce, false, false, 30),
+        // Workforce — Reporting-local codes. Driver personal data, so gated on the `workforce` key and
+        // ManagerOnly: the feeds require Drivers/Read, which only the Manager role holds. Widening the
+        // dispatcher (User) role to read driver records is the wrong trade for a report (SC-07).
+        ("workforce-driver-registry", "Driver registry export", "Workforce", FeatureKeys.Workforce, true, false, 10),
+        ("workforce-qualification-expirations", "Driver qualifications expiring within a window", "Workforce", FeatureKeys.Workforce, true, true, 20),
+        ("workforce-assignment-history", "Driver to transporter assignment history", "Workforce", FeatureKeys.Workforce, true, false, 30),
 
         // Trips — Reporting-local codes. Dispatch execution data, gated on the `trip-management` key.
+        // Dispatcher-facing, so not ManagerOnly: the feeds require Trips/Export, which the User role holds.
+        // trip-pod-export carries receiver names, identity documents and signature coordinates, but the
+        // dispatcher owns the trip that produced them; the control on bulk PII export is the export audit.
         ("trip-summary", "Trip summary by period", "Trips", FeatureKeys.TripManagement, false, false, 10),
         ("trip-detail", "Trip stop-level detail", "Trips", FeatureKeys.TripManagement, false, false, 20),
         ("trip-on-time-performance", "Trip on-time performance", "Trips", FeatureKeys.TripManagement, false, true, 30),

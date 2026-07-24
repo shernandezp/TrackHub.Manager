@@ -203,6 +203,47 @@ public sealed class OperatorReader(
         return items.Select(o => Map(o, includeCredentials, summaries.GetValueOrDefault(o.OperatorId))).ToList();
     }
 
+    // Paged counterpart of GetOperatorsAsync. The health/failure summary is derived per page, so the
+    // window is applied in SQL before any telemetry derivation runs.
+    public async Task<OperatorsPageVm> GetOperatorsPageAsync(Filters filters, int skip, int take, string? search, CancellationToken cancellationToken)
+    {
+        var query = filters.Apply(Context.Operators.Include(o => o.Credential).AsQueryable());
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = SearchPattern.Contains(search);
+            query = query.Where(o => EF.Functions.ILike(o.Name, term, SearchPattern.Escape));
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        // Operator names are not unique, so OperatorId completes the total order Skip/Take needs.
+        var items = await query
+            .OrderBy(o => o.Name)
+            .ThenBy(o => o.OperatorId)
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync(cancellationToken);
+
+        var summaries = await DeriveSummariesAsync(items.Select(o => o.OperatorId).ToList(), cancellationToken);
+        var includeCredentials = await CanIncludeCredentialsAsync(cancellationToken);
+        return new OperatorsPageVm(
+            items.Select(o => Map(o, includeCredentials, summaries.GetValueOrDefault(o.OperatorId))).ToList(),
+            totalCount);
+    }
+
+    // Minimal operator projection for select controls: no credential material, no derived telemetry
+    // summary, unpaged, capped by the caller.
+    public async Task<IReadOnlyCollection<OperatorLookupVm>> GetOperatorLookupByAccountAsync(Guid accountId, int fetchSize, CancellationToken cancellationToken)
+    {
+        var scoped = RequireAccountAccess(accountId);
+        return await Context.Operators
+            .Where(o => o.AccountId == scoped)
+            .OrderBy(o => o.Name)
+            .ThenBy(o => o.OperatorId)
+            .Take(fetchSize)
+            .Select(o => new OperatorLookupVm(o.OperatorId, o.Name))
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyCollection<OperatorVm>> GetOperatorsByUserAsync(Guid userId, CancellationToken cancellationToken)
     {
         var accountId = await Context.Users

@@ -11,6 +11,9 @@ public class CreateAccountSupportGrantCommandHandler(IAccountSupportGrantWriter 
 }
 
 [Authorize(Resource = Resources.SupportGrants, Action = Actions.Edit)]
+// Enforcement: the reader/writer this handler delegates to extends AccountScopedDataAccess and
+// checks the loaded row's owning account (RequireAccountAccess) or filters on the caller's scope.
+[AccountScopeEnforcedInHandler]
 public readonly record struct ApproveAccountSupportGrantCommand(Guid AccountSupportGrantId, string ApprovedBy) : IRequest;
 public class ApproveAccountSupportGrantCommandHandler(IAccountSupportGrantWriter writer) : IRequestHandler<ApproveAccountSupportGrantCommand>
 {
@@ -18,6 +21,9 @@ public class ApproveAccountSupportGrantCommandHandler(IAccountSupportGrantWriter
 }
 
 [Authorize(Resource = Resources.SupportGrants, Action = Actions.Delete)]
+// Enforcement: the reader/writer this handler delegates to extends AccountScopedDataAccess and
+// checks the loaded row's owning account (RequireAccountAccess) or filters on the caller's scope.
+[AccountScopeEnforcedInHandler]
 public readonly record struct RevokeAccountSupportGrantCommand(Guid AccountSupportGrantId, string RevokedBy) : IRequest;
 public class RevokeAccountSupportGrantCommandHandler(IAccountSupportGrantWriter writer) : IRequestHandler<RevokeAccountSupportGrantCommand>
 {

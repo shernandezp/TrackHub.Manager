@@ -58,6 +58,9 @@ public class UpdateDriverQualificationCommandValidator : AbstractValidator<Updat
 // Hard delete — the before-image survives in the audit trail (spec 09 §7.1).
 [Authorize(Resource = Resources.Drivers, Action = Actions.Delete)]
 [RequireFeature(FeatureKeys.Workforce)]
+// Enforcement: the reader/writer this handler delegates to extends AccountScopedDataAccess and
+// checks the loaded row's owning account (RequireAccountAccess) or filters on the caller's scope.
+[AccountScopeEnforcedInHandler]
 public readonly record struct DeleteDriverQualificationCommand(Guid DriverQualificationId) : IRequest;
 public class DeleteDriverQualificationCommandHandler(IDriverQualificationWriter writer) : IRequestHandler<DeleteDriverQualificationCommand>
 {

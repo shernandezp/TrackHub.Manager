@@ -61,6 +61,10 @@ builder.Services.AddHostedService<AlertEvaluationService>();
 builder.Services.AddHostedService<NotificationDigestService>();
 builder.Services.AddHostedService<DeliveryRetentionService>();
 
+// Platform-table retention: daily purge of aged background job runs (latest row per JobKey preserved
+// for the status page) and resolved alert events.
+builder.Services.AddHostedService<PlatformRetentionService>();
+
 // Add HealthChecks
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<ApplicationDbContext>();
